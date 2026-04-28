@@ -1,4 +1,4 @@
-function Controls() {
+function SpectrogramControls() {
     return (
         <div className="p-3 bg-[#82A062] flex rounded-xl items-center justify-center gap-3">
             <button className='bg-[#FEECBE] flex items-center justify-center font-display text-lg px-3 py-2 rounded-lg hover:bg-[#FFDE9E] cursor-pointer gap-2 h-fit'>
@@ -67,4 +67,4 @@ function Controls() {
     )
 }
 
-export default Controls
+export default SpectrogramControls

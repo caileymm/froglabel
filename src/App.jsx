@@ -1,6 +1,8 @@
 import './App.css'
 import Header from './components/Header'
-import Annotate from './components/Annotate'
+import BoundingBoxControls from './components/BoundingBoxControls'
+import Spectrogram from './components/Spectrogram'
+import SpectrogramControls from './components/SpectrogramControls'
 import Dataset from './components/Dataset'
 
 function App() {
@@ -8,9 +10,12 @@ function App() {
   return (
     <div>
       <Header />
-      <Annotate />
-      <Dataset />
-      
+      <div className='p-5 items-center'>
+        <BoundingBoxControls />
+        <Spectrogram />
+        <SpectrogramControls />
+        <Dataset />
+      </div> 
     </div>
   )
 }

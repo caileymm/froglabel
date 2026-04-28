@@ -1,6 +1,6 @@
 import play from '.././assets/play.png'
 
-function Waveform() {
+function BoundingBoxControls() {
   return (
     <div className='p-3 bg-[#82A062] rounded-xl h-20 flex items-center gap-2'>
       <button className='bg-[#CAE4EF] rounded-xl w-15 h-12 flex items-center justify-center hover:bg-[#B4D2EF] cursor-pointer flex-shrink-0'>
@@ -11,4 +11,4 @@ function Waveform() {
   )
 }
 
-export default Waveform
+export default BoundingBoxControls
