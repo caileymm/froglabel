@@ -1,70 +1,53 @@
 function SpectrogramControls() {
-    return (
-        <div className="p-3 bg-[#82A062] flex rounded-xl items-center justify-center gap-3">
-            <button className='bg-[#FEECBE] flex items-center justify-center font-display text-lg px-3 py-2 rounded-lg hover:bg-[#FFDE9E] cursor-pointer gap-2 h-fit'>
-                Pan Left
-                <div className='bg-[#1E1E1E] text-white font-display px-2 rounded-lg'>
-                A
-                </div>
-            </button>
-
-            <button className='bg-[#FEECBE] flex items-center justify-center font-display text-lg px-3 py-2 rounded-lg hover:bg-[#FFDE9E] cursor-pointer gap-2 h-fit'>
-                Pan Right
-                <div className='bg-[#1E1E1E] text-white font-display px-2 rounded-lg'>
-                D
-                </div>
-            </button>
-
-            <button className='bg-[#FEECBE] flex items-center justify-center font-display text-lg px-3 py-2 rounded-lg hover:bg-[#FFDE9E] cursor-pointer gap-2 h-fit'>
-                Pan Up
-                <div className='bg-[#1E1E1E] text-white font-display px-2 rounded-lg'>
-                W
-                </div>
-            </button>
-
-            <button className='bg-[#FEECBE] flex items-center justify-center font-display text-lg px-3 py-2 rounded-lg hover:bg-[#FFDE9E] cursor-pointer gap-2 h-fit'>
-                Pan Down
-                <div className='bg-[#1E1E1E] text-white font-display px-2 rounded-lg'>
-                D
-                </div>
-            </button>
-
-            <button className='bg-[#FEECBE] flex items-center justify-center font-display text-lg px-3 py-2 rounded-lg hover:bg-[#FFDE9E] cursor-pointer gap-2 h-fit'>
-                Zoom In (X)
-                <div className='bg-[#1E1E1E] text-white font-display px-2 rounded-lg'>
-                Q
-                </div>
-            </button>
-
-            <button className='bg-[#FEECBE] flex items-center justify-center font-display text-lg px-3 py-2 rounded-lg hover:bg-[#FFDE9E] cursor-pointer gap-2 h-fit'>
-                Zoom Out (X)
-                <div className='bg-[#1E1E1E] text-white font-display px-2 rounded-lg'>
-                E
-                </div>
-            </button>
-
-            <button className='bg-[#FEECBE] flex items-center justify-center font-display text-lg px-3 py-2 rounded-lg hover:bg-[#FFDE9E] cursor-pointer gap-2 h-fit'>
-                Zoom In (Y)
-                <div className='bg-[#1E1E1E] text-white font-display px-2 rounded-lg'>
-                R
-                </div>
-            </button>
-
-            <button className='bg-[#FEECBE] flex items-center justify-center font-display text-lg px-3 py-2 rounded-lg hover:bg-[#FFDE9E] cursor-pointer gap-2 h-fit'>
-                Zoom Out (Y)
-                <div className='bg-[#1E1E1E] text-white font-display px-2 rounded-lg'>
-                F
-                </div>
-            </button>
-
-            <button className='bg-[#FEECBE] flex items-center justify-center font-display text-lg px-3 py-2 rounded-lg hover:bg-[#FFDE9E] cursor-pointer gap-2 h-fit'>
-                Reset View
-                <div className='bg-[#1E1E1E] text-white font-display px-2 rounded-lg'>
-                Esc
-                </div>
-            </button>
-        </div>
-    )
+  return (
+    <div className='p-2 bg-[#82A062] rounded-xl flex items-center justify-center gap-2'>
+      <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-2'>
+        <button className='px-2 py-1.5 text-sm bg-[#CAE4EF] rounded-md font-display whitespace-nowrap hover:bg-[#B4D2EF] cursor-pointer flex items-center gap-1'>
+          Play Audio
+          <div className='bg-[#1E1E1E] text-white text-sm font-display px-2 rounded-md'>Space</div>
+        </button>
+      </div>
+      <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
+        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+          Pan Left
+          <div className='bg-[#1E1E1E] text-white text-sm font-display px-2 rounded-md'>A</div>
+        </button>
+        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+          Pan Right
+          <div className='bg-[#1E1E1E] text-white text-sm font-display px-2 rounded-md'>D</div>
+        </button>
+        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+          Pan Up
+          <div className='bg-[#1E1E1E] text-white text-sm font-display px-2 rounded-md'>W</div>
+        </button>
+        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+          Pan Down
+          <div className='bg-[#1E1E1E] text-white text-sm font-display px-2 rounded-md'>S</div>
+        </button>
+      </div>
+      <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
+        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+          Zoom In (X)
+          <div className='bg-[#1E1E1E] text-white text-sm font-display px-2 rounded-md'>Q</div>
+        </button>
+        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+          Zoom Out (X)
+          <div className='bg-[#1E1E1E] text-white text-sm font-display px-2 rounded-md'>E</div>
+        </button>
+        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+          Zoom In (Y)
+          <div className='bg-[#1E1E1E] text-white text-sm font-display px-2 rounded-md'>R</div>
+        </button>
+        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+          Zoom Out (Y)
+          <div className='bg-[#1E1E1E] text-white text-sm font-display px-2 rounded-md'>F</div>
+        </button>
+        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+          Reset View
+          <div className='bg-[#1E1E1E] text-white text-sm font-display px-2 rounded-md'>C</div>
+        </button>
+      </div>
+    </div>
+  )
 }
-
 export default SpectrogramControls
