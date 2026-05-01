@@ -144,7 +144,7 @@ function WaveformSpectrogram() {
                 height: SPECTROGRAM_HEIGHT,
                 imageRendering: 'pixelated' 
             }}
-            />
+          />
         </div>
       </div>
     </div>

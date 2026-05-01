@@ -12,7 +12,7 @@ function App() {
  return (
    <div>
      <Header />
-     <div className='px-5 py-2 items-center'>
+     <div className='px-5 py-2 flex-column items-center justify-center'>
        <BoundingBoxControls/>
        <WaveformSpectrogram/>
        <SpectrogramControls/>
