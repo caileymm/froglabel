@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import audioSrc from "../assets/frogsounds.mp3";
+import BoundingBoxLayer from "./BoundingBoxLayer";
 
 // CONFIG - Lower HOP_SIZE = Wider Scroll
 const HOP_SIZE = 256;
@@ -124,7 +125,7 @@ function WaveformSpectrogram() {
 
   return (
     <div className="bg-[#82A062] p-6 rounded-xl my-2">
-      <div className="overflow-x-auto rounded-xl">
+      <div className="overflow-x-auto">
         <div 
           className="flex flex-col gap-1" 
           style={{ width: dynamicWidth }}
@@ -137,14 +138,18 @@ function WaveformSpectrogram() {
           />
 
           {/* Spectrogram Canvas */}
-          <canvas
-            ref={spectroRef}
-            className="rounded-lg image-pixelated w-full"
-            style={{ 
-                height: SPECTROGRAM_HEIGHT,
-                imageRendering: 'pixelated' 
-            }}
-          />
+          <BoundingBoxLayer>
+            <div className='relative w-full'>
+              <canvas
+                ref={spectroRef}
+                className="image-pixelated w-full"
+                style={{ 
+                    height: SPECTROGRAM_HEIGHT,
+                    imageRendering: 'pixelated'
+                }}
+              />
+            </div>
+          </BoundingBoxLayer>
         </div>
       </div>
     </div>
