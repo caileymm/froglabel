@@ -66,7 +66,7 @@ self.onmessage = function(e) {
 };
 `;
 
-function WaveformSpectrogram({ zoomX, zoomY }) {
+function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox }{ zoomX, zoomY }) {
   const [data, setData] = useState(null);
   const waveformRef = useRef(null);
   const spectroRef = useRef(null);

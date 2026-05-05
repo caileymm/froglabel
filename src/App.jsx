@@ -9,14 +9,30 @@ import { useState } from 'react'  // ← add this
 
 
 function App() {
+  const [boxes, setBoxes] = useState([]);
+  const [code, setCode] = useState('');
+  const [currSelectedBox, setCurrSelectedBox] = useState(-1);
   const [zoomX, setZoomX] = useState(1);
   const [zoomY, setZoomY] = useState(1);
  return (
    <div>
      <Header />
      <div className='px-5 py-2 flex-column items-center justify-center'>
-       <BoundingBoxControls/>
-       <WaveformSpectrogram zoomX={zoomX} zoomY={zoomY} />
+       <BoundingBoxControls 
+        code={code}
+        setCode={setCode}
+        boxes={boxes}
+        setBoxes={setBoxes}
+        currSelectedBox={currSelectedBox}
+        setCurrSelectedBox={setCurrSelectedBox}
+        />
+       <WaveformSpectrogram zoomX={zoomX} zoomY={zoomY} 
+        code={code}
+        boxes={boxes}
+        setBoxes={setBoxes}
+        currSelectedBox={currSelectedBox}
+        setCurrSelectedBox={setCurrSelectedBox}
+        />
        <SpectrogramControls zoomX={zoomX} setZoomX={setZoomX} zoomY={zoomY} setZoomY={setZoomY} />
        <Dataset />
      </div>
