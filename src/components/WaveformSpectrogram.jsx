@@ -69,7 +69,7 @@ self.onmessage = function(e) {
 };
 `;
 
-function WaveformSpectrogram() {
+function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox }) {
   const [data, setData] = useState(null);
   const waveformRef = useRef(null);
   const spectroRef = useRef(null);
@@ -138,11 +138,17 @@ function WaveformSpectrogram() {
           />
 
           {/* Spectrogram Canvas */}
-          <BoundingBoxLayer>
-            <div className='relative w-full'>
+          <BoundingBoxLayer 
+            code={code}
+            boxes={boxes}
+            setBoxes={setBoxes}
+            currSelectedBox={currSelectedBox}
+            setCurrSelectedBox={setCurrSelectedBox}
+            >
+            <div className='relative w-full pointer-events-none'>
               <canvas
                 ref={spectroRef}
-                className="image-pixelated w-full"
+                className='image-pixelated w-full pointer-events-none'
                 style={{ 
                     height: SPECTROGRAM_HEIGHT,
                     imageRendering: 'pixelated'
