@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, scrollRef } from 'react';
 
-function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY}) {
+function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY, scrollRef, isPlaying, togglePlayPause }) {
   
   const ZOOM_STEP = 0.15;
   const MIN_ZOOM = 0.2;
@@ -18,7 +18,8 @@ function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY}) {
   const [isCPressed, setIsCPressed] = useState(false);
  
 
-  const handlePlayAudio = () => console.log("Play Audio");
+  const handlePlayAudio = () => togglePlayPause();
+
   
   const handlePanLeft = useCallback(() => {
     if (scrollRef.current) scrollRef.current.scrollLeft -= 50;
@@ -88,8 +89,9 @@ function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY}) {
     <div className='p-2 bg-[#82A062] rounded-xl flex items-center justify-center gap-2'>
       <button onClick={handlePlayAudio} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
         ${isVPressed ? 'bg-[#B4D2EF]' : 'bg-[#CAE4EF] hover:bg-[#B4D2EF]'}`}>
-        Play Audio
-        <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>V</div>
+          Play Audio
+          {isPlaying ? 'Pause Audio' : 'Play Audio'}
+          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>V</div>
       </button>
 
       <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
