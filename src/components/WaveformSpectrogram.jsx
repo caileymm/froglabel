@@ -118,14 +118,70 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
     return () => worker.terminate();
   }, [data]);
 
-
-
-
-
   const naturalWidth = data ? Math.floor(data.length / HOP_SIZE) : 0;
+
+  const xAxisRef = useRef(null);
+  const yAxisRef = useRef(null);
+
+
+  // Draw X axis (updates when zoomX changes or scroll changes)
+  const drawXAxis = useCallback(() => {
+    if (!data || !xAxisRef.current) return;
+    const sampleRate = 44100;
+    const totalFrames = Math.floor(data.length / HOP_SIZE);
+    const totalDuration = data.length / sampleRate;
+    const canvas = xAxisRef.current;
+    const visibleWidth = scrollRef.current?.clientWidth || 800;
+    const scrollLeft = scrollRef.current?.scrollLeft || 0;
+
+    canvas.width = naturalWidth * zoomX;
+    canvas.height = 30;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff00';
+    ctx.fillRect(0, 0, canvas.width, 24);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(canvas.width, 0);
+    ctx.stroke();
+
+    ctx.fillStyle = '#000000';
+    ctx.font = '15px monospace';
+    ctx.textAlign = 'center';
+
+    const numLabels = Math.floor(canvas.width / 85);
+    for (let i = 0; i <= numLabels; i++) {
+      const x = (i / numLabels) * canvas.width;
+      const time = (i / numLabels) * totalDuration;
+      const label = `${time.toFixed(1)}s`;
+      ctx.fillText(label, x, 20);
+      ctx.lineWidth = 3; 
+      ctx.strokeStyle = '#000000';
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 9);
+      ctx.stroke();
+    }
+  }, [data, zoomX, naturalWidth]);
+
+  useEffect(() => {
+    drawXAxis();
+  }, [drawXAxis]);
+
+  // Redraw X axis on scroll too
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', drawXAxis);
+    return () => el.removeEventListener('scroll', drawXAxis);
+  }, [drawXAxis, scrollRef]);
+
+
 
   return (
     <div className="bg-[#82A062] p-6 rounded-xl my-2">
+
 
       {/* Outer scroll container */}
       <div ref={scrollRef} className="overflow-auto rounded-lg" style={{ maxHeight: "600px" }}>
@@ -157,7 +213,7 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
               style={{ width: naturalWidth, height: WAVEFORM_HEIGHT, display: "block" }}
             />
           </div>
-
+    
           {/* Spectrogram */}
           <div
             style={{
@@ -188,10 +244,16 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
               />
               </div>
             </BoundingBoxLayer>
+
           </div>
         </div>
       </div>
-    </div>
+      {/* X Axis */}
+        <div className="overflow-hidden" style={{ width: '100%' }}>
+          <canvas ref={xAxisRef} style={{ height: 24, display: 'block' }} />
+        </div>
+      </div>
+      
   );
 }
 

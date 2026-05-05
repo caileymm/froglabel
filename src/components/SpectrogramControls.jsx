@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, scrollRef } from 'react';
 
-function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY, scrollRef }) {
+function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY}) {
   
   const ZOOM_STEP = 0.15;
   const MIN_ZOOM = 0.2;
