@@ -4,7 +4,7 @@ import BoundingBoxControls from './components/BoundingBoxControls'
 import WaveformSpectrogram from './components/WaveformSpectrogram'
 import SpectrogramControls from './components/SpectrogramControls'
 import Dataset from './components/Dataset'
-import { useState, useRef } from 'react' 
+import { useState, useRef, useCallback } from 'react' 
 import audioSrc from './assets/frogsounds.mp3';
 
 
@@ -20,10 +20,9 @@ function App() {
   const scrollRef = useRef(null);
   const audioRef = useRef(null);
 
-  const togglePlayPause = async () => {
+  const togglePlayPause = useCallback(async () => {
     const audio = audioRef.current;
     if (!audio) return;
-
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
@@ -35,7 +34,7 @@ function App() {
         console.error('Playback failed:', err);
       }
     }
-  };
+  }, [isPlaying]);
 
  return (
    <div>

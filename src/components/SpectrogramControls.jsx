@@ -79,17 +79,13 @@ function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY, scrollRef, isPl
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
-
-
+  }, [handlePlayAudio, togglePlayPause, handlePanLeft, handlePanRight, handleZoomInX, handleZoomOutX, handleResetView]);
   
-  
-
   return (
     <div className='p-2 bg-[#82A062] rounded-xl flex items-center justify-center gap-2'>
       <button onClick={handlePlayAudio} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
         ${isVPressed ? 'bg-[#B4D2EF]' : 'bg-[#CAE4EF] hover:bg-[#B4D2EF]'}`}>
-          Play Audio
+          
           {isPlaying ? 'Pause Audio' : 'Play Audio'}
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>V</div>
       </button>
