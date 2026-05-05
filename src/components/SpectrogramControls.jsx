@@ -1,51 +1,123 @@
+import { useState, useEffect } from 'react';
+
 function SpectrogramControls() {
+  const [isVPressed, setIsVPressed] = useState(false);
+  const [isAPressed, setIsAPressed] = useState(false);
+  const [isDPressed, setIsDPressed] = useState(false);
+  const [isWPressed, setIsWPressed] = useState(false);
+  const [isSPressed, setIsSPressed] = useState(false);
+  const [isQPressed, setIsQPressed] = useState(false);
+  const [isEPressed, setIsEPressed] = useState(false);
+  const [isRPressed, setIsRPressed] = useState(false);
+  const [isFPressed, setIsFPressed] = useState(false);
+  const [isCPressed, setIsCPressed] = useState(false);
+
+  const handlePlayAudio = () => console.log("Play Audio");
+  const handlePanLeft = () => console.log("Pan Left");
+  const handlePanRight = () => console.log("Pan Right");
+  const handlePanUp = () => console.log("Pan Up");
+  const handlePanDown = () => console.log("Pan Down");
+  const handleZoomInX = () => console.log("Zoom In X");
+  const handleZoomOutX = () => console.log("Zoom Out X");
+  const handleZoomInY = () => console.log("Zoom In Y");
+  const handleZoomOutY = () => console.log("Zoom Out Y");
+  const handleResetView = () => console.log("Reset View");
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'v') { setIsVPressed(true); handlePlayAudio(); }
+      if (e.key === 'a') { setIsAPressed(true); handlePanLeft(); }
+      if (e.key === 'd') { setIsDPressed(true); handlePanRight(); }
+      if (e.key === 'w') { setIsWPressed(true); handlePanUp(); }
+      if (e.key === 's') { setIsSPressed(true); handlePanDown(); }
+      if (e.key === 'q') { setIsQPressed(true); handleZoomInX(); }
+      if (e.key === 'e') { setIsEPressed(true); handleZoomOutX(); }
+      if (e.key === 'r') { setIsRPressed(true); handleZoomInY(); }
+      if (e.key === 'f') { setIsFPressed(true); handleZoomOutY(); }
+      if (e.key === 'c') { setIsCPressed(true); handleResetView(); }
+    };
+
+    const handleKeyUp = (e) => {
+      if (e.key === 'v') setIsVPressed(false);
+      if (e.key === 'a') setIsAPressed(false);
+      if (e.key === 'd') setIsDPressed(false);
+      if (e.key === 'w') setIsWPressed(false);
+      if (e.key === 's') setIsSPressed(false);
+      if (e.key === 'q') setIsQPressed(false);
+      if (e.key === 'e') setIsEPressed(false);
+      if (e.key === 'r') setIsRPressed(false);
+      if (e.key === 'f') setIsFPressed(false);
+      if (e.key === 'c') setIsCPressed(false);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
   return (
     <div className='p-2 bg-[#82A062] rounded-xl flex items-center justify-center gap-2'>
-      <button className='px-2 py-1.5 text-sm bg-[#CAE4EF] rounded-md font-display whitespace-nowrap hover:bg-[#B4D2EF] cursor-pointer flex items-center gap-1'>
-          Play Audio
-        <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>Shift</div>
+      <button onClick={handlePlayAudio} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+        ${isVPressed ? 'bg-[#B4D2EF]' : 'bg-[#CAE4EF] hover:bg-[#B4D2EF]'}`}>
+        Play Audio
+        <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>V</div>
       </button>
+
       <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
-        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+        <button onClick={handlePanLeft} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+          ${isAPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Pan Left
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>A</div>
         </button>
-        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+        <button onClick={handlePanRight} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+          ${isDPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Pan Right
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>D</div>
         </button>
-        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+        <button onClick={handlePanUp} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+          ${isWPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Pan Up
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>W</div>
         </button>
-        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+        <button onClick={handlePanDown} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+          ${isSPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Pan Down
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>S</div>
         </button>
       </div>
+
       <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
-        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+        <button onClick={handleZoomInX} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+          ${isQPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Zoom In (X)
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>Q</div>
         </button>
-        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+        <button onClick={handleZoomOutX} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+          ${isEPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Zoom Out (X)
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>E</div>
         </button>
-        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+        <button onClick={handleZoomInY} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+          ${isRPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Zoom In (Y)
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>R</div>
         </button>
-        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+        <button onClick={handleZoomOutY} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+          ${isFPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Zoom Out (Y)
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>F</div>
         </button>
-        <button className='px-2 py-1.5 text-sm bg-[#FEECBE] rounded-md font-display whitespace-nowrap hover:bg-[#FFDE9E] cursor-pointer flex items-center gap-1'>
+        <button onClick={handleResetView} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+          ${isCPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Reset View
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>C</div>
         </button>
       </div>
     </div>
-  )
+  );
 }
-export default SpectrogramControls
+
+export default SpectrogramControls;
