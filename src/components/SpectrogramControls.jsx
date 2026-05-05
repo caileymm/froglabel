@@ -1,6 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-function SpectrogramControls() {
+function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY }) {
+  
+  const ZOOM_STEP = 0.15;
+  const MIN_ZOOM = 0.2;
+  const MAX_ZOOM = 5;
+
   const [isVPressed, setIsVPressed] = useState(false);
   const [isAPressed, setIsAPressed] = useState(false);
   const [isDPressed, setIsDPressed] = useState(false);
@@ -11,17 +16,27 @@ function SpectrogramControls() {
   const [isRPressed, setIsRPressed] = useState(false);
   const [isFPressed, setIsFPressed] = useState(false);
   const [isCPressed, setIsCPressed] = useState(false);
+ 
 
   const handlePlayAudio = () => console.log("Play Audio");
   const handlePanLeft = () => console.log("Pan Left");
   const handlePanRight = () => console.log("Pan Right");
   const handlePanUp = () => console.log("Pan Up");
   const handlePanDown = () => console.log("Pan Down");
-  const handleZoomInX = () => console.log("Zoom In X");
-  const handleZoomOutX = () => console.log("Zoom Out X");
-  const handleZoomInY = () => console.log("Zoom In Y");
-  const handleZoomOutY = () => console.log("Zoom Out Y");
-  const handleResetView = () => console.log("Reset View");
+  // Keyboard zoom handler
+    const handleZoomInX = useCallback(() => {
+          setZoomX((z) => Math.min(MAX_ZOOM, parseFloat((z + ZOOM_STEP).toFixed(2))));
+      }, [])
+    const handleZoomOutX = useCallback(() => {
+          setZoomX((z) => Math.max(MIN_ZOOM, parseFloat((z - ZOOM_STEP).toFixed(2))));
+      }, [])
+    const handleZoomInY = () => console.log("Y zoom in");
+    const handleZoomOutY = () => console.log("Y zoom out");
+      
+    const handleResetView = useCallback(() => {
+      setZoomX(1);
+      setZoomY(1);
+    }, []);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -57,6 +72,10 @@ function SpectrogramControls() {
       window.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
+
+
+  
+  
 
   return (
     <div className='p-2 bg-[#82A062] rounded-xl flex items-center justify-center gap-2'>

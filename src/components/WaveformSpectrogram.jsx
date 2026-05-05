@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import audioSrc from "../assets/frogsounds.mp3";
 import BoundingBoxLayer from "./BoundingBoxLayer";
 
@@ -13,8 +13,7 @@ class ComplexNumber {
   add(other) { return new ComplexNumber(this.re + other.re, this.im + other.im); }
   subtract(other) { return new ComplexNumber(this.re - other.re, this.im - other.im); }
   multiply(other) {
-    return new ComplexNumber(this.re * other.re - this.im * other.im, this.re * other.im + this.im * other.re
-    );
+    return new ComplexNumber(this.re * other.re - this.im * other.im, this.re * other.im + this.im * other.re);
   }
 }
 class DFT {
@@ -47,12 +46,10 @@ self.onmessage = function(e) {
   const numFrames = Math.floor(channelData.length / hopSize);
   const freqBins = fftSize / 2;
   const pixels = new Uint8ClampedArray(numFrames * freqBins * 4);
-  
   for (let f = 0; f < numFrames; f++) {
     const offset = f * hopSize;
     const frame = channelData.slice(offset, offset + fftSize);
     const spectrum = dft.computeDFT(frame);
-    
     for (let b = 0; b < freqBins; b++) {
       const val = spectrum[b] || 0;
       const db = 20 * Math.log10(val + 1e-10);
@@ -69,10 +66,11 @@ self.onmessage = function(e) {
 };
 `;
 
-function WaveformSpectrogram() {
+function WaveformSpectrogram({ zoomX, zoomY }) {
   const [data, setData] = useState(null);
   const waveformRef = useRef(null);
   const spectroRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     fetch(audioSrc)
@@ -109,9 +107,7 @@ function WaveformSpectrogram() {
 
     const blob = new Blob([workerCode], { type: "application/javascript" });
     const worker = new Worker(URL.createObjectURL(blob));
-
     worker.postMessage({ channelData: data, fftSize, hopSize: HOP_SIZE });
-
     worker.onmessage = (e) => {
       const { pixels, numFrames, freqBins } = e.data;
       sCtx.putImageData(new ImageData(pixels, numFrames, freqBins), 0, 0);
@@ -121,35 +117,72 @@ function WaveformSpectrogram() {
     return () => worker.terminate();
   }, [data]);
 
-  const dynamicWidth = data ? Math.floor(data.length / HOP_SIZE) : "100%";
+
+
+
+
+  const naturalWidth = data ? Math.floor(data.length / HOP_SIZE) : 0;
 
   return (
     <div className="bg-[#82A062] p-6 rounded-xl my-2">
-      <div className="overflow-x-auto">
-        <div 
-          className="flex flex-col gap-1" 
-          style={{ width: dynamicWidth }}
-        >
-          {/* Waveform Canvas */}
-          <canvas
-            ref={waveformRef}
-            className="rounded-lg"
-            style={{ height: WAVEFORM_HEIGHT }}
-          />
 
-          {/* Spectrogram Canvas */}
-          <BoundingBoxLayer>
-            <div className='relative w-full'>
-              <canvas
-                ref={spectroRef}
-                className="image-pixelated w-full"
-                style={{ 
+      {/* Outer scroll container */}
+      <div className="overflow-auto rounded-lg" style={{ maxHeight: "600px" }}>
+        {/* Inner container sized to zoomed dimensions */}
+        <div
+          ref={containerRef}
+          style={{
+            width: naturalWidth * zoomX,
+            // Height accounts for both canvases + gap
+            height: (WAVEFORM_HEIGHT + SPECTROGRAM_HEIGHT + 4) * zoomY,
+            position: "relative",
+          }}
+        >
+          {/* Waveform */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: naturalWidth,
+              height: WAVEFORM_HEIGHT,
+              transformOrigin: "top left",
+              transform: `scale(${zoomX}, ${zoomY})`,
+            }}
+          >
+            <canvas
+              ref={waveformRef}
+              className="rounded-lg"
+              style={{ width: naturalWidth, height: WAVEFORM_HEIGHT, display: "block" }}
+            />
+          </div>
+
+          {/* Spectrogram */}
+          <div
+            style={{
+              position: "absolute",
+              top: WAVEFORM_HEIGHT * zoomY + 4,
+              left: 0,
+              width: naturalWidth,
+              height: SPECTROGRAM_HEIGHT,
+              transformOrigin: "top left",
+              transform: `scale(${zoomX}, ${zoomY})`,
+            }}
+          >
+            <BoundingBoxLayer>
+              <div className="relative w-full">
+                <canvas
+                  ref={spectroRef}
+                  style={{
+                    width: naturalWidth,
                     height: SPECTROGRAM_HEIGHT,
-                    imageRendering: 'pixelated'
-                }}
-              />
-            </div>
-          </BoundingBoxLayer>
+                    imageRendering: "pixelated",
+                    display: "block",
+                  }}
+                />
+              </div>
+            </BoundingBoxLayer>
+          </div>
         </div>
       </div>
     </div>
