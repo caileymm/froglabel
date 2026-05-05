@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY }) {
+function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY, scrollRef }) {
   
   const ZOOM_STEP = 0.15;
   const MIN_ZOOM = 0.2;
@@ -19,8 +19,15 @@ function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY }) {
  
 
   const handlePlayAudio = () => console.log("Play Audio");
-  const handlePanLeft = () => console.log("Pan Left");
-  const handlePanRight = () => console.log("Pan Right");
+  
+  const handlePanLeft = useCallback(() => {
+    if (scrollRef.current) scrollRef.current.scrollLeft -= 50;
+  }, [scrollRef]);
+
+  const handlePanRight = useCallback(() => {
+    if (scrollRef.current) scrollRef.current.scrollLeft += 50;
+  }, [scrollRef]);
+
   const handlePanUp = () => console.log("Pan Up");
   const handlePanDown = () => console.log("Pan Down");
   // Keyboard zoom handler

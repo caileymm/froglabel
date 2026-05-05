@@ -66,11 +66,12 @@ self.onmessage = function(e) {
 };
 `;
 
-function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, zoomX, zoomY }) {
+function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, zoomX, zoomY, scrollRef }) {
   const [data, setData] = useState(null);
   const waveformRef = useRef(null);
   const spectroRef = useRef(null);
   const containerRef = useRef(null);
+
 
   useEffect(() => {
     fetch(audioSrc)
@@ -127,7 +128,7 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
     <div className="bg-[#82A062] p-6 rounded-xl my-2">
 
       {/* Outer scroll container */}
-      <div className="overflow-auto rounded-lg" style={{ maxHeight: "600px" }}>
+      <div ref={scrollRef} className="overflow-auto rounded-lg" style={{ maxHeight: "600px" }}>
         {/* Inner container sized to zoomed dimensions */}
         <div
           ref={containerRef}

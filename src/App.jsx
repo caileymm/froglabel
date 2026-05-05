@@ -4,7 +4,7 @@ import BoundingBoxControls from './components/BoundingBoxControls'
 import WaveformSpectrogram from './components/WaveformSpectrogram'
 import SpectrogramControls from './components/SpectrogramControls'
 import Dataset from './components/Dataset'
-import { useState } from 'react' 
+import { useState, useRef } from 'react' 
 
 
 
@@ -14,6 +14,7 @@ function App() {
   const [currSelectedBox, setCurrSelectedBox] = useState(-1);
   const [zoomX, setZoomX] = useState(1);
   const [zoomY, setZoomY] = useState(1);
+  const scrollRef = useRef(null);
  return (
    <div>
      <Header />
@@ -26,14 +27,14 @@ function App() {
         currSelectedBox={currSelectedBox}
         setCurrSelectedBox={setCurrSelectedBox}
         />
-       <WaveformSpectrogram zoomX={zoomX} zoomY={zoomY} 
+       <WaveformSpectrogram zoomX={zoomX} zoomY={zoomY} scrollRef={scrollRef}
         code={code}
         boxes={boxes}
         setBoxes={setBoxes}
         currSelectedBox={currSelectedBox}
         setCurrSelectedBox={setCurrSelectedBox}
         />
-       <SpectrogramControls zoomX={zoomX} setZoomX={setZoomX} zoomY={zoomY} setZoomY={setZoomY} />
+       <SpectrogramControls zoomX={zoomX} setZoomX={setZoomX} zoomY={zoomY} setZoomY={setZoomY} scrollRef={scrollRef} />
        <Dataset />
      </div>
    </div>
