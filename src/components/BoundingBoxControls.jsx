@@ -87,7 +87,7 @@ function BoundingBoxControls({ code, setCode, boxes, setBoxes, currSelectedBox, 
   }, []);
 
   return (
-    <div className='p-2 bg-[#82A062] rounded-xl flex items-center justify-center gap-2'>
+    <div className='flex items-center justify-center gap-2 flex-wrap'>
       <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
         <button onClick={handleSetCode} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1 
           ${isSpacePressed ? 'bg-[#FFDE9E]': 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
