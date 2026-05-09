@@ -34,7 +34,7 @@ function App() {
         console.error('Playback failed:', err);
       }
     }
-  }, [isPlaying]);
+  }, [isPlaying]); // only creates a new function when isPlaying changes
 
  return (
    <div>
