@@ -7,46 +7,18 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Dependencies
-node_modules
-
-# Build output
-dist
-dist-ssr
-
-# Environment variables
-.env
-.env.local
-.env.production
-.env.development.local
-.env.test.local
-.env.production.local
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
 # OS files
-Thumbs.db
+.DS_Store          # Mac
+Thumbs.db          # Windows
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
 
 # Testing
 coverage/
 
-# Cache
+# Misc
 .cache/
 .parcel-cache/
-
-# Large audio/media files
-*.wav
-*.mp3
-*.mp4
-*.ogg
-*.flac
