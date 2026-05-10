@@ -89,10 +89,10 @@ function BoundingBoxControls({ code, setCode, boxes, setBoxes, currSelectedBox, 
   return (
     <div className='flex items-center justify-center gap-2 flex-wrap'>
       <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
-        <button onClick={handleSetCode} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1 
+        <button onClick={handleSetCode} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1 
           ${isSpacePressed ? 'bg-[#FFDE9E]': 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Set Code
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>Space</div>
+          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Space</div>
         </button>
         +
         <input 
@@ -102,49 +102,49 @@ function BoundingBoxControls({ code, setCode, boxes, setBoxes, currSelectedBox, 
           onKeyDown={(e) => e.stopPropagation()}
           placeholder='Code'
           maxLength={3}
-          className='w-15 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9] uppercase'/>
+          className='w-15 px-2 py-1.5 text-xs bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9] uppercase'/>
       </div>
 
       <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
-        <button onClick={handleSelectBox} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+        <button onClick={handleSelectBox} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
           ${isTabPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Select Box
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>Tab</div>
+          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Tab</div>
         </button>
 
-        <button onClick={handlePlayBoxAudio} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+        <button onClick={handlePlayBoxAudio} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
           ${isShiftVPressed ? 'bg-[#B4D2EF]' : 'bg-[#CAE4EF] hover:bg-[#B4D2EF]'}`}>
           Play Box Audio
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>Shift</div>
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>V</div>
+          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Shift</div>
+          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>V</div>
         </button>
 
-        <button onClick={handleDeleteBox} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+        <button onClick={handleDeleteBox} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
           ${isShiftDPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Delete Box
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>Shift</div>
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>D</div>
+          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Shift</div>
+          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>D</div>
         </button>
 
-        <button onClick={handleDeselectBox} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+        <button onClick={handleDeselectBox} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
           ${isEscPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Deselect Box
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>Esc</div>
+          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Esc</div>
         </button>
       </div>
       
       {/*
       <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
-        <button onClick={handleUndo} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+        <button onClick={handleUndo} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
           ${isZPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Undo
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>Z</div>
+          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Z</div>
         </button>
 
-        <button onClick={handleRedo} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+        <button onClick={handleRedo} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
           ${isXPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Redo
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>X</div>
+          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>X</div>
         </button>
       </div>
       */}

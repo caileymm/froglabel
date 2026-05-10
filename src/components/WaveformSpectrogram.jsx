@@ -331,6 +331,7 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
         currSelectedBox={currSelectedBox}
         setCurrSelectedBox={setCurrSelectedBox}
       >
+    <div className="bg-[#82A062] p-5 rounded-xl my-2">
 
         {/* Shared coordinate system */}
         <div className="relative w-full">
