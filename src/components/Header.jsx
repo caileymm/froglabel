@@ -2,7 +2,7 @@ import frogIdLogo from '.././assets/frog_id_logo.png'
 
 function Header() {
     return (
-        <div className='w-full h-15 bg-[#1E1E1E] flex items-center justify-between p-5'>
+        <div className='w-full h-15 bg-[#1E1E1E] flex items-center justify-between p-2'>
             <div className='w-[100px] flex items-center'>
                 <a href='https://www.frogid.net.au' target='_blank' rel='noreferrer'>
                     <img src={frogIdLogo} alt='frogid logo' className='w-[35px] h-[40px]' />
