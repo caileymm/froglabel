@@ -12,12 +12,14 @@ function App() {
   const [boxes, setBoxes] = useState([]);
   const [code, setCode] = useState('');
   const [currSelectedBox, setCurrSelectedBox] = useState(-1);
+  const [zoomX, setZoomX] = useState(1);
+  const [zoomY, setZoomY] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showLeftPanel, setShowLeftPanel] = useState(false);
   const [rightPanel, setRightPanel] = useState(null); // null | 2 | 3
   const [showDataset, setShowDataset] = useState(false);
 
-  // Ref to wavesurfer instance, set by WaveformSpectrogram via callback
+  const scrollRef = useRef(null);
   const wavesurferRef = useRef(null);
 
   const togglePlayPause = useCallback(() => {
@@ -74,19 +76,15 @@ function App() {
 
           {/* Waveform + Spectrogram */}
           <div className='flex-1 min-h-0 overflow-y-auto'>
-            <WaveformSpectrogram
+            <WaveformSpectrogram 
+              zoomX={zoomX} 
+              zoomY={zoomY} 
+              scrollRef={scrollRef}
               code={code}
               boxes={boxes}
               setBoxes={setBoxes}
               currSelectedBox={currSelectedBox}
               setCurrSelectedBox={setCurrSelectedBox}
-              compact={showDataset}
-              onWavesurferReady={(ws) => {
-                wavesurferRef.current = ws;
-                ws.on('play', () => setIsPlaying(true));
-                ws.on('pause', () => setIsPlaying(false));
-                ws.on('finish', () => setIsPlaying(false));
-              }}
             />
             <Tools />
           </div>
