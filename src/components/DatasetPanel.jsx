@@ -1,13 +1,9 @@
-function Dataset() {
+function DatasetPanel() {
     return (
         // Changed flex-column to flex-col and added w-full
-        <div className='flex flex-col items-center justify-center w-full my-5'>
-            
-            <div className='font-display text-2xl flex items-center justify-center'>
-                Dataset
-            </div>
+        <div className='flex flex-col items-center justify-center w-full'>
 
-            <div className='border-[#82A062] border-2 rounded-xl flex items-center justify-center w-[80%] mx-auto p-3 my-2'>
+            <div className='bg-[#F3F3E4] rounded-xl flex items-center justify-center w-[80%] mx-auto p-3 my-2'>
                 <div className='font-display text-md flex items-center justify-center space-x-10'>
                     <div> # </div>
                     <div> Code </div>
@@ -27,4 +23,4 @@ function Dataset() {
     )
 }
 
-export default Dataset;
+export default DatasetPanel;
