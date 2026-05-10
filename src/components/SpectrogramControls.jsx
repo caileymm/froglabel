@@ -82,7 +82,7 @@ function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY, scrollRef, isPl
   }, [handlePlayAudio, togglePlayPause, handlePanLeft, handlePanRight, handleZoomInX, handleZoomOutX, handleResetView]);
   
   return (
-    <div className='p-2 bg-[#82A062] rounded-xl flex items-center justify-center gap-2'>
+    <div className='flex items-center justify-center gap-2 flex-wrap'>
       <button onClick={handlePlayAudio} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
         ${isVPressed ? 'bg-[#B4D2EF]' : 'bg-[#CAE4EF] hover:bg-[#B4D2EF]'}`}>
           

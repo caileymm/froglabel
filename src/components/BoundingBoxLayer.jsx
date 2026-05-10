@@ -117,7 +117,7 @@ const BoundingBoxLayer = ({ children, code, boxes, setBoxes, currSelectedBox, se
 
   return (
     <div
-      className="relative w-full overflow-hidden select-none cursor-crosshair"
+      className={`relative w-full overflow-hidden select-none ${code ? 'cursor-crosshair' : 'cursor-default'}`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
