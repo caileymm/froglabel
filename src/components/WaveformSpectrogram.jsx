@@ -4,8 +4,6 @@ import BoundingBoxLayer from "./BoundingBoxLayer";
 
 // CONFIG - Lower HOP_SIZE = Wider Scroll
 const HOP_SIZE = 256;
-const WAVEFORM_HEIGHT = 100;
-const SPECTROGRAM_HEIGHT = 400;
 
 const workerCode = `
 class ComplexNumber {
@@ -66,12 +64,14 @@ self.onmessage = function(e) {
 };
 `;
 
-function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, zoomX, zoomY, scrollRef }) {
+function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, zoomX, zoomY, scrollRef, compact }) {
   const [data, setData] = useState(null);
   const waveformRef = useRef(null);
   const spectroRef = useRef(null);
   const containerRef = useRef(null);
 
+  const WAVEFORM_HEIGHT = compact ? 30 : 50;
+  const SPECTROGRAM_HEIGHT = compact ? 270 : 450;
 
   useEffect(() => {
     fetch(audioSrc)
@@ -82,6 +82,9 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
 
   useEffect(() => {
     if (!data) return;
+
+    waveformRef.current.height = WAVEFORM_HEIGHT;
+    spectroRef.current.height = SPECTROGRAM_HEIGHT;
 
     const totalFrames = Math.floor(data.length / HOP_SIZE);
     const fftSize = 512;
@@ -116,7 +119,7 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
     };
 
     return () => worker.terminate();
-  }, [data]);
+  }, [data, WAVEFORM_HEIGHT, SPECTROGRAM_HEIGHT]);
 
   const naturalWidth = data ? Math.floor(data.length / HOP_SIZE) : 0;
 
@@ -180,7 +183,7 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
 
 
   return (
-    <div className="bg-[#82A062] p-6 rounded-xl my-2">
+    <div className="bg-[#82A062] p-5 rounded-xl my-2">
 
 
       {/* Outer scroll container */}
