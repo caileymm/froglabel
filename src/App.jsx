@@ -21,8 +21,8 @@ function App() {
   const [showLeftPanel, setShowLeftPanel] = useState(false);
   const [rightPanel, setRightPanel] = useState(null); // null | 2 | 3
   const [showDataset, setShowDataset] = useState(false);
-
-  const scrollRef = useRef(null);
+  
+  // Ref to wavesurfer instance, set by WaveformSpectrogram via callback
   const wavesurferRef = useRef(null);
 
   const togglePlayPause = useCallback(() => {
@@ -54,8 +54,7 @@ function App() {
           <div className='w-48 shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'>
             <CodesPanel
               codesDict={codesDict}
-              setCodesDict={setCodesDict}
-            />
+              setCodesDict={setCodesDict}/>
           </div>
         )}
 
@@ -92,7 +91,7 @@ function App() {
               currSelectedBox={currSelectedBox}
               setCurrSelectedBox={setCurrSelectedBox}
             />
-            <Tools />
+            <Tools/>
           </div>
 
           {/* Bottom Dataset Panel (key: 4) */}
@@ -110,8 +109,7 @@ function App() {
             {rightPanel === 3 && <div><SpectrogramPanel/></div>}
           </div>
         )}
-        <Tools/>
-        <Dataset />
+
       </div>
     </div>
   );
