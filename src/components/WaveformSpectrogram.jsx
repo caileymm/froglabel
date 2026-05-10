@@ -266,6 +266,7 @@ import { useEffect, useRef, useState } from "react";
 import Spectrogram from "wavesurfer.js/dist/plugins/spectrogram.esm.js";
 import ZoomPlugin from 'wavesurfer.js/dist/plugins/zoom.esm.js'
 import WaveSurfer from "wavesurfer.js";
+import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
 
 
 function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, scrollRef
@@ -301,7 +302,9 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
         ZoomPlugin.create({
             scale: 0.5, // the amount of zoom per wheel step, e.g. 0.5 means a 50% magnification per scroll
             maxZoom: 100 // Optionally, specify the maximum pixels-per-second factor while zooming
-        })],       
+        }),
+        TimelinePlugin.create()],
+          
     });
 
     setWavesurfer(ws);
