@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef} from 'react';
 
 function BoundingBoxControls() {
     const [isShiftPressed, setIsShiftPressed] = useState(false);
     const [currTool, setCurrTool] = useState(0);
+    const shiftAloneRef = useRef(true);
 
     const handleChangeTool = () => {
         setCurrTool((prev) => ((prev + 1) % 5));
@@ -28,21 +29,30 @@ function BoundingBoxControls() {
         setCurrTool(4)
     }
 
+    
     useEffect(() => {
-        const handleKeyDown = (e) => { 
-        if (e.shiftKey) { e.preventDefault(); setIsShiftPressed(true); handleChangeTool(); }
-        };
+    const handleKeyDown = (e) => {
+        if (e.key === 'Shift') {
+        shiftAloneRef.current = true; // assume alone until proven otherwise
+        setIsShiftPressed(true);
+        } else if (e.shiftKey) {
+        shiftAloneRef.current = false; // another key was pressed with Shift
+        }
+    };
 
-        const handleKeyUp = (e) => {
-        if (e.key === 'Shift') setIsShiftPressed(false);
-        };
+    const handleKeyUp = (e) => {
+        if (e.key === 'Shift') {
+        if (shiftAloneRef.current) handleChangeTool(); // only cycle if Shift was alone
+        setIsShiftPressed(false);
+        }
+    };
 
-        window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('keyup', handleKeyUp);
-        return () => {
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
         window.removeEventListener('keydown', handleKeyDown);
         window.removeEventListener('keyup', handleKeyUp);
-        };
+    };
     }, []);
 
   return (
