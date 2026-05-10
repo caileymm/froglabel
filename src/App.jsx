@@ -57,8 +57,6 @@ function App() {
         togglePlayPause={togglePlayPause}
         />
        <WaveformSpectrogram 
-        zoomX={zoomX} 
-        zoomY={zoomY} 
         scrollRef={scrollRef}
         code={code}
         boxes={boxes}
@@ -66,7 +64,7 @@ function App() {
         currSelectedBox={currSelectedBox}
         setCurrSelectedBox={setCurrSelectedBox}
         />
-       <SpectrogramControls 
+        <SpectrogramControls 
         zoomX={zoomX} 
         setZoomX={setZoomX} 
         zoomY={zoomY} 
