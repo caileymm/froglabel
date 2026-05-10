@@ -3,6 +3,7 @@ import Header from './components/Header'
 import BoundingBoxControls from './components/BoundingBoxControls'
 import WaveformSpectrogram from './components/WaveformSpectrogram'
 import SpectrogramControls from './components/SpectrogramControls'
+import Tools from './components/Tools'
 import Dataset from './components/Dataset'
 import { useState, useRef, useCallback } from 'react' 
 import audioSrc from './assets/frogsounds.mp3';
@@ -45,38 +46,41 @@ function App() {
     />
 
      <Header />
-     <div className='px-5 py-2 flex-column items-center justify-center'>
-       <BoundingBoxControls 
-        code={code}
-        setCode={setCode}
-        boxes={boxes}
-        setBoxes={setBoxes}
-        currSelectedBox={currSelectedBox}
-        setCurrSelectedBox={setCurrSelectedBox}
-        isPlaying={isPlaying}
-        togglePlayPause={togglePlayPause}
+      <div className='px-5 py-2 flex-col items-center justify-center'>
+        <div className='p-2 bg-[#82A062] rounded-xl flex flex-col gap-2'>
+          <BoundingBoxControls 
+            code={code}
+            setCode={setCode}
+            boxes={boxes}
+            setBoxes={setBoxes}
+            currSelectedBox={currSelectedBox}
+            setCurrSelectedBox={setCurrSelectedBox}
+            isPlaying={isPlaying}
+            togglePlayPause={togglePlayPause}
+            />
+          <SpectrogramControls 
+            zoomX={zoomX} 
+            setZoomX={setZoomX} 
+            zoomY={zoomY} 
+            setZoomY={setZoomY} 
+            scrollRef={scrollRef} 
+            isPlaying={isPlaying}
+            togglePlayPause={togglePlayPause}
+            />
+        </div>
+        <WaveformSpectrogram 
+          zoomX={zoomX} 
+          zoomY={zoomY} 
+          scrollRef={scrollRef}
+          code={code}
+          boxes={boxes}
+          setBoxes={setBoxes}
+          currSelectedBox={currSelectedBox}
+          setCurrSelectedBox={setCurrSelectedBox}
         />
-       <WaveformSpectrogram 
-        zoomX={zoomX} 
-        zoomY={zoomY} 
-        scrollRef={scrollRef}
-        code={code}
-        boxes={boxes}
-        setBoxes={setBoxes}
-        currSelectedBox={currSelectedBox}
-        setCurrSelectedBox={setCurrSelectedBox}
-        />
-       <SpectrogramControls 
-        zoomX={zoomX} 
-        setZoomX={setZoomX} 
-        zoomY={zoomY} 
-        setZoomY={setZoomY} 
-        scrollRef={scrollRef} 
-        isPlaying={isPlaying}
-        togglePlayPause={togglePlayPause}
-        />
-       <Dataset />
-     </div>
+        <Tools/>
+        <Dataset />
+      </div>
    </div>
  )
 }
