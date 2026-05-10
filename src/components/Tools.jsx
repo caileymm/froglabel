@@ -8,6 +8,26 @@ function BoundingBoxControls() {
         setCurrTool((prev) => ((prev + 1) % 5));
     }
 
+    const handleChangeToTool0 = () => {
+        setCurrTool(0)
+    }
+
+    const handleChangeToTool1 = () => {
+        setCurrTool(1)
+    }
+
+    const handleChangeToTool2 = () => {
+        setCurrTool(2)
+    }
+
+    const handleChangeToTool3 = () => {
+        setCurrTool(3)
+    }
+
+    const handleChangeToTool4 = () => {
+        setCurrTool(4)
+    }
+
     useEffect(() => {
         const handleKeyDown = (e) => { 
         if (e.shiftKey) { e.preventDefault(); setIsShiftPressed(true); handleChangeTool(); }
@@ -32,28 +52,28 @@ function BoundingBoxControls() {
           Change Tool
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md'>Shift</div>
         </button>
-        <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
+        <div eventHandler={handleChangeToTool0} className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
             <button className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1 
                 ${currTool == 0 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T1
+            T0
             </button>
 
-            <button className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+            <button onClick={handleChangeToTool1} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
                 ${currTool == 1 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
             T2
             </button>
 
-            <button className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+            <button onClick={handleChangeToTool2} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
                 ${currTool == 2 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
             T3
             </button>
 
-            <button className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+            <button onClick={handleChangeToTool3} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
                 ${currTool == 3 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
             T4
             </button>
 
-            <button className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
+            <button onClick={handleChangeToTool4} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
                 ${currTool == 4 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
             T5
             </button>
