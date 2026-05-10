@@ -283,8 +283,8 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
       height: 50,
       url: audioSrc,
       waveColor: 'rgb(0, 0, 0)',
-      cursorColor: '#ddd5e9',
-      progressColor: 'rgb(210, 181, 210)',
+      cursorColor: 'rgb(221, 213, 233)',
+      progressColor: 'rgb(221, 213, 233)',
       cursorWidth: 3,
       sampleRate: 10000,
       plugins: [
@@ -303,7 +303,8 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
             scale: 0.5, // the amount of zoom per wheel step, e.g. 0.5 means a 50% magnification per scroll
             maxZoom: 100 // Optionally, specify the maximum pixels-per-second factor while zooming
         }),
-        TimelinePlugin.create()],
+        TimelinePlugin.create( {style: {fontSize: '10px',color: '#000000',}
+        })],
           
     });
 
