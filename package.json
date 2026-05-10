@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.4",
+    "@wavesurfer/react": "^1.0.12",
     "react": "^19.2.5",
     "react-audio-spectrogram-player": "^2.0.1",
     "react-dom": "^19.2.5",
-    "tailwindcss": "^4.2.4"
+    "tailwindcss": "^4.2.4",
+    "wavesurfer.js": "^7.12.6"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
