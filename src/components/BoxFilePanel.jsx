@@ -15,7 +15,7 @@ function BoxFilePanel() {
     const boxClass = 'bg-[#F3F3E4] rounded-md px-2 py-0.5 font-display text-sm inline-block self-start';
     const rowClass = 'flex flex-row items-center gap-1';
     const headerClass = 'font-display text-sm text-[#1E1E1E]';
-    const unitClass = 'font-display text-sm';
+    const unitClass = 'font-display text-xs';
 
     return (
         <div className='flex flex-col gap-2'>

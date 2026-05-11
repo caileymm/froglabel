@@ -58,7 +58,7 @@ function CodesPanel({ codesDict, setCodesDict }) {
 
                 <div className='rounded-lg flex flex-col gap-1 max-h-48 overflow-y-auto'>
                     {filteredCodes.length === 0 ? (
-                        <div className='font-display text-xs text-gray-400'>No codes found</div>
+                        <div className='font-display text-sm text-[#E6E5C9]'>No codes found</div>
                     ) : (
                         filteredCodes.map(([c, name]) => (
                             <div key={c} className='bg-[#F3F3E4] rounded-md px-2 py-1'>

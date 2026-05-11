@@ -4,6 +4,10 @@ function DatasetPanel() {
     const [rows, setRows] = useState([
         { id: 1, code: 'LIT', name: 'Litoria', startTime: '1.23', endTime: '2.45', startFreq: '1200', endFreq: '4800' },
         { id: 2, code: 'MIX', name: 'Mixophyes', startTime: '3.10', endTime: '4.20', startFreq: '800', endFreq: '3200' },
+        { id: 1, code: 'LIT', name: 'Litoria', startTime: '1.23', endTime: '2.45', startFreq: '1200', endFreq: '4800' },
+        { id: 2, code: 'MIX', name: 'Mixophyes', startTime: '3.10', endTime: '4.20', startFreq: '800', endFreq: '3200' },
+        { id: 1, code: 'LIT', name: 'Litoria', startTime: '1.23', endTime: '2.45', startFreq: '1200', endFreq: '4800' },
+        { id: 2, code: 'MIX', name: 'Mixophyes', startTime: '3.10', endTime: '4.20', startFreq: '800', endFreq: '3200' },
     ]);
 
     const deleteRow = (id) => {
