@@ -54,7 +54,7 @@ function App() {
     const endFreq   = yToFreq(box.top);
     return {
       ...box,
-      name:      codesDict[box.code],
+      name:      codesDict[box.code] ?? '—',
       startTime: startTime.toFixed(3),
       endTime:   endTime.toFixed(3),
       duration:  (endTime - startTime).toFixed(3),
@@ -62,7 +62,7 @@ function App() {
       endFreq:   Math.round(endFreq),
       bandwidth: Math.round(endFreq - startFreq),
     };
-  }, [containerWidth, duration]);
+  }, [containerWidth, duration, codesDict]);
 
   // Derived rows — boxes converted to time/freq values
   const rows = useMemo(() => boxes.map(boxToRow), [boxes, boxToRow]);
@@ -83,7 +83,7 @@ function App() {
   }, []);
 
   // Resizable dataset panel
-  const [datasetHeight, setDatasetHeight] = useState(100);
+  const [datasetHeight, setDatasetHeight] = useState(160);
   const isDragging = useRef(false);
   const dragStartY = useRef(0);
   const dragStartHeight = useRef(0);
@@ -166,25 +166,23 @@ function App() {
             <Tools />
           </div>
 
-          {/* Bottom Dataset Panel (key: 4) — drag handle on top */}
+          {/* Bottom Dataset Panel (key: 4) */}
           {showDataset && (
-            <>
+            <div
+              className='shrink-0 bg-[#82A062] rounded-xl overflow-y-auto'
+              style={{ height: datasetHeight }}
+            >
               <div
-                className='shrink-0 bg-[#82A062] rounded-xl overflow-y-auto'
-                style={{ height: datasetHeight }}
-                >
-                  <div
-                    className='h-2 cursor-ns-resize'
-                    onMouseDown={handleDragStart}
-                    />
-                  <div className='px-2 pb-2'>
-                    <DatasetPanel
-                      rows={rows}
-                      onDeleteRow={(i) => setBoxes(prev => prev.filter((_, idx) => idx !== i))}
-                      />
-                  </div>
-                </div>
-            </>
+                className='h-2 cursor-ns-resize'
+                onMouseDown={handleDragStart}
+              />
+              <div className='px-2 pb-2'>
+                <DatasetPanel
+                  rows={rows}
+                  onDeleteRow={(i) => setBoxes(prev => prev.filter((_, idx) => idx !== i))}
+                />
+              </div>
+            </div>
           )}
         </div>
 

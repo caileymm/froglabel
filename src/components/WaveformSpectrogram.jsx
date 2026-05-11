@@ -4,76 +4,77 @@ import { useEffect, useState, useRef } from "react";
 import Spectrogram from "wavesurfer.js/dist/plugins/spectrogram.esm.js";
 import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js';
-import { WAVEFORM_HEIGHT, SPECTROGRAM_HEIGHT, SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES, FREQ_LABELS} from "../utils/spectrogramConfig"
+import { WAVEFORM_HEIGHT, SPECTROGRAM_HEIGHT, SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES, FREQ_LABELS } from "../utils/spectrogramConfig"
 import { freqToY } from '../utils/spectrogramScale';
 import { audioInfoReady, sampleRate } from '../utils/audioInfo';
 
 export const wavesurferRef = { current: null };
 
-function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, setDuration, setContainerWidth, setDrawingBox}) {
+function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, setDuration, setContainerWidth, setDrawingBox }) {
   const containerRef = useRef(null);
   const [spectroTop, setSpectroTop] = useState(WAVEFORM_HEIGHT);
   const [spectroHeight, setSpectroHeight] = useState(SPECTROGRAM_HEIGHT);
-  
+
   useEffect(() => {
-  if (!containerRef.current) return;
+    if (!containerRef.current) return;
 
-  let ws = null;
-  let cancelled = false;
+    let ws = null;
+    let cancelled = false;
 
-  audioInfoReady.then(() => {
-    if (cancelled) return;
-    ws = WaveSurfer.create({
-      container: containerRef.current,
-      height: WAVEFORM_HEIGHT,
-      url: audioSrc,
-      waveColor: '#1E1E1E',
-      cursorColor: '#CAE4EF',
-      progressColor: '#F3F3E4',
-      cursorWidth: 3,
-      sampleRate: sampleRate,
-      dragToSeek: true,
-      plugins: [
-        Spectrogram.create({
-          labels: true,
-          height: SPECTROGRAM_HEIGHT,
-          splitChannels: false,
-          scale: SCALE,
-          frequencyMax: FREQUENCY_MAX,
-          frequencyMin: FREQUENCY_MIN,
-          fftSamples: FFT_SAMPLES,
-          labelsBackground: 'rgba(0, 0, 0, 0.1)',
-          useWebWorker: true,
-        }),
-        TimelinePlugin.create({
-          style: { fontSize: '12px', color: '#1E1E1E', fontFamily: 'Afacad, sans-serif' },
-          formatTimeCallback: (seconds) => `${seconds.toFixed(1)} s`,
-        }),
-      ],
+    audioInfoReady.then(() => {
+      if (cancelled) return;
+
+      ws = WaveSurfer.create({
+        container: containerRef.current,
+        height: WAVEFORM_HEIGHT,
+        url: audioSrc,
+        waveColor: '#1E1E1E',
+        cursorColor: '#CAE4EF',
+        progressColor: '#F3F3E4',
+        cursorWidth: 3,
+        sampleRate: sampleRate,
+        dragToSeek: true,
+        plugins: [
+          Spectrogram.create({
+            labels: false,
+            height: SPECTROGRAM_HEIGHT,
+            splitChannels: false,
+            scale: SCALE,
+            frequencyMax: FREQUENCY_MAX,
+            frequencyMin: FREQUENCY_MIN,
+            fftSamples: FFT_SAMPLES,
+            labelsBackground: 'rgba(0, 0, 0, 0.1)',
+            useWebWorker: true,
+          }),
+          TimelinePlugin.create({
+            style: { fontSize: '12px', color: '#1E1E1E', fontFamily: 'Afacad, sans-serif' },
+            formatTimeCallback: (seconds) => `${seconds.toFixed(1)} s`,
+          }),
+        ],
+      });
+
+      ws.on('ready', () => {
+        setDuration(ws.getDuration());
+        setContainerWidth(containerRef.current.clientWidth);
+        const canvases = containerRef.current.querySelectorAll('canvas');
+        if (canvases.length > 1) {
+          const spectroCanvas = canvases[1];
+          const containerTop = containerRef.current.getBoundingClientRect().top;
+          const canvasTop = spectroCanvas.getBoundingClientRect().top;
+          setSpectroTop(canvasTop - containerTop);
+          setSpectroHeight(spectroCanvas.getBoundingClientRect().height);
+        }
+      });
+
+      wavesurferRef.current = ws;
     });
 
-    ws.on('ready', () => {
-      setDuration(ws.getDuration());
-      setContainerWidth(containerRef.current.clientWidth);
-      const canvases = containerRef.current.querySelectorAll('canvas');
-      if (canvases.length > 1) {
-        const spectroCanvas = canvases[1];
-        const containerTop = containerRef.current.getBoundingClientRect().top;
-        const canvasTop = spectroCanvas.getBoundingClientRect().top;
-        setSpectroTop(canvasTop - containerTop);
-        setSpectroHeight(spectroCanvas.getBoundingClientRect().height);
-      }
-    });
-
-    wavesurferRef.current = ws;
-  });
-
-  return () => {
-    cancelled = true;
-    ws?.destroy();
-    wavesurferRef.current = null;
-  };
-}, []);
+    return () => {
+      cancelled = true;
+      ws?.destroy();
+      wavesurferRef.current = null;
+    };
+  }, []);
 
   return (
     <div className="bg-[#82A062] p-6 rounded-xl my-2">
