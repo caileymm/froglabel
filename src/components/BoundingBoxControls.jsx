@@ -1,27 +1,39 @@
 import { useState, useEffect, useRef } from 'react';
 
-function BoundingBoxControls({ code, setCode, boxes, setBoxes, currSelectedBox, setCurrSelectedBox }) {
+function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSelectedBox, setCurrSelectedBox }) {
   const inputRef = useRef(null);
+  const [isError, setIsError] = useState(false);
 
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [isTabPressed, setIsTabPressed] = useState(false);
   const [isShiftVPressed, setIsShiftVPressed] = useState(false);
   const [isShiftDPressed, setIsShiftDPressed] = useState(false);
   const [isEscPressed, setIsEscPressed] = useState(false);
-  const [isZPressed, setIsZPressed] = useState(false);
-  const [isXPressed, setIsXPressed] = useState(false);
+  // const [isZPressed, setIsZPressed] = useState(false);
+  // const [isXPressed, setIsXPressed] = useState(false);
 
   const handleSetCode = () => {
     setCode('')
     inputRef.current?.focus();
     inputRef.current?.select();
   }
+
   const handleCodeInput = (e) => {
     const value = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
-    if (value.length <= 3) {
+    if (value.length < 3) {
       setCode(value);
+      setIsError(false);
+      return;
     }
     if (value.length === 3) {
+      if (Object.keys(codesDict).includes(value)) {
+        setCode(value)
+        setIsError(false);
+      } else {
+        setCode(''); // reset if not a valid code
+        setIsError(true);
+        setTimeout(() => setIsError(false), 1000); // clears after 1000ms
+      }
       inputRef.current?.blur();
     }
   }
@@ -54,8 +66,9 @@ function BoundingBoxControls({ code, setCode, boxes, setBoxes, currSelectedBox, 
   const handleDeselectBox = () => {
     setCurrSelectedBox(-1)
   }
-  const handleUndo = () => console.log("Undo");
-  const handleRedo = () => console.log("Redo");
+
+  // const handleUndo = () => console.log("Undo");
+  // const handleRedo = () => console.log("Redo");
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -64,8 +77,8 @@ function BoundingBoxControls({ code, setCode, boxes, setBoxes, currSelectedBox, 
       if (e.shiftKey && e.key == 'V') { e.preventDefault(); setIsShiftVPressed(true); handlePlayBoxAudio(); }
       if (e.shiftKey && e.key == 'D') { e.preventDefault(); setIsShiftDPressed(true); handleDeleteBoxRef.current(); }
       if (e.key === 'Escape') { setIsEscPressed(true); handleDeselectBox(); }
-      if (e.key === 'z') { e.preventDefault(); setIsZPressed(true); handleUndo(); }
-      if (e.key === 'x') { e.preventDefault(); setIsXPressed(true); handleRedo(); }
+      // if (e.key === 'z') { e.preventDefault(); setIsZPressed(true); handleUndo(); }
+      // if (e.key === 'x') { e.preventDefault(); setIsXPressed(true); handleRedo(); }
     };
 
     const handleKeyUp = (e) => {
@@ -74,8 +87,8 @@ function BoundingBoxControls({ code, setCode, boxes, setBoxes, currSelectedBox, 
       if (e.key === 'Shift' || e.key === 'V') setIsShiftVPressed(false);
       if (e.key === 'Shift' || e.key === 'D') setIsShiftDPressed(false);
       if (e.key === 'Escape') setIsEscPressed(false);
-      if (e.key === 'z') setIsZPressed(false);
-      if (e.key === 'x') setIsXPressed(false);
+      // if (e.key === 'z') setIsZPressed(false);
+      // if (e.key === 'x') setIsXPressed(false);
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -88,7 +101,7 @@ function BoundingBoxControls({ code, setCode, boxes, setBoxes, currSelectedBox, 
 
   return (
     <div className='flex items-center justify-center gap-2 flex-wrap'>
-      <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
+      <div className='p-1.5 bg-[#C8D9A3] rounded-xl flex items-center gap-1 font-display'>
         <button onClick={handleSetCode} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1 
           ${isSpacePressed ? 'bg-[#FFDE9E]': 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Set Code
@@ -102,10 +115,16 @@ function BoundingBoxControls({ code, setCode, boxes, setBoxes, currSelectedBox, 
           onKeyDown={(e) => e.stopPropagation()}
           placeholder='Code'
           maxLength={3}
-          className='w-15 px-2 py-1.5 text-xs bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9] uppercase'/>
+          className={`bg-[#FFFFFF] w-15 px-2 py-1.5 text-xs rounded-md font-display placeholder-[#E6E5C9] uppercase placeholder:normal-case
+            ${isError ? 'border-2 border-[#FFAAAA]' : 'border-none'}`}
+        />
+        :
+        <div className={`bg-[#F3F3E4] px-2 py-1.5 text-xs rounded-md font-display`}>
+          {codesDict[code] || '—'}
+        </div>
       </div>
 
-      <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
+      <div className='p-1.5 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
         <button onClick={handleSelectBox} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
           ${isTabPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Select Box

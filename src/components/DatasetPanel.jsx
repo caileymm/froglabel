@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function DatasetPanel({ rows }) {
+function DatasetPanel({ rows, onDeleteRow }) {
     const colClass = 'flex-1 flex items-center justify-center px-1 font-display text-sm text-[#1E1E1E]';
 
     return (
@@ -33,7 +33,9 @@ function DatasetPanel({ rows }) {
                                 <div className={colClass}>{row.endFreq}</div>
                                 <div className={colClass}>{row.bandwidth}</div>
                                 <div className='w-6 flex items-center justify-center'>
-                                    <button className='text-red-400 hover:text-red-600 font-display text-sm cursor-pointer'>✕</button>
+                                    <button 
+                                        className='text-red-400 hover:text-red-600 font-display text-sm cursor-pointer'
+                                        onClick={() => onDeleteRow(i)}>✕</button>
                                 </div>
                             </div>
                         ))}

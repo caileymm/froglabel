@@ -5,8 +5,31 @@ function CodesPanel({ codesDict, setCodesDict }) {
     const [speciesName, setSpeciesName] = useState('');
     const [search, setSearch] = useState('');
 
+    const [isCodeError, setIsCodeError] = useState(false);
+    const [isNameError, setIsNameError] = useState(false);
+
     const handleCreate = () => {
-        if (!code.trim() || !speciesName.trim()) return;
+        if (!code.trim() || !speciesName.trim()) {
+            return;
+        } else if (code.length < 3) {
+            setCode('');
+            setIsCodeError(true);
+            setTimeout(() => setIsCodeError(false), 1000);
+            return
+        } else if (Object.values(codesDict).includes(speciesName.trim())) {
+            setSpeciesName('');
+            setCode('');
+            setIsNameError(true);
+            setTimeout(() => setIsNameError(false), 1000);
+            return;
+        }
+        else if (Object.keys(codesDict).includes(code)) {
+            setCode('');
+            setIsCodeError(true);
+            setTimeout(() => setIsCodeError(false), 1000);
+            return;
+        }
+        setIsCodeError(false);
         setCodesDict(prev => ({ ...prev, [code.trim()]: speciesName.trim() }));
         setCode('');
         setSpeciesName('');
@@ -15,6 +38,14 @@ function CodesPanel({ codesDict, setCodesDict }) {
     const filteredCodes = Object.entries(codesDict).filter(([c, name]) =>
         name.toLowerCase().includes(search.toLowerCase())
     );
+
+    const handleDelete = (codeToDelete) => {
+        setCodesDict(prev => {
+            const next = { ...prev };
+            delete next[codeToDelete];
+            return next;
+        });
+    };
 
     return (
         <div className='flex flex-col gap-2'>
@@ -28,14 +59,16 @@ function CodesPanel({ codesDict, setCodesDict }) {
                         placeholder='Code'
                         onKeyDown={e => e.stopPropagation()}
                         maxLength={3}
-                        className='w-15 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9]'/>
+                        className={`w-15 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9] uppercase placeholder:normal-case
+                        ${isCodeError ? 'border-2 border-[#FFAAAA]' : 'border-none'}`}/>
                     <input
                         value={speciesName}
                         onChange={e => setSpeciesName(e.target.value)}
                         placeholder='Species Name'
                         onKeyDown={e => e.stopPropagation()}
                         maxLength={35}
-                        className='w-25 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9]'/>
+                        className={`w-25 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9]
+                        ${isNameError ? 'border-2 border-[#FFAAAA]' : 'border-none'}`}/>
                 </div>
                 <button
                     onClick={handleCreate}
@@ -56,14 +89,21 @@ function CodesPanel({ codesDict, setCodesDict }) {
                         className='w-40 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9]'/>
                 </div>
 
-                <div className='rounded-lg flex flex-col gap-1 max-h-48 overflow-y-auto'>
+                <div className='rounded-lg flex flex-col gap-1 overflow-y-auto'>
                     {filteredCodes.length === 0 ? (
                         <div className='font-display text-sm text-[#E6E5C9]'>No codes found</div>
                     ) : (
                         filteredCodes.map(([c, name]) => (
-                            <div key={c} className='bg-[#F3F3E4] rounded-md px-2 py-1'>
-                                <div className='font-display text-sm'>{c}</div>
-                                <div className='font-display text-xs'>{name}</div>
+                            <div key={c} className='bg-[#F3F3E4] rounded-md px-2 py-1 flex items-center justify-between'>
+                                <div>
+                                    <div className='font-display text-sm'>{c}</div>
+                                    <div className='font-display text-xs'>{name}</div>
+                                </div>
+                                <button
+                                    onClick={() => handleDelete(c)}
+                                    className='text-red-400 hover:text-red-600 font-display text-sm cursor-pointer'>
+                                    ✕
+                                </button>
                             </div>
                         ))
                     )}

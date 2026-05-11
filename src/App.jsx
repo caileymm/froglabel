@@ -9,11 +9,23 @@ import DatasetPanel from './components/DatasetPanel'
 import BoxFilePanel from './components/BoxFilePanel'
 import SpectrogramPanel from './components/SpectrogramPanel'
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import { yToFreq } from './utils/spectrogramScale'
 
 function App() {
   const [boxes, setBoxes] = useState([]);
   const [code, setCode] = useState('');
-  const [codesDict, setCodesDict] = useState({});
+  const [codesDict, setCodesDict] = useState({
+    'GRE' : 'Green Tree Frog',
+    'COR' : 'Corroboree Frog',
+    'SOU' : 'Southern Bell Frog',
+    'RED' : 'Red-Eyed Tree Frog',
+    'BLU' : 'Blue Mountains Tree Frog',
+    'POU' : 'Pouched Frog',
+    'GRO' : 'Growling Grass Frog',
+    'PER' : 'Peron’s Tree Frog',
+    'BRE' : 'Brereton’s Frog',
+    'GIA' : 'Giant Burrowing Frog'
+  });
   const [currSelectedBox, setCurrSelectedBox] = useState(-1);
   const [zoomX, setZoomX] = useState(1);
   const [zoomY, setZoomY] = useState(1);
@@ -21,8 +33,9 @@ function App() {
   const [showLeftPanel, setShowLeftPanel] = useState(false);
   const [rightPanel, setRightPanel] = useState(null); // null | 2 | 3
   const [showDataset, setShowDataset] = useState(false);
-  
-  // Ref to wavesurfer instance, set by WaveformSpectrogram via callback
+  const [duration, setDuration] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
+
   const wavesurferRef = useRef(null);
 
   const togglePlayPause = useCallback(() => {
@@ -31,28 +44,10 @@ function App() {
     ws.playPause();
   }, []);
 
-  const [duration, setDuration] = useState(0);
-  const [containerWidth, setContainerWidth] = useState(0);
-  const SPECTROGRAM_HEIGHT = 400;
-  const FREQUENCY_MIN = 0;
-  const FREQUENCY_MAX = 5000;
-const melFromHz = (hz) => 2595 * Math.log10(1 + hz / 700);
-const hzFromMel = (mel) => 700 * (Math.pow(10, mel / 2595) - 1);
-const MEL_MIN = melFromHz(FREQUENCY_MIN);
-const MEL_MAX = melFromHz(FREQUENCY_MAX);
-
-const yToFreq = (y) => {
-  const fraction = 1 - y / SPECTROGRAM_HEIGHT;       // 0=bottom, 1=top
-  const mel = MEL_MIN + fraction * (MEL_MAX - MEL_MIN);
-  const hz = hzFromMel(mel);
-  return Math.max(FREQUENCY_MIN, Math.min(FREQUENCY_MAX, hz)); // clamp
-};
-
   const rows = useMemo(() => {
-
     return boxes.map((box, index) => {
-      const startTime  = (box.left / containerWidth) * duration;
-      const endTime    = ((box.left + box.width) / containerWidth) * duration;
+      const startTime = (box.left / containerWidth) * duration;
+      const endTime   = ((box.left + box.width) / containerWidth) * duration;
       const endFreq   = yToFreq(box.top);
       const startFreq = yToFreq(box.top + box.height);
 
@@ -63,12 +58,45 @@ const yToFreq = (y) => {
         startTime: startTime.toFixed(2),
         endTime:   endTime.toFixed(2),
         duration:  (endTime - startTime).toFixed(2),
-        startFreq: Math.round(Math.max(0, startFreq)),
-        endFreq:   Math.round(Math.min(FREQUENCY_MAX, endFreq)),
+        startFreq: Math.round(startFreq),
+        endFreq:   Math.round(endFreq),
         bandwidth: Math.round(endFreq - startFreq),
       };
     });
   }, [boxes, codesDict, duration, containerWidth]);
+
+  const handleDeleteBox = (i) => {
+    setBoxes(boxes.filter((_, idx) => idx !== i));
+  };
+
+  const [drawingBox, setDrawingBox] = useState(null);
+
+  const drawingRow = useMemo(() => {
+    if (!drawingBox || !containerWidth || !duration) return null;
+    const startTime = (drawingBox.left / containerWidth) * duration;
+    const endTime   = ((drawingBox.left + drawingBox.width) / containerWidth) * duration;
+    const endFreq   = yToFreq(drawingBox.top);
+    const startFreq = yToFreq(drawingBox.top + drawingBox.height);
+    return {
+      code:      drawingBox.code,
+      startTime: startTime.toFixed(2),
+      endTime:   endTime.toFixed(2),
+      duration:  (endTime - startTime).toFixed(2),
+      startFreq: Math.round(startFreq),
+      endFreq:   Math.round(endFreq),
+      bandwidth: Math.round(endFreq - startFreq),
+    };
+  }, [drawingBox, containerWidth, duration, code]);
+
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  useEffect(() => {
+    if (currSelectedBox !== -1 && rows[currSelectedBox]) {
+      setSelectedRow(rows[currSelectedBox]);
+    } else {
+      setSelectedRow(null);
+    }
+  }, [rows, currSelectedBox]);
 
   // Keyboard shortcuts: 1=left panel, 2=box panel, 3=spectrogram panel, 4=dataset
   useEffect(() => {
@@ -82,6 +110,37 @@ const yToFreq = (y) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const [datasetHeight, setDatasetHeight] = useState(95);
+  const isDragging = useRef(false);
+  const dragStartY = useRef(0);
+  const dragStartHeight = useRef(0);
+
+  const handleDragStart = (e) => {
+    isDragging.current = true;
+    dragStartY.current = e.clientY;
+    dragStartHeight.current = datasetHeight;
+    document.body.style.cursor = 'ns-resize';
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDragging.current) return;
+      const delta = dragStartY.current - e.clientY; // dragging up = positive = taller
+      const newHeight = Math.max(80, Math.min(400, dragStartHeight.current + delta));
+      setDatasetHeight(newHeight);
+    };
+    const handleMouseUp = () => {
+      isDragging.current = false;
+      document.body.style.cursor = '';
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
+
   return (
     <div className='flex flex-col h-screen overflow-hidden'>
       <Header />
@@ -91,9 +150,7 @@ const yToFreq = (y) => {
         {/* Left Panel (key: 1) — Codes */}
         {showLeftPanel && (
           <div className='w-48 shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'>
-            <CodesPanel
-              codesDict={codesDict}
-              setCodesDict={setCodesDict}/>
+            <CodesPanel codesDict={codesDict} setCodesDict={setCodesDict} />
           </div>
         )}
 
@@ -101,23 +158,24 @@ const yToFreq = (y) => {
         <div className='flex-1 min-w-0 min-h-0 flex flex-col'>
 
           {/* Controls bar */}
-          <div className='p-2 bg-[#82A062] rounded-xl flex flex-col gap-2'>
+          <div className='p-2 bg-[#82A062] rounded-xl flex flex-col gap-1.5'>
             <BoundingBoxControls
               code={code}
               setCode={setCode}
+              codesDict={codesDict}
               boxes={boxes}
               setBoxes={setBoxes}
               currSelectedBox={currSelectedBox}
               setCurrSelectedBox={setCurrSelectedBox}
               isPlaying={isPlaying}
               togglePlayPause={togglePlayPause}
-              />
-            <SpectrogramControls 
-              zoomX={zoomX} 
-              setZoomX={setZoomX} 
-              zoomY={zoomY} 
-              setZoomY={setZoomY} 
-              />
+            />
+            <SpectrogramControls
+              zoomX={zoomX}
+              setZoomX={setZoomX}
+              zoomY={zoomY}
+              setZoomY={setZoomY}
+            />
           </div>
 
           {/* Waveform + Spectrogram */}
@@ -130,15 +188,26 @@ const yToFreq = (y) => {
               setCurrSelectedBox={setCurrSelectedBox}
               setDuration={setDuration}
               setContainerWidth={setContainerWidth}
+              setDrawingBox={setDrawingBox}
+              showDataset={showDataset}
             />
-            <Tools/>
+            <Tools />
           </div>
 
           {/* Bottom Dataset Panel (key: 4) */}
           {showDataset && (
-            <div className='h-40 shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'>
-              <DatasetPanel 
-                rows={rows}/>
+            <div
+              className='shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'
+              style={{ height: datasetHeight }}
+            >
+              {/* Drag handle */}
+              <div
+                className='w-full flex items-center justify-center mb-1 cursor-ns-resize'
+                onMouseDown={handleDragStart}
+              >
+                <div className='w-12 h-1 bg-[#1E1E1E] opacity-30 rounded-full' />
+              </div>
+              <DatasetPanel rows={rows} onDeleteRow={handleDeleteBox} />
             </div>
           )}
         </div>
@@ -146,8 +215,8 @@ const yToFreq = (y) => {
         {/* Right Panel (key: 2 or 3) */}
         {rightPanel !== null && (
           <div className='w-48 shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'>
-            {rightPanel === 2 && <div><BoxFilePanel/></div>}
-            {rightPanel === 3 && <div><SpectrogramPanel/></div>}
+            {rightPanel === 2 && <BoxFilePanel selectedRow={selectedRow} currSelectedBox={currSelectedBox} drawingRow={drawingRow} />}
+            {rightPanel === 3 && <SpectrogramPanel />}
           </div>
         )}
 

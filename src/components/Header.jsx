@@ -8,11 +8,8 @@ function Header() {
                     <img src={frogIdLogo} alt='frogid logo' className='w-[35px] h-[40px]' />
                 </a>
             </div>
-            <p className='font-display text-[#C8D9A3] text-center text-3xl'>FrogLabel Studio</p>
+            <p className='font-display text-[#C8D9A3] text-center text-3xl'>FrogLabel</p>
             <div className='w-[100px] flex justify-end'>
-                <button className='bg-[#FEECBE] font-display px-3 py-2 rounded-lg hover:bg-[#FFDE9E] cursor-pointer'>
-                    Export
-                </button>
             </div>
         </div>
     )

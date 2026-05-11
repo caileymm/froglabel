@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 
-const BoundingBoxLayer = ({ children, code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox}) => {
+const BoundingBoxLayer = ({ children, code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, setDrawingBox }) => {
     const [activeBox, setActiveBox] = useState(null);
     const [isDrawing, setIsDrawing] = useState(false);
 
@@ -28,6 +28,7 @@ const BoundingBoxLayer = ({ children, code, boxes, setBoxes, currSelectedBox, se
 
     const handleCornerMouseDown = (e, corner, boxIndex) => {
         e.stopPropagation(); // don't trigger the container's mousedown
+        setCurrSelectedBox(boxIndex);
         resizeState.current = {
             corner,
             boxIndex,
@@ -37,7 +38,7 @@ const BoundingBoxLayer = ({ children, code, boxes, setBoxes, currSelectedBox, se
         };
     };
 
-    const handleMouseMove = (e) => {
+   const handleMouseMove = (e) => {
         // Handle resize
         if (resizeState.current) {
             const { corner, boxIndex, startX, startY, originalBox } = resizeState.current;
@@ -66,24 +67,44 @@ const BoundingBoxLayer = ({ children, code, boxes, setBoxes, currSelectedBox, se
                     box.height = originalBox.height + dy;
                 }
 
-                // Minimum size
                 if (box.width < 20) { box.width = 20; if (corner === 'tl' || corner === 'bl') box.left = originalBox.left + originalBox.width - 20; }
                 if (box.height < 20) { box.height = 20; if (corner === 'tl' || corner === 'tr') box.top = originalBox.top + originalBox.height - 20; }
 
                 updated[boxIndex] = box;
+
+                // Update panel during resize
+                setDrawingBox?.({
+                    left:   box.left,
+                    top:    box.top,
+                    width:  box.width,
+                    height: box.height,
+                    code:   originalBox.code,
+                });
+
                 return updated;
             });
             return;
         }
-        
+
+        // Handle drawing
         if (!isDrawing || (code.length < 3)) return;
 
         const rect = e.currentTarget.getBoundingClientRect();
-        setActiveBox((prev) => ({
-        ...prev,
-        currentX: e.clientX - rect.left,
-        currentY: e.clientY - rect.top,
-        }));
+        setActiveBox((prev) => {
+            const updated = {
+                ...prev,
+                currentX: e.clientX - rect.left,
+                currentY: e.clientY - rect.top,
+            };
+            setDrawingBox?.({
+                left:   Math.min(updated.startX, updated.currentX),
+                top:    Math.min(updated.startY, updated.currentY),
+                width:  Math.abs(updated.currentX - updated.startX),
+                height: Math.abs(updated.currentY - updated.startY),
+                code:   code,
+            });
+            return updated;
+        });
     };
 
     const handleMouseUp = () => {
@@ -113,6 +134,7 @@ const BoundingBoxLayer = ({ children, code, boxes, setBoxes, currSelectedBox, se
         setBoxes((prev) => [...prev, newBox]);
         setActiveBox(null);
         setIsDrawing(false);
+        setDrawingBox?.(null);
     };
 
   return (
