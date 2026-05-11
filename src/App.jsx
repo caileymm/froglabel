@@ -4,13 +4,16 @@ import BoundingBoxControls from './components/BoundingBoxControls'
 import WaveformSpectrogram from './components/WaveformSpectrogram'
 import SpectrogramControls from './components/SpectrogramControls'
 import Tools from './components/Tools'
-import DatasetPanel from './components/DatasetPanel'
 import CodesPanel from './components/CodesPanel'
+import DatasetPanel from './components/DatasetPanel'
+import BoxFilePanel from './components/BoxFilePanel'
+import SpectrogramPanel from './components/SpectrogramPanel'
 import { useState, useRef, useCallback, useEffect } from 'react'
 
 function App() {
   const [boxes, setBoxes] = useState([]);
   const [code, setCode] = useState('');
+  const [codesDict, setCodesDict] = useState({});
   const [currSelectedBox, setCurrSelectedBox] = useState(-1);
   const [zoomX, setZoomX] = useState(1);
   const [zoomY, setZoomY] = useState(1);
@@ -49,7 +52,10 @@ function App() {
         {/* Left Panel (key: 1) — Codes */}
         {showLeftPanel && (
           <div className='w-48 shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'>
-            <CodesPanel />
+            <CodesPanel
+              codesDict={codesDict}
+              setCodesDict={setCodesDict}
+            />
           </div>
         )}
 
@@ -91,7 +97,7 @@ function App() {
 
           {/* Bottom Dataset Panel (key: 4) */}
           {showDataset && (
-            <div className='h-48 shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'>
+            <div className='h-40 shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'>
               <DatasetPanel />
             </div>
           )}
@@ -100,8 +106,8 @@ function App() {
         {/* Right Panel (key: 2 or 3) */}
         {rightPanel !== null && (
           <div className='w-48 shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'>
-            {rightPanel === 2 && <div>{/* Box Panel */}</div>}
-            {rightPanel === 3 && <div>{/* Spectrogram Panel */}</div>}
+            {rightPanel === 2 && <div><BoxFilePanel/></div>}
+            {rightPanel === 3 && <div><SpectrogramPanel/></div>}
           </div>
         )}
 
