@@ -269,7 +269,10 @@ import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
 
 
-function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, scrollRef
+export const wavesurferRef = { current: null };
+
+
+function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox,
 }) {
   const containerRef = useRef(null);
   const [wavesurfer, setWavesurfer] = useState(null);
@@ -309,19 +312,20 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
     });
 
     setWavesurfer(ws);
+    wavesurferRef.current=ws;
 
-    const unsubscribe = [
-      ws.on("play", () => {
-        setPlaying(true);
-      }),
-      ws.on("pause", () => {
-        setPlaying(false);
-      }),
-    ];
+    // const unsubscribe = [
+    //   ws.on("play", () => {
+    //     setPlaying(true);
+    //   }),
+    //   ws.on("pause", () => {
+    //     setPlaying(false);
+    //   }),
+    // ];
 
     return () => {
-      unsubscribe.forEach((fn) => fn());
       ws.destroy();
+      wavesurferRef.current = null;
     };
   }, [
   ]);
@@ -350,15 +354,14 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
       </BoundingBoxLayer>
 
       <div className="controls mt-4">
-        <button onClick={() => wavesurfer.playPause()}>
+        {/* <button onClick={() => wavesurfer.playPause()}>
           {playing ? "Pause" : "Play"}
-        </button>
+        </button> */}
       </div>
 
-    </div>
+    </div>  
   );
 }
-
 
 
 

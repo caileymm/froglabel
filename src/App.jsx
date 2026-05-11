@@ -63,15 +63,10 @@ function App() {
             setZoomX={setZoomX} 
             zoomY={zoomY} 
             setZoomY={setZoomY} 
-            scrollRef={scrollRef} 
-            isPlaying={isPlaying}
-            togglePlayPause={togglePlayPause}
             />
         </div>
         <WaveformSpectrogram 
-          zoomX={zoomX} 
           zoomY={zoomY} 
-          scrollRef={scrollRef}
           code={code}
           boxes={boxes}
           setBoxes={setBoxes}

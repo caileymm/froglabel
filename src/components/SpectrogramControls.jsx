@@ -1,7 +1,9 @@
-import { useState, useEffect, useCallback, scrollRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import {wavesurferRef} from './WaveformSpectrogram.jsx';
+import WaveSurfer from "wavesurfer.js";
 
-function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY, scrollRef, isPlaying, togglePlayPause }) {
-  
+
+function SpectrogramControls({ zoomY, setZoomY }) {
   const ZOOM_STEP = 0.15;
   const MIN_ZOOM = 0.2;
   const MAX_ZOOM = 5;
@@ -16,33 +18,61 @@ function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY, scrollRef, isPl
   const [isRPressed, setIsRPressed] = useState(false);
   const [isFPressed, setIsFPressed] = useState(false);
   const [isCPressed, setIsCPressed] = useState(false);
- 
+  
+  const [isPlaying, setPlaying] = useState(false);
+  const [wsZoom, setWsZoom] = useState(5); // starting px/sec value
 
-  const handlePlayAudio = () => togglePlayPause();
+ 
+  const handlePlayAudio  = useCallback(() => {
+  wavesurferRef.current?.playPause();
+  }, []); 
 
   
   const handlePanLeft = useCallback(() => {
-    if (scrollRef.current) scrollRef.current.scrollLeft -= 50;
-  }, [scrollRef]);
+    const ws = wavesurferRef.current;
+    if (!ws) return;
+    const currentTime = ws.getCurrentTime();
+    ws.setTime(Math.max(0, currentTime - 1)); // seek back 1 second
+  }, []);
 
   const handlePanRight = useCallback(() => {
-    if (scrollRef.current) scrollRef.current.scrollLeft += 50;
-  }, [scrollRef]);
+  const ws = wavesurferRef.current;
+    if (!ws) return;
+    const currentTime = ws.getCurrentTime();
+    ws.setTime(Math.min(ws.getDuration(), currentTime + 1)); // seek forward 1 second
+  }, []);
 
+
+// >>>>>>>>>>>>>>>>>>> TBD >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   const handlePanUp = () => console.log("Pan Up");
   const handlePanDown = () => console.log("Pan Down");
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
   // Keyboard zoom handler
     const handleZoomInX = useCallback(() => {
-          setZoomX((z) => Math.min(MAX_ZOOM, parseFloat((z + ZOOM_STEP).toFixed(2))));
-      }, [])
+      const ws = wavesurferRef.current;
+      if (!ws) return;
+      const newZoom = Math.min(wsZoom + 20, 500); // cap rn at 500px/sec can be changed later
+      ws.zoom(newZoom);
+      setWsZoom(newZoom);
+    }, [wsZoom]);
+
     const handleZoomOutX = useCallback(() => {
-          setZoomX((z) => Math.max(MIN_ZOOM, parseFloat((z - ZOOM_STEP).toFixed(2))));
-      }, [])
+      const ws = wavesurferRef.current;
+      if (!ws) return;
+      const newZoom = Math.max(wsZoom - 20, 5); // min display 10px/sec
+      ws.zoom(newZoom);
+      setWsZoom(newZoom);
+    }, [wsZoom]);
+
     const handleZoomInY = () => console.log("Y zoom in");
     const handleZoomOutY = () => console.log("Y zoom out");
       
     const handleResetView = useCallback(() => {
-      setZoomX(1);
+      const ws = wavesurferRef.current;
+      if (!ws) return;
+      ws.zoom(5);
       setZoomY(1);
     }, []);
 
@@ -75,12 +105,34 @@ function SpectrogramControls({ zoomX, setZoomX, zoomY, setZoomY, scrollRef, isPl
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [handlePlayAudio, togglePlayPause, handlePanLeft, handlePanRight, handleZoomInX, handleZoomOutX, handleResetView]);
+  }, [handlePlayAudio, handlePlayAudio, handlePanLeft, handlePanRight, handleZoomInX, handleZoomOutX, handleResetView]);
   
+  useEffect(() => {
+    // Poll until wavesurferRef.current is available
+    const interval = setInterval(() => {
+      const ws = wavesurferRef.current;
+      if (!ws) return;
+
+      clearInterval(interval);
+
+      const unsubs = [
+        ws.on("play", () => setPlaying(true)),
+        ws.on("pause", () => setPlaying(false)),
+      ];
+
+      // cleanup stored so we can call it later
+      return () => unsubs.forEach(fn => fn());
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className='flex items-center justify-center gap-2 flex-wrap'>
       <button onClick={handlePlayAudio} className={`px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
