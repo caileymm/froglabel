@@ -73,19 +73,19 @@ function App() {
               setCurrSelectedBox={setCurrSelectedBox}
               isPlaying={isPlaying}
               togglePlayPause={togglePlayPause}
-            />
-            <SpectrogramControls
-              isPlaying={isPlaying}
-              togglePlayPause={togglePlayPause}
-            />
+              />
+            <SpectrogramControls 
+              zoomX={zoomX} 
+              setZoomX={setZoomX} 
+              zoomY={zoomY} 
+              setZoomY={setZoomY} 
+              />
           </div>
 
           {/* Waveform + Spectrogram */}
           <div className='flex-1 min-h-0 overflow-y-auto'>
             <WaveformSpectrogram 
-              zoomX={zoomX} 
               zoomY={zoomY} 
-              scrollRef={scrollRef}
               code={code}
               boxes={boxes}
               setBoxes={setBoxes}
@@ -110,7 +110,8 @@ function App() {
             {rightPanel === 3 && <div><SpectrogramPanel/></div>}
           </div>
         )}
-
+        <Tools/>
+        <Dataset />
       </div>
     </div>
   );
