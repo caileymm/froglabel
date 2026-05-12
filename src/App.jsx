@@ -31,19 +31,30 @@ function App() {
     ws.playPause();
   }, []);
 
-  const [spectroMeta, setSpectroMeta] = useState({ duration: 1, containerWidth: 1 });
-
+  const [duration, setDuration] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
   const SPECTROGRAM_HEIGHT = 400;
+  const FREQUENCY_MIN = 0;
   const FREQUENCY_MAX = 5000;
+const melFromHz = (hz) => 2595 * Math.log10(1 + hz / 700);
+const hzFromMel = (mel) => 700 * (Math.pow(10, mel / 2595) - 1);
+const MEL_MIN = melFromHz(FREQUENCY_MIN);
+const MEL_MAX = melFromHz(FREQUENCY_MAX);
+
+const yToFreq = (y) => {
+  const fraction = 1 - y / SPECTROGRAM_HEIGHT;       // 0=bottom, 1=top
+  const mel = MEL_MIN + fraction * (MEL_MAX - MEL_MIN);
+  const hz = hzFromMel(mel);
+  return Math.max(FREQUENCY_MIN, Math.min(FREQUENCY_MAX, hz)); // clamp
+};
 
   const rows = useMemo(() => {
-    const { duration, containerWidth } = spectroMeta;
 
     return boxes.map((box, index) => {
       const startTime  = (box.left / containerWidth) * duration;
       const endTime    = ((box.left + box.width) / containerWidth) * duration;
-      const endFreq    = FREQUENCY_MAX * (1 - box.top / SPECTROGRAM_HEIGHT);
-      const startFreq  = FREQUENCY_MAX * (1 - (box.top + box.height) / SPECTROGRAM_HEIGHT);
+      const endFreq   = yToFreq(box.top);
+      const startFreq = yToFreq(box.top + box.height);
 
       return {
         id:        index + 1,
@@ -57,7 +68,7 @@ function App() {
         bandwidth: Math.round(endFreq - startFreq),
       };
     });
-  }, [boxes, codesDict, spectroMeta]);
+  }, [boxes, codesDict, duration, containerWidth]);
 
   // Keyboard shortcuts: 1=left panel, 2=box panel, 3=spectrogram panel, 4=dataset
   useEffect(() => {
@@ -111,14 +122,14 @@ function App() {
 
           {/* Waveform + Spectrogram */}
           <div className='flex-1 min-h-0 overflow-y-auto'>
-            <WaveformSpectrogram 
-              zoomY={zoomY} 
+            <WaveformSpectrogram
               code={code}
               boxes={boxes}
               setBoxes={setBoxes}
               currSelectedBox={currSelectedBox}
               setCurrSelectedBox={setCurrSelectedBox}
-              onReady={setSpectroMeta}
+              setDuration={setDuration}
+              setContainerWidth={setContainerWidth}
             />
             <Tools/>
           </div>

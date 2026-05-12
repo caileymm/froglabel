@@ -14,7 +14,7 @@ const FREQ_LABELS = [5000, 3900, 2800, 2000, 1300, 866, 497, 216, 0];
 
 export const wavesurferRef = { current: null };
 
-function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox }) {
+function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, setDuration, setContainerWidth}) {
   const containerRef = useRef(null);
 
   const melFromHz = (hz) => 2595 * Math.log10(1 + hz / 700);
@@ -47,18 +47,29 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
           labels: false,
           height: SPECTROGRAM_HEIGHT,
           splitChannels: false,
-          scale: 'mel',
+          scale: 'mel', // linear, log, mel, bark, erb
           frequencyMax: FREQUENCY_MAX,
           frequencyMin: FREQUENCY_MIN,
           fftSamples: 512,
           labelsBackground: 'rgba(0, 0, 0, 0.1)',
           useWebWorker: true,
+          // window fun
+          // bandpass (affect audio hear and spectrogram)
+          // 1. bin size and hop size ? 
+          // 2. overlap or stride ?
+          // 3. brightness and contrast -- gainDB (brightless), rangeDB (?)
         }),
         TimelinePlugin.create({
           style: { fontSize: '12px', color: '#1E1E1E', fontFamily: 'Afacad, sans-serif',},
           formatTimeCallback: (seconds) => `${seconds.toFixed(1)} s`,
         }),
       ],
+    });
+
+    ws.on('ready', () => {
+      const duration = ws.getDuration(); // in seconds
+      setDuration(duration)
+      setContainerWidth(containerRef.current.clientWidth);
     });
 
     wavesurferRef.current = ws;
