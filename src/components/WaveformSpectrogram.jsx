@@ -266,9 +266,13 @@ import { useEffect, useRef, useState } from "react";
 import Spectrogram from "wavesurfer.js/dist/plugins/spectrogram.esm.js";
 import ZoomPlugin from 'wavesurfer.js/dist/plugins/zoom.esm.js'
 import WaveSurfer from "wavesurfer.js";
+import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
 
 
-function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, scrollRef
+export const wavesurferRef = { current: null };
+
+
+function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox,
 }) {
   const containerRef = useRef(null);
   const [wavesurfer, setWavesurfer] = useState(null);
@@ -282,8 +286,8 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
       height: 50,
       url: audioSrc,
       waveColor: 'rgb(0, 0, 0)',
-      cursorColor: '#ddd5e9',
-      progressColor: 'rgb(210, 181, 210)',
+      cursorColor: 'rgb(221, 213, 233)',
+      progressColor: 'rgb(221, 213, 233)',
       cursorWidth: 3,
       sampleRate: 10000,
       plugins: [
@@ -301,40 +305,44 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
         ZoomPlugin.create({
             scale: 0.5, // the amount of zoom per wheel step, e.g. 0.5 means a 50% magnification per scroll
             maxZoom: 100 // Optionally, specify the maximum pixels-per-second factor while zooming
-        })],       
+        }),
+        TimelinePlugin.create( {style: {fontSize: '10px',color: '#000000',}
+        })],
+          
     });
 
     setWavesurfer(ws);
+    wavesurferRef.current=ws;
 
-    const unsubscribe = [
-      ws.on("play", () => {
-        setPlaying(true);
-      }),
-      ws.on("pause", () => {
-        setPlaying(false);
-      }),
-    ];
+    // const unsubscribe = [
+    //   ws.on("play", () => {
+    //     setPlaying(true);
+    //   }),
+    //   ws.on("pause", () => {
+    //     setPlaying(false);
+    //   }),
+    // ];
 
     return () => {
-      unsubscribe.forEach((fn) => fn());
       ws.destroy();
+      wavesurferRef.current = null;
     };
   }, [
   ]);
 
   return (
     <div className="bg-[#82A062] p-6 rounded-xl my-2">
+
       <BoundingBoxLayer
         code={code}
         boxes={boxes}
         setBoxes={setBoxes}
         currSelectedBox={currSelectedBox}
         setCurrSelectedBox={setCurrSelectedBox}
-      >
+        >
 
         {/* Shared coordinate system */}
         <div className="relative w-full">
-
           {/* Spectrogram/player */}
           <div className="player" ref={containerRef}>
             <div className="relative w-full">
@@ -346,15 +354,14 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
       </BoundingBoxLayer>
 
       <div className="controls mt-4">
-        <button onClick={() => wavesurfer.playPause()}>
+        {/* <button onClick={() => wavesurfer.playPause()}>
           {playing ? "Pause" : "Play"}
-        </button>
+        </button> */}
       </div>
 
-    </div>
+    </div>  
   );
 }
-
 
 
 
