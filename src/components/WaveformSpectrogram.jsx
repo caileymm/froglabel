@@ -314,15 +314,6 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
     setWavesurfer(ws);
     wavesurferRef.current=ws;
 
-    // const unsubscribe = [
-    //   ws.on("play", () => {
-    //     setPlaying(true);
-    //   }),
-    //   ws.on("pause", () => {
-    //     setPlaying(false);
-    //   }),
-    // ];
-
     return () => {
       ws.destroy();
       wavesurferRef.current = null;
@@ -352,12 +343,6 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
         </div>
 
       </BoundingBoxLayer>
-
-      <div className="controls mt-4">
-        {/* <button onClick={() => wavesurfer.playPause()}>
-          {playing ? "Pause" : "Play"}
-        </button> */}
-      </div>
 
     </div>  
   );
