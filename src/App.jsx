@@ -8,7 +8,7 @@ import CodesPanel from './components/CodesPanel'
 import DatasetPanel from './components/DatasetPanel'
 import BoxFilePanel from './components/BoxFilePanel'
 import SpectrogramPanel from './components/SpectrogramPanel'
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 
 function App() {
   const [boxes, setBoxes] = useState([]);
@@ -30,6 +30,34 @@ function App() {
     if (!ws) return;
     ws.playPause();
   }, []);
+
+  const [spectroMeta, setSpectroMeta] = useState({ duration: 1, containerWidth: 1 });
+
+  const SPECTROGRAM_HEIGHT = 400;
+  const FREQUENCY_MAX = 5000;
+
+  const rows = useMemo(() => {
+    const { duration, containerWidth } = spectroMeta;
+
+    return boxes.map((box, index) => {
+      const startTime  = (box.left / containerWidth) * duration;
+      const endTime    = ((box.left + box.width) / containerWidth) * duration;
+      const endFreq    = FREQUENCY_MAX * (1 - box.top / SPECTROGRAM_HEIGHT);
+      const startFreq  = FREQUENCY_MAX * (1 - (box.top + box.height) / SPECTROGRAM_HEIGHT);
+
+      return {
+        id:        index + 1,
+        code:      box.code,
+        name:      codesDict[box.code] ?? '',
+        startTime: startTime.toFixed(2),
+        endTime:   endTime.toFixed(2),
+        duration:  (endTime - startTime).toFixed(2),
+        startFreq: Math.round(Math.max(0, startFreq)),
+        endFreq:   Math.round(Math.min(FREQUENCY_MAX, endFreq)),
+        bandwidth: Math.round(endFreq - startFreq),
+      };
+    });
+  }, [boxes, codesDict, spectroMeta]);
 
   // Keyboard shortcuts: 1=left panel, 2=box panel, 3=spectrogram panel, 4=dataset
   useEffect(() => {
@@ -59,7 +87,7 @@ function App() {
         )}
 
         {/* Middle: Controls + Waveform + Tools */}
-        <div className='flex-1 min-w-0 min-h-0 flex flex-col gap-2'>
+        <div className='flex-1 min-w-0 min-h-0 flex flex-col'>
 
           {/* Controls bar */}
           <div className='p-2 bg-[#82A062] rounded-xl flex flex-col gap-2'>
@@ -90,6 +118,7 @@ function App() {
               setBoxes={setBoxes}
               currSelectedBox={currSelectedBox}
               setCurrSelectedBox={setCurrSelectedBox}
+              onReady={setSpectroMeta}
             />
             <Tools/>
           </div>
@@ -97,7 +126,8 @@ function App() {
           {/* Bottom Dataset Panel (key: 4) */}
           {showDataset && (
             <div className='h-40 shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'>
-              <DatasetPanel />
+              <DatasetPanel 
+                rows={rows}/>
             </div>
           )}
         </div>

@@ -7,3 +7,9 @@
 body {
     background-color: #E6E5C9;
 }
+
+.afacad-font {
+  font-family: "Afacad", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}

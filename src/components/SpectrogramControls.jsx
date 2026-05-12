@@ -153,6 +153,7 @@ function SpectrogramControls({ zoomY, setZoomY }) {
           Pan Right
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>D</div>
         </button>
+        {/*
         <button onClick={handlePanUp} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
           ${isWPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Pan Up
@@ -163,6 +164,7 @@ function SpectrogramControls({ zoomY, setZoomY }) {
           Pan Down
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>S</div>
         </button>
+        */}
       </div>
 
       <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
@@ -176,6 +178,7 @@ function SpectrogramControls({ zoomY, setZoomY }) {
           Zoom Out (X)
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>E</div>
         </button>
+        {/*
         <button onClick={handleZoomInY} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
           ${isRPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Zoom In (Y)
@@ -186,6 +189,7 @@ function SpectrogramControls({ zoomY, setZoomY }) {
           Zoom Out (Y)
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>F</div>
         </button>
+        */}
         <button onClick={handleResetView} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
           ${isCPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Reset View
