@@ -8,8 +8,7 @@ import CodesPanel from './components/CodesPanel'
 import DatasetPanel from './components/DatasetPanel'
 import BoxFilePanel from './components/BoxFilePanel'
 import SpectrogramPanel from './components/SpectrogramPanel'
-import { useState, useRef, useCallback, useEffect, useMemo, useMemo } from 'react'
-import { yToFreq } from './utils/spectrogramScale'
+import { useState, useRef, useCallback, useEffect } from 'react'
 
 function App() {
   const [boxes, setBoxes] = useState([]);
@@ -43,60 +42,6 @@ function App() {
     if (!ws) return;
     ws.playPause();
   }, []);
-
-  const rows = useMemo(() => {
-    return boxes.map((box, index) => {
-      const startTime = (box.left / containerWidth) * duration;
-      const endTime   = ((box.left + box.width) / containerWidth) * duration;
-      const endFreq   = yToFreq(box.top);
-      const startFreq = yToFreq(box.top + box.height);
-
-      return {
-        id:        index + 1,
-        code:      box.code,
-        name:      codesDict[box.code] ?? '',
-        startTime: startTime.toFixed(2),
-        endTime:   endTime.toFixed(2),
-        duration:  (endTime - startTime).toFixed(2),
-        startFreq: Math.round(startFreq),
-        endFreq:   Math.round(endFreq),
-        bandwidth: Math.round(endFreq - startFreq),
-      };
-    });
-  }, [boxes, codesDict, duration, containerWidth]);
-
-  const handleDeleteBox = (i) => {
-    setBoxes(boxes.filter((_, idx) => idx !== i));
-  };
-
-  const [drawingBox, setDrawingBox] = useState(null);
-
-  const drawingRow = useMemo(() => {
-    if (!drawingBox || !containerWidth || !duration) return null;
-    const startTime = (drawingBox.left / containerWidth) * duration;
-    const endTime   = ((drawingBox.left + drawingBox.width) / containerWidth) * duration;
-    const endFreq   = yToFreq(drawingBox.top);
-    const startFreq = yToFreq(drawingBox.top + drawingBox.height);
-    return {
-      code:      drawingBox.code,
-      startTime: startTime.toFixed(2),
-      endTime:   endTime.toFixed(2),
-      duration:  (endTime - startTime).toFixed(2),
-      startFreq: Math.round(startFreq),
-      endFreq:   Math.round(endFreq),
-      bandwidth: Math.round(endFreq - startFreq),
-    };
-  }, [drawingBox, containerWidth, duration, code]);
-
-  const [selectedRow, setSelectedRow] = useState(null);
-
-  useEffect(() => {
-    if (currSelectedBox !== -1 && rows[currSelectedBox]) {
-      setSelectedRow(rows[currSelectedBox]);
-    } else {
-      setSelectedRow(null);
-    }
-  }, [rows, currSelectedBox]);
 
   // Keyboard shortcuts: 1=left panel, 2=box panel, 3=spectrogram panel, 4=dataset
   useEffect(() => {
@@ -186,28 +131,14 @@ function App() {
               setBoxes={setBoxes}
               currSelectedBox={currSelectedBox}
               setCurrSelectedBox={setCurrSelectedBox}
-              setDuration={setDuration}
-              setContainerWidth={setContainerWidth}
-              setDrawingBox={setDrawingBox}
-              showDataset={showDataset}
             />
             <Tools />
           </div>
 
           {/* Bottom Dataset Panel (key: 4) */}
           {showDataset && (
-            <div
-              className='shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'
-              style={{ height: datasetHeight }}
-            >
-              {/* Drag handle */}
-              <div
-                className='w-full flex items-center justify-center mb-1 cursor-ns-resize'
-                onMouseDown={handleDragStart}
-              >
-                <div className='w-12 h-1 bg-[#1E1E1E] opacity-30 rounded-full' />
-              </div>
-              <DatasetPanel rows={rows} onDeleteRow={handleDeleteBox} />
+            <div className='h-40 shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'>
+              <DatasetPanel />
             </div>
           )}
         </div>
