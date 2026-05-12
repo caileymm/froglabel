@@ -45,11 +45,17 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
           labelsBackground: 'rgba(0, 0, 0, 0.1)',
           useWebWorker: true,
         }),
+<<<<<<< HEAD
         TimelinePlugin.create({
           style: { fontSize: '12px', color: '#1E1E1E', fontFamily: 'Afacad, sans-serif' },
           formatTimeCallback: (seconds) => `${seconds.toFixed(1)} s`,
         }),
       ],
+=======
+        TimelinePlugin.create( {style: {fontSize: '10px',color: '#000000',}
+        })],
+          
+>>>>>>> 700410f (removed mouse zoom option)
     });
 
     ws.on('ready', () => {
