@@ -56,7 +56,7 @@ function BoundingBoxControls() {
     }, []);
 
   return (
-    <div className='p-2 bg-[#82A062] rounded-xl flex items-center justify-center gap-2 w-90 mx-auto'>
+    <div className='p-1 bg-[#82A062] rounded-xl flex items-center justify-center gap-2 w-80  mx-auto'>
         <button className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
           ${isShiftPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
           Change Tool
