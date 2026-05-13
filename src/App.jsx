@@ -54,6 +54,7 @@ function App() {
     const endFreq   = yToFreq(box.top);
     return {
       ...box,
+      name:      codesDict[box.code],
       startTime: startTime.toFixed(3),
       endTime:   endTime.toFixed(3),
       duration:  (endTime - startTime).toFixed(3),
@@ -82,7 +83,7 @@ function App() {
   }, []);
 
   // Resizable dataset panel
-  const [datasetHeight, setDatasetHeight] = useState(160);
+  const [datasetHeight, setDatasetHeight] = useState(100);
   const isDragging = useRef(false);
   const dragStartY = useRef(0);
   const dragStartHeight = useRef(0);
@@ -127,10 +128,16 @@ function App() {
         )}
 
         {/* Middle: Controls + Waveform + Tools */}
-        <div className='flex-1 min-w-0 min-h-0 flex flex-col gap-2'>
+        <div className='flex-1 min-w-0 min-h-0 flex flex-col'>
 
           {/* Controls bar */}
-          <div className='p-2 bg-[#82A062] rounded-xl flex flex-col gap-1.5 shrink-0'>
+          <div className='p-2 bg-[#82A062] rounded-xl flex flex-wrap justify-center items-center gap-1.5'>
+            <SpectrogramControls
+              zoomX={zoomX}
+              setZoomX={setZoomX}
+              zoomY={zoomY}
+              setZoomY={setZoomY}
+            />
             <BoundingBoxControls
               code={code}
               setCode={setCode}
@@ -141,12 +148,6 @@ function App() {
               setCurrSelectedBox={setCurrSelectedBox}
               isPlaying={isPlaying}
               togglePlayPause={togglePlayPause}
-            />
-            <SpectrogramControls
-              zoomX={zoomX}
-              setZoomX={setZoomX}
-              zoomY={zoomY}
-              setZoomY={setZoomY}
             />
           </div>
 
@@ -169,18 +170,20 @@ function App() {
           {showDataset && (
             <>
               <div
-                className='shrink-0 h-1.5 rounded-full bg-[#82A062] cursor-ns-resize hover:bg-[#6a8f4f] transition-colors'
-                onMouseDown={handleDragStart}
-              />
-              <div
-                className='shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'
+                className='shrink-0 bg-[#82A062] rounded-xl overflow-y-auto'
                 style={{ height: datasetHeight }}
-              >
-                <DatasetPanel
-                  rows={rows}
-                  onDeleteRow={(i) => setBoxes(prev => prev.filter((_, idx) => idx !== i))}
-                />
-              </div>
+                >
+                  <div
+                    className='h-2 cursor-ns-resize'
+                    onMouseDown={handleDragStart}
+                    />
+                  <div className='px-2 pb-2'>
+                    <DatasetPanel
+                      rows={rows}
+                      onDeleteRow={(i) => setBoxes(prev => prev.filter((_, idx) => idx !== i))}
+                      />
+                  </div>
+                </div>
             </>
           )}
         </div>

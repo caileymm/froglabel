@@ -35,7 +35,7 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
       dragToSeek: true,
       plugins: [
         Spectrogram.create({
-          labels: false,
+          labels: true,
           height: SPECTROGRAM_HEIGHT,
           splitChannels: false,
           scale: SCALE,

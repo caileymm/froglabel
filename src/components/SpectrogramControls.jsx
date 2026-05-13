@@ -11,12 +11,12 @@ function SpectrogramControls({ zoomY, setZoomY }) {
   const [isVPressed, setIsVPressed] = useState(false);
   const [isAPressed, setIsAPressed] = useState(false);
   const [isDPressed, setIsDPressed] = useState(false);
-  const [isWPressed, setIsWPressed] = useState(false);
-  const [isSPressed, setIsSPressed] = useState(false);
+  // const [isWPressed, setIsWPressed] = useState(false);
+  // const [isSPressed, setIsSPressed] = useState(false);
   const [isQPressed, setIsQPressed] = useState(false);
   const [isEPressed, setIsEPressed] = useState(false);
-  const [isRPressed, setIsRPressed] = useState(false);
-  const [isFPressed, setIsFPressed] = useState(false);
+  // const [isRPressed, setIsRPressed] = useState(false);
+  // const [isFPressed, setIsFPressed] = useState(false);
   const [isCPressed, setIsCPressed] = useState(false);
   
   const [isPlaying, setPlaying] = useState(false);
@@ -27,10 +27,15 @@ function SpectrogramControls({ zoomY, setZoomY }) {
   wavesurferRef.current?.playPause();
   }, []); 
 
+  const getWsScrollContainer = () => {
+    const ws = wavesurferRef.current;
+    if (!ws) return null;
+    return ws.getWrapper()?.parentElement;  //gets the parent div of the waveform div which in this case is the scroll container
+  };
   
   const handlePanLeft = useCallback(() => {
-  const container = getWsScrollContainer();
-  if (container) container.scrollLeft -= 100;
+    const container = getWsScrollContainer();
+    if (container) container.scrollLeft -= 100;
   }, []);
 
   const handlePanRight = useCallback(() => {
@@ -38,12 +43,8 @@ function SpectrogramControls({ zoomY, setZoomY }) {
     if (container) container.scrollLeft += 100;
   }, []);
 
-
-// >>>>>>>>>>>>>>>>>>> TBD >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  const handlePanUp = () => console.log("Pan Up");
-  const handlePanDown = () => console.log("Pan Down");
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
+  // const handlePanUp = () => console.log("Pan Up");
+  // const handlePanDown = () => console.log("Pan Down");
 
   // Keyboard zoom handler
     const handleZoomInX = useCallback(() => {
@@ -72,20 +73,13 @@ function SpectrogramControls({ zoomY, setZoomY }) {
       setZoomY(1);
     }, []);
 
-    const getWsScrollContainer = () => {
-      const ws = wavesurferRef.current;
-      if (!ws) return null;
-      return ws.getWrapper()?.parentElement;  //gets the parent div of the waveform div which in this case is the scroll container
-    };
-
-
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'v') { setIsVPressed(true); handlePlayAudio(); }
       if (e.key === 'a') { setIsAPressed(true); handlePanLeft(); }
       if (e.key === 'd') { setIsDPressed(true); handlePanRight(); }
-      if (e.key === 'w') { setIsWPressed(true); handlePanUp(); }
-      if (e.key === 's') { setIsSPressed(true); handlePanDown(); }
+      // if (e.key === 'w') { setIsWPressed(true); handlePanUp(); }
+      // if (e.key === 's') { setIsSPressed(true); handlePanDown(); }
       if (e.key === 'q') { setIsQPressed(true); handleZoomInX(); }
       if (e.key === 'e') { setIsEPressed(true); handleZoomOutX(); }
       if (e.key === 'r') { setIsRPressed(true); handleZoomInY(); }
