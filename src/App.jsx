@@ -8,7 +8,7 @@ import CodesPanel from './components/CodesPanel'
 import DatasetPanel from './components/DatasetPanel'
 import BoxFilePanel from './components/BoxFilePanel'
 import SpectrogramPanel from './components/SpectrogramPanel'
-import { useState, useRef, useCallback, useEffect, useMemo, useMemo } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { yToFreq } from './utils/spectrogramScale'
 
 function App() {
