@@ -1,4 +1,4 @@
-import audioSrc from "../assets/audio.mp3";
+import audioSrc from "../assets/frogsounds.mp3";
 import BoundingBoxLayer from "./BoundingBoxLayer";
 import { useEffect, useState, useRef } from "react";
 import Spectrogram from "wavesurfer.js/dist/plugins/spectrogram.esm.js";
