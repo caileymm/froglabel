@@ -45,10 +45,9 @@ function App() {
 
   return (
     <div className='flex flex-col h-screen overflow-hidden'>
+      <Header />
 
-     <Header />
-      <div className='px-5 py-2 flex-col items-center justify-center'>
-
+      <div className='flex gap-2 px-2 py-2 flex-1 min-h-0 overflow-hidden items-stretch'>
 
         {/* Left Panel (key: 1) — Codes */}
         {showLeftPanel && (
