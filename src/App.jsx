@@ -45,42 +45,10 @@ function App() {
 
   return (
     <div className='flex flex-col h-screen overflow-hidden'>
-      <Header />
 
      <Header />
       <div className='px-5 py-2 flex-col items-center justify-center'>
-        <div className='p-2 bg-[#82A062] rounded-xl flex flex-col gap-2'>
-          <BoundingBoxControls 
-            code={code}
-            setCode={setCode}
-            boxes={boxes}
-            setBoxes={setBoxes}
-            currSelectedBox={currSelectedBox}
-            setCurrSelectedBox={setCurrSelectedBox}
-            isPlaying={isPlaying}
-            togglePlayPause={togglePlayPause}
-            />
-          <SpectrogramControls 
-            zoomX={zoomX} 
-            setZoomX={setZoomX} 
-            zoomY={zoomY} 
-            setZoomY={setZoomY} 
-            />
-        </div>
-        <WaveformSpectrogram 
-          zoomY={zoomY} 
-          code={code}
-          boxes={boxes}
-          setBoxes={setBoxes}
-          currSelectedBox={currSelectedBox}
-          setCurrSelectedBox={setCurrSelectedBox}
-        />
-        <Tools/>
-        <Dataset />
-      </div>
-   </div>
- )
-}
+
 
         {/* Left Panel (key: 1) — Codes */}
         {showLeftPanel && (
