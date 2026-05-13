@@ -4,10 +4,6 @@ import {wavesurferRef, spectrogramRef} from './WaveformSpectrogram.jsx';
 function Tools() {
     const [isShiftPressed, setIsShiftPressed] = useState(false);
     const [currTool, setCurrTool] = useState(0);
-    const [is1Pressed, setIs1Pressed] = useState(false);
-    const [is2Pressed, setIs2Pressed] = useState(false);
-    const [is3Pressed, setIs3Pressed] = useState(false);
-    const [is4Pressed, setIs4Pressed] = useState(false);
     const shiftAloneRef = useRef(true);
 
     const handleChangeTool = () => {
@@ -53,10 +49,10 @@ function Tools() {
         } else if (e.shiftKey) {
         shiftAloneRef.current = false; // another key was pressed with Shift
         }
-        else if (e.key === '1') {setIs1Pressed(true); handleChangeToTool1();}
-        else if (e.key === '2') {setIs2Pressed(true); handleChangeToTool2();}
-        else if (e.key === '3') {setIs3Pressed(true); handleChangeToTool3();}
-        else if (e.key === '4') {setIs4Pressed(true); handleChangeToTool4();}
+        else if (e.key === '1') { handleChangeToTool1();}
+        else if (e.key === '2') { handleChangeToTool2();}
+        else if (e.key === '3') {handleChangeToTool3();}
+        else if (e.key === '4') {handleChangeToTool4();}
     };
 
     const handleKeyUp = (e) => {
@@ -64,10 +60,6 @@ function Tools() {
         if (shiftAloneRef.current) handleChangeTool(); // only cycle if Shift was alone
         setIsShiftPressed(false);
         }
-        else if (e.key === '1') {setIs1Pressed(false);}
-        else if (e.key === '2') {setIs2Pressed(false);}
-        else if (e.key === '3') {setIs3Pressed(false);}
-        else if (e.key === '4') {setIs4Pressed(false);}
     };
 
     window.addEventListener('keydown', handleKeyDown);
