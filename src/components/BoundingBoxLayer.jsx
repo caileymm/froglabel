@@ -19,6 +19,7 @@ const BoundingBoxLayer = ({ children, code, boxes, setBoxes, currSelectedBox, se
 
         if (clickedIndex !== -1) {
             setCurrSelectedBox(clickedIndex);
+            setDrawingBox?.(null);
             return;
         }
 
@@ -110,6 +111,7 @@ const BoundingBoxLayer = ({ children, code, boxes, setBoxes, currSelectedBox, se
     const handleMouseUp = () => {
         if (resizeState.current) {
             resizeState.current = null;
+            setDrawingBox?.(null);
             return;
         }
         if (!isDrawing || !activeBox || (code.length < 3)) return;

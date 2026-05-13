@@ -10,7 +10,7 @@ import { audioInfoReady, sampleRate } from '../utils/audioInfo';
 
 export const wavesurferRef = { current: null };
 
-function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, setDuration, setContainerWidth, setDrawingBox, showDataset}) {
+function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, setDuration, setContainerWidth, setDrawingBox}) {
   const containerRef = useRef(null);
   const [spectroTop, setSpectroTop] = useState(WAVEFORM_HEIGHT);
   const [spectroHeight, setSpectroHeight] = useState(SPECTROGRAM_HEIGHT);
