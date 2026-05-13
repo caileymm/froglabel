@@ -270,6 +270,8 @@ import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
 
 
 export const wavesurferRef = { current: null };
+export const spectrogramRef = { current: null };
+
 
 
 function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox,
@@ -278,9 +280,25 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
   const [wavesurfer, setWavesurfer] = useState(null);
   const [playing, setPlaying] = useState(false);
 
+  
+  
+
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const spectroPlugin = Spectrogram.create({
+    labels: true,
+    height: 400,
+    splitChannels: false,
+    scale: 'mel',
+    frequencyMax: 5000,
+    frequencyMin: 0,
+    fftSamples: 512,
+    labelsBackground: 'rgba(0, 0, 0, 0.1)',
+    useWebWorker: true,
+    gainDB: 50,
+    });
+    
     const ws = WaveSurfer.create({
       container: containerRef.current,
       height: 50,
@@ -290,25 +308,14 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
       progressColor: 'rgb(221, 213, 233)',
       cursorWidth: 3,
       sampleRate: 10000,
-      plugins: [
-        Spectrogram.create({
-          labels: true,
-          height: 400,
-          splitChannels: false,
-          scale: 'mel',
-          frequencyMax: 5000, // Maximum frequency to show
-          frequencyMin: 0, // Minimum frequency to show
-          fftSamples: 512, // Number of samples for FFT (must be power of 2),  // Higher values = better frequency resolution, slower rendering
-          labelsBackground: 'rgba(0, 0, 0, 0.1)', // Background for frequency labels
-          useWebWorker: true, // Use web worker for FFT calculations (improves performance)
-        }),
-        ZoomPlugin.create({
-            scale: 0.5, // the amount of zoom per wheel step, e.g. 0.5 means a 50% magnification per scroll
-            maxZoom: 100 // Optionally, specify the maximum pixels-per-second factor while zooming
-        }),
+      plugins: [ spectroPlugin,
         TimelinePlugin.create( {style: {fontSize: '10px',color: '#000000',}
         })],
           
+    });
+
+    ws.on('ready', () => {
+      spectrogramRef.current = spectroPlugin; 
     });
 
     setWavesurfer(ws);

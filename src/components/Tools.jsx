@@ -1,8 +1,13 @@
 import { useState, useEffect, useRef} from 'react';
+import {wavesurferRef, spectrogramRef} from './WaveformSpectrogram.jsx';
 
-function BoundingBoxControls() {
+function Tools() {
     const [isShiftPressed, setIsShiftPressed] = useState(false);
     const [currTool, setCurrTool] = useState(0);
+    const [is1Pressed, setIs1Pressed] = useState(false);
+    const [is2Pressed, setIs2Pressed] = useState(false);
+    const [is3Pressed, setIs3Pressed] = useState(false);
+    const [is4Pressed, setIs4Pressed] = useState(false);
     const shiftAloneRef = useRef(true);
 
     const handleChangeTool = () => {
@@ -11,22 +16,32 @@ function BoundingBoxControls() {
 
     const handleChangeToTool0 = () => {
         setCurrTool(0)
+        const ws = wavesurferRef.current;
+        if (!ws) return;
     }
 
     const handleChangeToTool1 = () => {
         setCurrTool(1)
+        const ws = wavesurferRef.current;
+        if (!ws) return;
     }
 
     const handleChangeToTool2 = () => {
         setCurrTool(2)
+        const ws = wavesurferRef.current;
+        if (!ws) return;
     }
 
     const handleChangeToTool3 = () => {
         setCurrTool(3)
+        const ws = wavesurferRef.current;
+        if (!ws) return;
     }
 
     const handleChangeToTool4 = () => {
         setCurrTool(4)
+        const ws = wavesurferRef.current;
+        if (!ws) return;
     }
 
     
@@ -38,6 +53,10 @@ function BoundingBoxControls() {
         } else if (e.shiftKey) {
         shiftAloneRef.current = false; // another key was pressed with Shift
         }
+        else if (e.key === '1') {setIs1Pressed(true); handleChangeToTool1();}
+        else if (e.key === '2') {setIs2Pressed(true); handleChangeToTool2();}
+        else if (e.key === '3') {setIs3Pressed(true); handleChangeToTool3();}
+        else if (e.key === '4') {setIs4Pressed(true); handleChangeToTool4();}
     };
 
     const handleKeyUp = (e) => {
@@ -45,6 +64,10 @@ function BoundingBoxControls() {
         if (shiftAloneRef.current) handleChangeTool(); // only cycle if Shift was alone
         setIsShiftPressed(false);
         }
+        else if (e.key === '1') {setIs1Pressed(false);}
+        else if (e.key === '2') {setIs2Pressed(false);}
+        else if (e.key === '3') {setIs3Pressed(false);}
+        else if (e.key === '4') {setIs4Pressed(false);}
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -54,6 +77,7 @@ function BoundingBoxControls() {
         window.removeEventListener('keyup', handleKeyUp);
     };
     }, []);
+
 
   return (
     <div className='p-1 bg-[#82A062] rounded-xl flex items-center justify-center gap-2 w-80  mx-auto'>
@@ -70,26 +94,26 @@ function BoundingBoxControls() {
 
             <button onClick={handleChangeToTool1} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
                 ${currTool == 1 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T2
+            T1
             </button>
 
             <button onClick={handleChangeToTool2} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
                 ${currTool == 2 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T3
+            T2
             </button>
 
             <button onClick={handleChangeToTool3} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
                 ${currTool == 3 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T4
+            T3
             </button>
 
             <button onClick={handleChangeToTool4} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
                 ${currTool == 4 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T5
+            T4
             </button>
       </div>
     </div>
   );
 }
 
-export default BoundingBoxControls;
+export default Tools;
