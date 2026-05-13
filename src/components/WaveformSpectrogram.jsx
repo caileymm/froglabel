@@ -302,10 +302,6 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
           labelsBackground: 'rgba(0, 0, 0, 0.1)', // Background for frequency labels
           useWebWorker: true, // Use web worker for FFT calculations (improves performance)
         }),
-        ZoomPlugin.create({
-            scale: 0.5, // the amount of zoom per wheel step, e.g. 0.5 means a 50% magnification per scroll
-            maxZoom: 100 // Optionally, specify the maximum pixels-per-second factor while zooming
-        }),
         TimelinePlugin.create( {style: {fontSize: '10px',color: '#000000',}
         })],
           
@@ -313,15 +309,6 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
 
     setWavesurfer(ws);
     wavesurferRef.current=ws;
-
-    // const unsubscribe = [
-    //   ws.on("play", () => {
-    //     setPlaying(true);
-    //   }),
-    //   ws.on("pause", () => {
-    //     setPlaying(false);
-    //   }),
-    // ];
 
     return () => {
       ws.destroy();
@@ -352,12 +339,6 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
         </div>
 
       </BoundingBoxLayer>
-
-      <div className="controls mt-4">
-        {/* <button onClick={() => wavesurfer.playPause()}>
-          {playing ? "Pause" : "Play"}
-        </button> */}
-      </div>
 
     </div>  
   );

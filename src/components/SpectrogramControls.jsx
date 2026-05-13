@@ -29,17 +29,13 @@ function SpectrogramControls({ zoomY, setZoomY }) {
 
   
   const handlePanLeft = useCallback(() => {
-    const ws = wavesurferRef.current;
-    if (!ws) return;
-    const currentTime = ws.getCurrentTime();
-    ws.setTime(Math.max(0, currentTime - 1)); // seek back 1 second
+  const container = getWsScrollContainer();
+  if (container) container.scrollLeft -= 100;
   }, []);
 
   const handlePanRight = useCallback(() => {
-  const ws = wavesurferRef.current;
-    if (!ws) return;
-    const currentTime = ws.getCurrentTime();
-    ws.setTime(Math.min(ws.getDuration(), currentTime + 1)); // seek forward 1 second
+    const container = getWsScrollContainer();
+    if (container) container.scrollLeft += 100;
   }, []);
 
 
@@ -75,6 +71,13 @@ function SpectrogramControls({ zoomY, setZoomY }) {
       ws.zoom(5);
       setZoomY(1);
     }, []);
+
+    const getWsScrollContainer = () => {
+      const ws = wavesurferRef.current;
+      if (!ws) return null;
+      return ws.getWrapper()?.parentElement;  //gets the parent div of the waveform div which in this case is the scroll container
+    };
+
 
   useEffect(() => {
     const handleKeyDown = (e) => {
