@@ -1,6 +1,6 @@
 import audioSrc from "../assets/audio.mp3";
 import BoundingBoxLayer from "./BoundingBoxLayer";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Spectrogram from "wavesurfer.js/dist/plugins/spectrogram.esm.js";
 import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js';
@@ -10,12 +10,21 @@ import { audioInfoReady, sampleRate } from '../utils/audioInfo';
 
 export const wavesurferRef = { current: null };
 
-function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, setDuration, setContainerWidth, setDrawingBox }) {
+function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, setDuration, setDrawingBox }) {
   const containerRef = useRef(null);
-  const [spectroTop, setSpectroTop] = useState(WAVEFORM_HEIGHT);
-  const [spectroHeight, setSpectroHeight] = useState(SPECTROGRAM_HEIGHT);
-
+  const overlayRef = useRef(null); // Ref to move the boxes during pan
+  const [spectroTop] = useState(WAVEFORM_HEIGHT);
+  const [spectroHeight] = useState(SPECTROGRAM_HEIGHT);
   const [canvasWidth, setCanvasWidth] = useState(0);
+
+  // Helper to sync the overlay position with WaveSurfer's scroll
+  const syncOverlayPosition = useCallback(() => {
+    const scrollContainer = containerRef.current?.querySelector('div');
+    if (scrollContainer && overlayRef.current) {
+      // Move the overlay horizontally to match the scroll position
+      overlayRef.current.style.transform = `translateX(-${scrollContainer.scrollLeft}px)`;
+    }
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -55,24 +64,27 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
         ],
       });
 
+      // Update state when audio is loaded
       ws.on('ready', () => {
-        setDuration(ws.getDuration());
-        setContainerWidth(containerRef.current.clientWidth);
-        const waveCanvas = containerRef.current.querySelector('canvas');
-        if (waveCanvas) setCanvasWidth(waveCanvas.scrollWidth);
-        const canvases = containerRef.current.querySelectorAll('canvas');
-        if (canvases.length > 1) {
-          const spectroCanvas = canvases[1];
-          const containerTop = containerRef.current.getBoundingClientRect().top;
-          const canvasTop = spectroCanvas.getBoundingClientRect().top;
-          setSpectroTop(canvasTop - containerTop);
-          setSpectroHeight(spectroCanvas.getBoundingClientRect().height);
+        const duration = ws.getDuration();
+        setDuration(duration);
+        
+        const wrapper = containerRef.current.querySelector('div');
+        if (wrapper) {
+          setCanvasWidth(wrapper.scrollWidth);
+          // Listen for manual scrolls (panning)
+          wrapper.addEventListener('scroll', syncOverlayPosition);
         }
       });
 
+      // Update width and position whenever zoom changes
       ws.on('zoom', () => {
-        const waveCanvas = containerRef.current?.querySelector('canvas');
-        if (waveCanvas) setCanvasWidth(waveCanvas.scrollWidth);
+        const wrapper = containerRef.current.querySelector('div');
+        if (wrapper) {
+          setCanvasWidth(wrapper.scrollWidth);
+          // Recalculate position immediately after zoom
+          requestAnimationFrame(syncOverlayPosition);
+        }
       });
 
       wavesurferRef.current = ws;
@@ -80,16 +92,20 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
 
     return () => {
       cancelled = true;
-      ws?.destroy();
+      if (wavesurferRef.current) {
+        const wrapper = containerRef.current?.querySelector('div');
+        wrapper?.removeEventListener('scroll', syncOverlayPosition);
+        wavesurferRef.current.destroy();
+      }
       wavesurferRef.current = null;
     };
-  }, []);
+  }, [setDuration, syncOverlayPosition]);
 
   return (
     <div className="bg-[#82A062] p-6 rounded-xl my-2 overflow-hidden">
       <div className="flex">
 
-        {/* Frequency labels */}
+        {/* Frequency labels (Fixed Left) */}
         <div
           className="relative shrink-0 w-11 items-end pr-1"
           style={{ marginTop: spectroTop, height: spectroHeight }}
@@ -105,22 +121,35 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
           ))}
         </div>
 
-        {/* Waveform + Spectrogram + Bounding Box Overlay */}
-        <div className="relative w-full">
-          <div ref={containerRef} />
+        {/* Main Viewing Area */}
+        <div className="relative w-full overflow-hidden">
+          {/* WaveSurfer UI */}
+          <div ref={containerRef} className="relative z-10" />
+
+          {/* Bounding Box Overlay Layer */}
           <div
-            className="absolute z-50 left-0 right-0"
-            style={{ top: spectroTop, height: spectroHeight }}
+            ref={overlayRef}
+            className="absolute z-50 left-0 top-0"
+            style={{ 
+              top: spectroTop, 
+              height: spectroHeight, 
+              width: canvasWidth, // Crucial: Same width as zoomed audio
+              pointerEvents: 'none',
+              willChange: 'transform' // Performance optimization for panning
+            }}
           >
-            <BoundingBoxLayer
-              code={code}
-              boxes={boxes}
-              setBoxes={setBoxes}
-              currSelectedBox={currSelectedBox}
-              setCurrSelectedBox={setCurrSelectedBox}
-              setDrawingBox={setDrawingBox}
-              canvasWidth={canvasWidth}
-            />
+            {/* Wrapper to re-enable mouse interactions on boxes */}
+            <div className="w-full h-full relative" style={{ pointerEvents: 'auto' }}>
+              <BoundingBoxLayer
+                code={code}
+                boxes={boxes}
+                setBoxes={setBoxes}
+                currSelectedBox={currSelectedBox}
+                setCurrSelectedBox={setCurrSelectedBox}
+                setDrawingBox={setDrawingBox}
+                canvasWidth={canvasWidth}
+              />
+            </div>
           </div>
         </div>
 

@@ -130,9 +130,11 @@ function App() {
         <div className='flex-1 min-w-0 min-h-0 flex flex-col relative'>
 
           {/* Controls bar */}
-            <div className='p-2 bg-[#82A062] rounded-xl flex flex-wrap justify-center items-center gap-1.5'>            <SpectrogramControls
+            <div className='p-2 bg-[#82A062] rounded-xl flex flex-wrap justify-center items-center gap-1.5'>
+              <SpectrogramControls
               zoomX={zoomX}
               setZoomX={setZoomX}
+              duration={duration}
             />
             <BoundingBoxControls
               code={code}
