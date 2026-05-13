@@ -15,6 +15,8 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
   const [spectroTop, setSpectroTop] = useState(WAVEFORM_HEIGHT);
   const [spectroHeight, setSpectroHeight] = useState(SPECTROGRAM_HEIGHT);
 
+  const [canvasWidth, setCanvasWidth] = useState(0);
+
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -56,6 +58,8 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
       ws.on('ready', () => {
         setDuration(ws.getDuration());
         setContainerWidth(containerRef.current.clientWidth);
+        const waveCanvas = containerRef.current.querySelector('canvas');
+        if (waveCanvas) setCanvasWidth(waveCanvas.scrollWidth);
         const canvases = containerRef.current.querySelectorAll('canvas');
         if (canvases.length > 1) {
           const spectroCanvas = canvases[1];
@@ -64,6 +68,11 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
           setSpectroTop(canvasTop - containerTop);
           setSpectroHeight(spectroCanvas.getBoundingClientRect().height);
         }
+      });
+
+      ws.on('zoom', () => {
+        const waveCanvas = containerRef.current?.querySelector('canvas');
+        if (waveCanvas) setCanvasWidth(waveCanvas.scrollWidth);
       });
 
       wavesurferRef.current = ws;
@@ -77,7 +86,7 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
   }, []);
 
   return (
-    <div className="bg-[#82A062] p-6 rounded-xl my-2">
+    <div className="bg-[#82A062] p-6 rounded-xl my-2 overflow-hidden">
       <div className="flex">
 
         {/* Frequency labels */}
@@ -110,6 +119,7 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
               currSelectedBox={currSelectedBox}
               setCurrSelectedBox={setCurrSelectedBox}
               setDrawingBox={setDrawingBox}
+              canvasWidth={canvasWidth}
             />
           </div>
         </div>

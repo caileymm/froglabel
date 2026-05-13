@@ -28,7 +28,6 @@ function App() {
   });
   const [currSelectedBox, setCurrSelectedBox] = useState(-1);
   const [zoomX, setZoomX] = useState(1);
-  const [zoomY, setZoomY] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showLeftPanel, setShowLeftPanel] = useState(false);
   const [rightPanel, setRightPanel] = useState(null); // null | 2 | 3
@@ -48,8 +47,8 @@ function App() {
   // Convert a raw pixel box to time/frequency row data
   const boxToRow = useCallback((box) => {
     if (!box) return null;
-    const startTime = containerWidth > 0 ? (box.left / containerWidth) * duration : 0;
-    const endTime   = containerWidth > 0 ? ((box.left + box.width) / containerWidth) * duration : 0;
+    const startTime = (box.leftPct ?? 0) * duration;
+    const endTime   = ((box.leftPct ?? 0) + (box.widthPct ?? 0)) * duration;
     const startFreq = yToFreq(box.top + box.height);
     const endFreq   = yToFreq(box.top);
     return {
@@ -128,15 +127,12 @@ function App() {
         )}
 
         {/* Middle: Controls + Waveform + Tools */}
-        <div className='flex-1 min-w-0 min-h-0 flex flex-col'>
+        <div className='flex-1 min-w-0 min-h-0 flex flex-col relative'>
 
           {/* Controls bar */}
-          <div className='p-2 bg-[#82A062] rounded-xl flex flex-wrap justify-center items-center gap-1.5'>
-            <SpectrogramControls
+            <div className='p-2 bg-[#82A062] rounded-xl flex flex-wrap justify-center items-center gap-1.5'>            <SpectrogramControls
               zoomX={zoomX}
               setZoomX={setZoomX}
-              zoomY={zoomY}
-              setZoomY={setZoomY}
             />
             <BoundingBoxControls
               code={code}
@@ -169,7 +165,7 @@ function App() {
           {/* Bottom Dataset Panel (key: 4) */}
           {showDataset && (
             <div
-              className='shrink-0 bg-[#82A062] rounded-xl overflow-y-auto'
+              className='absolute bottom-0 left-0 right-0 z-[100] bg-[#82A062] rounded-t-xl shadow-2xl overflow-y-auto'
               style={{ height: datasetHeight }}
             >
               <div

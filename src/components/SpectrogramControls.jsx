@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { wavesurferRef } from './WaveformSpectrogram.jsx';
 
-function SpectrogramControls({ zoomY, setZoomY }) {
+function SpectrogramControls({ zoomX, setZoomX }) {
   const [isVPressed, setIsVPressed] = useState(false);
   const [isAPressed, setIsAPressed] = useState(false);
   const [isDPressed, setIsDPressed] = useState(false);
@@ -48,16 +48,13 @@ function SpectrogramControls({ zoomY, setZoomY }) {
     setWsZoom(newZoom);
   }, [wsZoom]);
 
-  const handleZoomInY  = () => console.log("Y zoom in");
-  const handleZoomOutY = () => console.log("Y zoom out");
-
   const handleResetView = useCallback(() => {
     const ws = wavesurferRef.current;
     if (!ws) return;
     ws.zoom(5);
     setWsZoom(5);
-    setZoomY(1);
-  }, [setZoomY]);
+    setZoomX(1);
+  }, [setZoomX]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
