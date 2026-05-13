@@ -319,17 +319,17 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
 
   return (
     <div className="bg-[#82A062] p-6 rounded-xl my-2">
+
       <BoundingBoxLayer
         code={code}
         boxes={boxes}
         setBoxes={setBoxes}
         currSelectedBox={currSelectedBox}
         setCurrSelectedBox={setCurrSelectedBox}
-      >
+        >
 
         {/* Shared coordinate system */}
         <div className="relative w-full">
-
           {/* Spectrogram/player */}
           <div className="player" ref={containerRef}>
             <div className="relative w-full">
