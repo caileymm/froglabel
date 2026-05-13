@@ -1,19 +1,6 @@
 import { useState } from 'react';
 
-function DatasetPanel() {
-    const [rows, setRows] = useState([
-        { id: 1, code: 'LIT', name: 'Litoria', startTime: '1.23', endTime: '2.45', startFreq: '1200', endFreq: '4800' },
-        { id: 2, code: 'MIX', name: 'Mixophyes', startTime: '3.10', endTime: '4.20', startFreq: '800', endFreq: '3200' },
-        { id: 1, code: 'LIT', name: 'Litoria', startTime: '1.23', endTime: '2.45', startFreq: '1200', endFreq: '4800' },
-        { id: 2, code: 'MIX', name: 'Mixophyes', startTime: '3.10', endTime: '4.20', startFreq: '800', endFreq: '3200' },
-        { id: 1, code: 'LIT', name: 'Litoria', startTime: '1.23', endTime: '2.45', startFreq: '1200', endFreq: '4800' },
-        { id: 2, code: 'MIX', name: 'Mixophyes', startTime: '3.10', endTime: '4.20', startFreq: '800', endFreq: '3200' },
-    ]);
-
-    const deleteRow = (id) => {
-        setRows(prev => prev.filter(row => row.id !== id));
-    };
-
+function DatasetPanel({ rows, onDeleteRow }) {
     const colClass = 'flex-1 flex items-center justify-center px-1 font-display text-sm text-[#1E1E1E]';
 
     return (
@@ -27,8 +14,10 @@ function DatasetPanel() {
                         <div className={colClass}>Name</div>
                         <div className={colClass}>Start Time (s)</div>
                         <div className={colClass}>End Time (s)</div>
+                        <div className={colClass}>Duration (s)</div>
                         <div className={colClass}>Start Freq (Hz)</div>
                         <div className={colClass}>End Freq (Hz)</div>
+                        <div className={colClass}>Bandwidth (s)</div>
                         <div className='w-6'/>
                     </div>
                     <div className='flex flex-col'>
@@ -39,10 +28,14 @@ function DatasetPanel() {
                                 <div className={colClass}>{row.name}</div>
                                 <div className={colClass}>{row.startTime}</div>
                                 <div className={colClass}>{row.endTime}</div>
+                                <div className={colClass}>{row.duration}</div>
                                 <div className={colClass}>{row.startFreq}</div>
                                 <div className={colClass}>{row.endFreq}</div>
+                                <div className={colClass}>{row.bandwidth}</div>
                                 <div className='w-6 flex items-center justify-center'>
-                                    <button onClick={() => deleteRow(row.id)} className='text-red-400 hover:text-red-600 font-display text-sm cursor-pointer'>✕</button>
+                                    <button 
+                                        className='text-red-400 hover:text-red-600 font-display text-sm cursor-pointer'
+                                        onClick={() => onDeleteRow(i)}>✕</button>
                                 </div>
                             </div>
                         ))}

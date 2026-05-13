@@ -1,28 +1,29 @@
-function BoxFilePanel() {
-    const label = 'Label1';
-    const startTime = '1.23';
-    const endTime = '2.45';
-    const duration = '1.22';
-    const startFreq = '1200';
-    const endFreq = '4800';
-    const bandwidth = '3600';
+import { sampleRate, channels, bitrate, version } from '../utils/audioInfo';
 
-    const filename = 'recording_001.wav';
-    const sampleRate = '44100';
-    const recordingDate = '2024-03-15';
-    const recordingTime = '08:32:11';
+function BoxFilePanel({ selectedRow, drawingRow }) {
+    const box = drawingRow ?? selectedRow;
 
-    const boxClass = 'bg-[#F3F3E4] rounded-md px-2 py-0.5 font-display text-sm inline-block self-start';
-    const rowClass = 'flex flex-row items-center gap-1';
+    const label     = box?.code      ?? '—';
+    const startTime = box?.startTime ?? '—';
+    const endTime   = box?.endTime   ?? '—';
+    const duration  = box?.duration  ?? '—';
+    const startFreq = box?.startFreq ?? '—';
+    const endFreq   = box?.endFreq   ?? '—';
+    const bandwidth = box?.bandwidth ?? '—';
+
+    const filename      = 'audio.mp3';
+
+    const boxClass    = 'bg-[#F3F3E4] rounded-md px-2 py-0.5 font-display text-sm inline-block self-start';
+    const rowClass    = 'flex flex-row items-center gap-1';
     const headerClass = 'font-display text-sm text-[#1E1E1E]';
-    const unitClass = 'font-display text-xs';
+    const unitClass   = 'font-display text-xs';
 
     return (
         <div className='flex flex-col gap-2'>
             <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md w-5 flex items-center justify-center'>2</div>
 
             <div className='bg-[#C8D9A3] flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
-                Box Info
+                Box Details
                 <div className='flex flex-col gap-1'>
                     <div className='flex flex-col'>
                         <span className={headerClass}>Label</span>
@@ -76,7 +77,7 @@ function BoxFilePanel() {
             </div>
 
             <div className='bg-[#C8D9A3] flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
-                File Info
+                File Details
                 <div className='flex flex-col gap-1'>
                     <div className='flex flex-col'>
                         <span className={headerClass}>Filename</span>
@@ -92,15 +93,22 @@ function BoxFilePanel() {
                         </div>
                     </div>
                     <div className='flex flex-col'>
-                        <span className={headerClass}>Recording Date</span>
+                        <span className={headerClass}>Channels</span>
                         <div className={rowClass}>
-                            <span className={boxClass}>{recordingDate}</span>
+                            <span className={boxClass}>{channels}</span>
                         </div>
                     </div>
                     <div className='flex flex-col'>
-                        <span className={headerClass}>Recording Time</span>
+                        <span className={headerClass}>Bit Rate</span>
                         <div className={rowClass}>
-                            <span className={boxClass}>{recordingTime}</span>
+                            <span className={boxClass}>{bitrate}</span>
+                        </div>
+                    </div>
+
+                    <div className='flex flex-col'>
+                        <span className={headerClass}>Version</span>
+                        <div className={rowClass}>
+                            <span className={boxClass}>{version}</span>
                         </div>
                     </div>
                 </div>
