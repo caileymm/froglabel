@@ -24,6 +24,8 @@ function WaveformSpectrogram({
     setVisibleTime,
     theme,
 }) {
+    const [localSampleRate, setLocalSampleRate] = useState(null);
+    
     const containerRef = useRef(null);
     const [spectroTop] = useState(WAVEFORM_HEIGHT);
     const [spectroHeight] = useState(SPECTROGRAM_HEIGHT);
@@ -86,7 +88,7 @@ function WaveformSpectrogram({
             });
 
             wavesurferRef.current = ws;
-        });
+        }, [setDuration, selectedAudio]);
 
         return () => {
             cancelled = true;
