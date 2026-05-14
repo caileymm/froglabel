@@ -152,7 +152,6 @@ function WaveformSpectrogram({
                                 zIndex: 10,
                             }}
                         />
-
                         <div className="w-full h-full relative" style={{ pointerEvents: currTool === 0 ? 'none' : 'auto', cursor: cursorMap(currTool) }}>
                             <BoundingBoxLayer
                                 code={code}
