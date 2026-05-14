@@ -36,7 +36,6 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime }) {
     }
 
     setVisibleTime({start: start, end: end});
-    console.log(`Current View: ${start.toFixed(2)}s - ${end.toFixed(2)}s`);
   }, [setVisibleTime, duration]);
 
 const handleZoomInX = useCallback(() => {

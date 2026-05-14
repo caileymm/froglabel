@@ -12,6 +12,8 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { yToFreq } from './utils/spectrogramScale'
 
 function App() {
+  const [currTool, setCurrTool] = useState(0);
+
   const [boxes, setBoxes] = useState([]);
   const [code, setCode] = useState('');
   const [codesDict, setCodesDict] = useState({
@@ -178,7 +180,9 @@ function App() {
               visibleTime={visibleTime}
               setVisibleTime={setVisibleTime}
             />
-            <Tools />
+            <Tools
+              currTool={currTool}
+              setCurrTool={setCurrTool}/>
           </div>
 
           {/* Bottom Dataset Panel (key: 4) */}

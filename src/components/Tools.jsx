@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef} from 'react';
 
-function BoundingBoxControls() {
+function BoundingBoxControls({currTool, setCurrTool}) {
     const [isShiftPressed, setIsShiftPressed] = useState(false);
-    const [currTool, setCurrTool] = useState(0);
     const shiftAloneRef = useRef(true);
 
     const handleChangeTool = () => {
