@@ -7,6 +7,7 @@ import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js';
 import { WAVEFORM_HEIGHT, SPECTROGRAM_HEIGHT, SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES, FREQ_LABELS } from "../utils/spectrogramConfig"
 import { freqToY } from '../utils/spectrogramScale';
 import { audioInfoReady, sampleRate } from '../utils/audioInfo';
+import { usePanels } from './PanelContext';
 
 export const wavesurferRef = { current: null };
 
@@ -34,6 +35,7 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
         cursorWidth: 3,
         sampleRate: sampleRate,
         dragToSeek: true,
+        gainDB: 20,
         plugins: [
           Spectrogram.create({
             labels: false,
@@ -76,6 +78,32 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
     };
   }, []);
 
+
+  const { brightness, setBrightness, contrast, setContrast, showLeftPanel, setShowLeftPanel, rightPanel, setRightPanel, showDataset, setShowDataset } = usePanels();
+
+  const isDragging = useRef(false);
+  const lastPos = useRef({ x: 0, y: 0 });
+
+  const handleMouseDown = (e) => {
+    if (!e.altKey) return;  // only activate when Alt is held for now 
+    isDragging.current = true;
+    lastPos.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging.current) return;
+    const dx = e.clientX - lastPos.current.x;
+    const dy = e.clientY - lastPos.current.y;
+    lastPos.current = { x: e.clientX, y: e.clientY };
+    setBrightness(prev => Math.max(0.1, Math.min(3.0, prev + dx * 0.01)));
+    setContrast(prev =>   Math.max(0.1, Math.min(3.0, prev - dy * 0.01)));
+    console.log(brightness);
+    console.log(contrast);
+
+  };
+
+  const handleMouseUp = () => { isDragging.current = false; };
+
   return (
     <div className="bg-[#82A062] p-6 rounded-xl my-2">
       <div className="flex">
@@ -102,6 +130,10 @@ function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSe
           <div
             className="absolute z-50 left-0 right-0"
             style={{ top: spectroTop, height: spectroHeight }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
           >
             <BoundingBoxLayer
               code={code}

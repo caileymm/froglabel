@@ -1,13 +1,17 @@
 import { useState } from 'react';
+import { usePanels } from './PanelContext';
+
 
 function SpectrogramPanel() {
     const [fftSize, setFftSize] = useState('1024');
     const [hopSize, setHopSize] = useState('512');
     const [minFreq, setMinFreq] = useState('0');
     const [maxFreq, setMaxFreq] = useState('22050');
-    const [brightness, setBrightness] = useState('1.0');
-    const [contrast, setContrast] = useState('1.0');
+    
     const [colorScale, setColorScale] = useState('viridis');
+
+    const { brightness, setBrightness, contrast, setContrast } = usePanels();
+
 
     const colorScales = [
         { name: 'viridis', gradient: 'linear-gradient(to right, #440154, #31688e, #35b779, #fde725)', dbfs: [-120, -90, -60, -30, 0] },
@@ -25,7 +29,7 @@ function SpectrogramPanel() {
     const unitClass = 'font-display text-sm';
     const inputClass = 'bg-transparent font-display text-sm outline-none w-16';
 
-    
+
 
     return (
         <div className='flex flex-col gap-2'>

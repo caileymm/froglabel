@@ -72,17 +72,6 @@ function App() {
   const selectedRow = rows[currSelectedBox] ?? null;
   const drawingRow  = boxToRow(drawingBox);
 
-  // Keyboard shortcuts: 1=left panel, 2=box panel, 3=spectrogram panel, 4=dataset
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === '1') setShowLeftPanel(prev => !prev);
-      if (e.key === '2') setRightPanel(prev => prev === 2 ? null : 2);
-      if (e.key === '3') setRightPanel(prev => prev === 3 ? null : 3);
-      if (e.key === '4') setShowDataset(prev => !prev);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   // Resizable dataset panel
   const [datasetHeight, setDatasetHeight] = useState(160);
@@ -171,6 +160,7 @@ function App() {
           </div>
 
           {/* Bottom Dataset Panel (key: 4) */}
+          {/* !!!!!!!!!!!!!!!!when this pannel is shown the buttons are hidden !!!!!!!!!!!!!!!!!!!*/}
           {showDataset && (
             <div
               className='shrink-0 bg-[#82A062] rounded-xl overflow-y-auto'

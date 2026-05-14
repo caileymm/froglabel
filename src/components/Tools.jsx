@@ -1,9 +1,23 @@
 import { useState, useEffect, useRef} from 'react';
+import { usePanels } from './PanelContext';
 
-function Tools(showDataset, showRightPanel, showLeftPanel) {
+function Tools() {
     const [isShiftPressed, setIsShiftPressed] = useState(false);
     const [currTool, setCurrTool] = useState(null);
     const shiftAloneRef = useRef(true);
+1
+    const { showLeftPanel, setShowLeftPanel, rightPanel, setRightPanel, showDataset, setShowDataset} = usePanels();
+    
+    useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === '1') setShowLeftPanel(prev => !prev);
+      if (e.key === '2') setRightPanel(prev => prev === 2 ? null : 2);
+      if (e.key === '3') setRightPanel(prev => prev === 3 ? null : 3);
+      if (e.key === '4') setShowDataset(prev => !prev);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     const handleChangeTool = () => {
         setCurrTool((prev) => ((prev + 1) % 5));
@@ -15,18 +29,22 @@ function Tools(showDataset, showRightPanel, showLeftPanel) {
 
     const handleChangeToTool1 = () => {
         setCurrTool(1)
+        setShowLeftPanel(prev => !prev)
     }
 
     const handleChangeToTool2 = () => {
         setCurrTool(2)
+        setRightPanel(prev => prev === 2 ? null : 2);
     }
 
     const handleChangeToTool3 = () => {
         setCurrTool(3)
+        setRightPanel(prev => prev === 3 ? null : 3)
     }
 
     const handleChangeToTool4 = () => {
         setCurrTool(4)
+        setShowDataset(prev => !prev);
     }
 
     
@@ -63,29 +81,24 @@ function Tools(showDataset, showRightPanel, showLeftPanel) {
           <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Shift</div>
         </button>
         <div eventHandler={handleChangeToTool0} className='p-1.5 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
-            <button className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1 
-                ${currTool == 0 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T1
-            </button>
-
             <button onClick={handleChangeToTool1} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
                 ${currTool == 1 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T2
+            T1
             </button>
 
             <button onClick={handleChangeToTool2} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
                 ${currTool == 2 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T3
+            T2
             </button>
 
             <button onClick={handleChangeToTool3} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
                 ${currTool == 3 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T4
+            T3
             </button>
 
             <button onClick={handleChangeToTool4} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
                 ${currTool == 4 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T5
+            T4
             </button>
       </div>
     </div>
