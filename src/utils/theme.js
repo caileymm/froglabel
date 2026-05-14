@@ -1,44 +1,23 @@
-/* export const defaultColors = {
-    background:          '#E5E7EB',
-    panels:              '#F9FAFB',
-    group:               '#F3F4F6',
-    buttons:             '#E5E7EB',
-    buttonsPressed:      '#D1D5DB',
-    audioButton:         '#3B82F6',
-    audioButtonPressed:  '#1D4ED8',
-    keyButtons:          '#1E1E1E',
-    keyText:             'rgb(255, 255, 255)',
-    text:                '#1E1E1E',
-    cursor:              '#3B82F6',
-    progress:            '#E5E7EB',
-    waveform:            '#1F2937',
-    cream:               '#E5E7EB',
-    box:                 '#3B82F6',
-    boxSelected:         '#1D4ED8',
-    boxFill:             'rgba(59, 130, 246, 0.15)',
-    boxFillSelected:     'rgba(29, 78, 216, 0.25)',
-    boxLabel:            '#1F2937',
-    boxLabelBg:          '#BFDBFE',
-};*/
 export const defaultColors = {
-    header:              '#82A062', // Near black for the top bar
-    background:          '#09090b', // Deepest Zinc
-    panels:              '#18181b', // Base layer
-    group:               '#27272a', // The section background
-    buttons:             '#09090b', // Deepest color; looks like a "hole" or "well"
+    header:              '#82A062',
+    background:          '#09090b',
+    panels:              '#18181b',
+    group:               '#27272a',
+    buttons:             '#09090b',
+    buttonsHover:          '#5b5b5e',
     buttonsText:          '#ffffff',
     buttonsPressed:      '#5b5b5e',
     
-    // Interactive accents (Emerald/Mint)
     audioButton:         '#3b82f6', 
+    audioButtonHover:   '#60a5fa',
     audioButtonPressed:  '#60a5fa',
     
     keyButtons:          '#f4f4f5', 
     keyText:             '#09090b', 
-    text:                '#fafafa', // High readability white
-    cursor:              '#3b82f6', // Matches accent
+    text:                '#fafafa', 
+    cursor:              '#3b82f6',
     progress:            '#ffffff',
-    waveform:            '#52525b', // Muted Zinc for the wave
+    waveform:            '#52525b', 
     cream:               '#18181b',
     
     // Bounding Box Styles
@@ -47,9 +26,8 @@ export const defaultColors = {
     boxFill:             'rgba(16, 185, 129, 0.05)',
     boxFillSelected:     'rgba(52, 211, 153, 0.15)',
     boxLabel:            '#ffffff',
-    boxLabelBg:          '#82A062', // Deep forest green for labels
+    boxLabelBg:          '#82A062',
     
-    // Inputs
     textInput:           '#18181b',
     textInputText:       '#fafafa',
     placeholderText:     '#52525b',
@@ -61,9 +39,11 @@ export const frogThemeColors = {
     panels:              '#82A062',
     group:               '#C8D9A3',
     buttons:             '#FEECBE',
+    buttonsHover:          '#FFDE9E',
     buttonsText:        '#1E1E1E',
     buttonsPressed:      '#FFDE9E',
     audioButton:         '#CAE4EF',
+    audioButtonHover:  '#B4D2EF',
     audioButtonPressed:  '#B4D2EF',
     keyButtons:          '#1E1E1E',
     keyText:             '#E6E5C9',

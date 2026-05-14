@@ -83,6 +83,10 @@ function CodesPanel({ codesDict, setCodesDict, theme }) {
                 </div>
                 <button
                     onClick={handleCreate}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.buttonsHover}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.buttons}
+                    onMouseDown={(e) => e.currentTarget.style.backgroundColor = theme.buttonsPressed}
+                    onMouseUp={(e) => e.currentTarget.style.backgroundColor = theme.buttonsHover}
                     style={{ backgroundColor: theme.buttons, color: theme.buttonsText }}
                     className='w-full px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer'>
                     Create

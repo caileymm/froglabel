@@ -83,6 +83,8 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
       <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1 font-display'>
         <button onClick={handleSetCode}
           style={{ backgroundColor: isSpacePressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+          onMouseEnter={(e) => !isSpacePressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+          onMouseLeave={(e) => !isSpacePressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
           className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Set Code
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Space</div>
@@ -112,12 +114,16 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
       <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1'>
         <button onClick={handleSelectBox}
           style={{ backgroundColor: isTabPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+          onMouseEnter={(e) => !isTabPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+          onMouseLeave={(e) => !isTabPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
           className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Select Box
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Tab</div>
         </button>
         <button onClick={handlePlayBoxAudio}
           style={{ backgroundColor: isShiftVPressed ? theme.audioButtonPressed : theme.audioButton, color: theme.buttonsText }}
+          onMouseEnter={(e) => !isShiftVPressed && (e.currentTarget.style.backgroundColor = theme.audioButtonHover)}
+          onMouseLeave={(e) => !isShiftVPressed && (e.currentTarget.style.backgroundColor = theme.audioButton)}
           className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Play Box Audio
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift</div>
@@ -125,6 +131,8 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
         </button>
         <button onClick={handleDeleteBox}
           style={{ backgroundColor: isShiftDPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+          onMouseEnter={(e) => !isShiftDPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+          onMouseLeave={(e) => !isShiftDPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
           className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Delete Box
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift</div>
@@ -132,6 +140,8 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
         </button>
         <button onClick={handleDeselectBox}
           style={{ backgroundColor: isEscPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+          onMouseEnter={(e) => !isEscPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+          onMouseLeave={(e) => !isEscPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
           className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Deselect Box
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Esc</div>
