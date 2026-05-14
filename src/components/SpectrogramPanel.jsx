@@ -90,7 +90,7 @@ function SpectrogramPanel() {
                         <span className={headerClass}>Brightness</span>
                         <div className={rowClass}>
                             <div className={boxClass}>
-                                <input value={brightness} onChange={e => setBrightness(e.target.value)} onKeyDown={e => e.stopPropagation()} className={inputClass}/>
+                                <input value={typeof brightness === 'number' ? brightness.toFixed(2) : brightness} onChange={e => setBrightness(parseFloat(e.target.value) || 1)} onKeyDown={e => e.stopPropagation()} className={inputClass}/>
                             </div>
                         </div>
                     </div>
@@ -98,7 +98,8 @@ function SpectrogramPanel() {
                         <span className={headerClass}>Contrast</span>
                         <div className={rowClass}>
                             <div className={boxClass}>
-                                <input value={contrast} onChange={e => setContrast(e.target.value)} onKeyDown={e => e.stopPropagation()} className={inputClass}/>
+                                <input value={typeof contrast === 'number' ? contrast.toFixed(2) : contrast} onChange={e => setContrast(parseFloat(e.target.value) || 1)}
+ className={inputClass}/>
                             </div>
                         </div>
                     </div>

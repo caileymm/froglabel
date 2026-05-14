@@ -7,7 +7,7 @@ function Tools() {
     const shiftAloneRef = useRef(true);
 1
     const { showLeftPanel, setShowLeftPanel, rightPanel, setRightPanel, showDataset, setShowDataset} = usePanels();
-    
+     
     useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === '1') setShowLeftPanel(prev => !prev);
