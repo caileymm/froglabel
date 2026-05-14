@@ -34,7 +34,7 @@ function WaveformSpectrogram({
     const [spectroHeight] = useState(SPECTROGRAM_HEIGHT);
     const [viewWidth, setViewWidth] = useState(0);
 
-    const { brightness, setBrightness, contrast, setContrast } = usePanels();
+    const { brightness, contrast } = usePanels();
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -152,6 +152,7 @@ function WaveformSpectrogram({
                                 zIndex: 10,
                             }}
                         />
+
                         <div className="w-full h-full relative" style={{ pointerEvents: currTool === 0 ? 'none' : 'auto', cursor: cursorMap(currTool) }}>
                             <BoundingBoxLayer
                                 code={code}

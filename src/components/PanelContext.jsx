@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 
-//all variables that need to be accessed by multiple files will be created and saved here to be accessed.
+//all variables that need to be accessed by multiple files will be created and saved here to be accessed. 
 const PanelContext = createContext(null);
 
 export function PanelProvider({ children }) {
@@ -31,15 +31,6 @@ export function PanelProvider({ children }) {
 
   const handleSpectroMouseUp = () => { isDragging.current = false; };
 
-  // Move keyboard shortcuts here so they work app-wide
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === '2') setRightPanel(prev => prev === 2 ? null : 2);
-      if (e.key === '3') setRightPanel(prev => prev === 3 ? null : 3);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   return (
     <PanelContext.Provider value={{
