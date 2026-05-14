@@ -30,7 +30,6 @@ function WaveformSpectrogram({
     const [spectroTop] = useState(WAVEFORM_HEIGHT);
     const [spectroHeight] = useState(SPECTROGRAM_HEIGHT);
     const [viewWidth, setViewWidth] = useState(0);
-    const [localSampleRate, setLocalSampleRate] = useState(null);
 
     useEffect(() => {
         if (!containerRef.current) return;
