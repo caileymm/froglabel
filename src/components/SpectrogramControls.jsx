@@ -173,4 +173,4 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme 
   );
 }
 
-export default SpectrogramControls;s
+export default SpectrogramControls;
