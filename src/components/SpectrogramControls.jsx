@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { wavesurferRef } from './WaveformSpectrogram.jsx';
 
-function SpectrogramControls({ zoomX, setZoomX, duration }) {
+function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime }) {
   const [isVPressed, setIsVPressed] = useState(false);
   const [isAPressed, setIsAPressed] = useState(false);
   const [isDPressed, setIsDPressed] = useState(false);
@@ -23,16 +23,21 @@ function SpectrogramControls({ zoomX, setZoomX, duration }) {
   };
 
   const updateVisibleTime = useCallback((currentZoom) => {
-  const ws = wavesurferRef.current;
-  const container = getWsScrollContainer();
-  if (!container || !currentZoom) return;
+    const ws = wavesurferRef.current;
+    const container = getWsScrollContainer();
+    if (!container || !currentZoom) return;
 
-  // Time = Distance / PixelsPerSecond
-  const start = container.scrollLeft / currentZoom;
-  const end = (container.scrollLeft + container.clientWidth) / currentZoom;
+    // Time = Distance / PixelsPerSecond
+    const start = container.scrollLeft / currentZoom;
+    let end = (container.scrollLeft + container.clientWidth) / currentZoom;
 
-  console.log(`Current View: ${start.toFixed(2)}s - ${end.toFixed(2)}s`);
-}, []);
+    if (end > duration) {
+      end = duration;
+    }
+
+    setVisibleTime({start: start, end: end});
+    console.log(`Current View: ${start.toFixed(2)}s - ${end.toFixed(2)}s`);
+  }, [setVisibleTime, duration]);
 
 const handleZoomInX = useCallback(() => {
   const ws = wavesurferRef.current;
