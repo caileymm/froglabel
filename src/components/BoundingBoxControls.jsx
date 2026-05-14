@@ -120,6 +120,7 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
           Select Box
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Tab</div>
         </button>
+        {/*
         <button onClick={handlePlayBoxAudio}
           style={{ backgroundColor: isShiftVPressed ? theme.audioButtonPressed : theme.audioButton, color: theme.buttonsText }}
           onMouseEnter={(e) => !isShiftVPressed && (e.currentTarget.style.backgroundColor = theme.audioButtonHover)}
@@ -129,6 +130,7 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift</div>
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>V</div>
         </button>
+        */}
         <button onClick={handleDeleteBox}
           style={{ backgroundColor: isShiftDPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
           onMouseEnter={(e) => !isShiftDPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
