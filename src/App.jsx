@@ -139,7 +139,7 @@ function App() {
 
         <div className='flex-1 min-w-0 min-h-0 flex flex-col relative'>
 
-          <div style={{ backgroundColor: theme.panels }} className='p-2 rounded-xl flex flex-wrap justify-center items-center gap-1.5'>
+          <div style={{ backgroundColor: theme.panels }} className='p-2 rounded-xl flex flex-wrap justify-center items-center gap-2'>
             <SpectrogramControls
               zoomX={zoomX}
               setZoomX={setZoomX}
@@ -157,6 +157,7 @@ function App() {
               setCurrSelectedBoxId={setCurrSelectedBoxId}
               isPlaying={isPlaying}
               togglePlayPause={togglePlayPause}
+              setCurrTool={currTool}
               theme={theme}
             />
           </div>
@@ -177,8 +178,13 @@ function App() {
               visibleTime={visibleTime}
               setVisibleTime={setVisibleTime}
               theme={theme}
+              currTool={currTool}
             />
-            <Tools currTool={currTool} setCurrTool={setCurrTool} theme={theme} />
+            <Tools 
+              currTool={currTool}
+              setCurrTool={setCurrTool}
+              theme={theme}
+              frogTheme={frogTheme} />
           </div>
 
           {showDataset && (

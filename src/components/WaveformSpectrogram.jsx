@@ -6,6 +6,7 @@ import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js';
 import { WAVEFORM_HEIGHT, SPECTROGRAM_HEIGHT, SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES, FREQ_LABELS } from "../utils/spectrogramConfig"
 import { freqToY } from '../utils/spectrogramScale';
 import { getAudioInfo } from '../utils/audioInfo';
+import moonCursor from '../assets/moon_cursor.png'
 
 export const wavesurferRef = { current: null };
 
@@ -23,6 +24,7 @@ function WaveformSpectrogram({
     visibleTime,
     setVisibleTime,
     theme,
+    currTool
 }) {
     const [localSampleRate, setLocalSampleRate] = useState(null);
     
@@ -99,6 +101,12 @@ function WaveformSpectrogram({
         };
     }, [setDuration, selectedAudio]);
 
+    const cursorMap = (tool) => {
+        if (tool === 0) return `auto`;
+        if (tool === 1) return `crosshair`;
+        if (tool === 2) return `url(${moonCursor}), auto`;
+    };
+
     return (
         <div style={{ backgroundColor: theme.panels }} className="p-6 rounded-xl my-2 overflow-hidden">
             <div className="flex">
@@ -131,7 +139,7 @@ function WaveformSpectrogram({
                         className="absolute z-50 left-0 right-0"
                         style={{ top: spectroTop, height: spectroHeight, pointerEvents: 'none' }}
                     >
-                        <div className="w-full h-full relative" style={{ pointerEvents: 'auto' }}>
+                        <div className="w-full h-full relative" style={{ pointerEvents: currTool === 0 ? 'none' : 'auto', cursor: cursorMap(currTool) }}>
                             <BoundingBoxLayer
                                 code={code}
                                 boxes={boxes}
@@ -142,6 +150,7 @@ function WaveformSpectrogram({
                                 canvasWidth={viewWidth}
                                 visibleTime={visibleTime}
                                 theme={theme}
+                                currTool={currTool}
                             />
                         </div>
                     </div>

@@ -1,15 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import defaultBlack from '../assets/default_black.png';
+import defaultWhite from '../assets/default_white.png'
+import crosshairBlack from '../assets/crosshair_black.png'
+import crosshairWhite from '../assets/crosshair_white.png'
+import moonBlack from '../assets/moon_black.png'
+import moonWhite from '../assets/moon_white.png'
 
-function Tools({ currTool, setCurrTool, theme }) {
+function Tools({ currTool, setCurrTool, theme, frogTheme }) {
     const [isShiftPressed, setIsShiftPressed] = useState(false);
     const shiftAloneRef = useRef(true);
 
-    const handleChangeTool = () => setCurrTool((prev) => ((prev + 1) % 5));
     const handleChangeToTool0 = () => setCurrTool(0);
     const handleChangeToTool1 = () => setCurrTool(1);
     const handleChangeToTool2 = () => setCurrTool(2);
-    const handleChangeToTool3 = () => setCurrTool(3);
-    const handleChangeToTool4 = () => setCurrTool(4);
+
+    const handleChangeTool = useCallback(
+        () => setCurrTool((prev) => ((prev + 1) % 3)),
+        [] // setCurrTool is stable, so this never re-creates
+    );
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -32,10 +40,10 @@ function Tools({ currTool, setCurrTool, theme }) {
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, []);
+    }, [handleChangeTool]); // stable ref, so effect still only runs once
 
     return (
-        <div style={{ backgroundColor: theme.panels }} className='py-2 rounded-xl flex items-center justify-center gap-2 w-80 mx-auto'>
+        <div style={{ backgroundColor: theme.panels }} className='py-2 rounded-xl flex items-center justify-center gap-2 w-70 mx-auto'>
             <button
                 style={{ backgroundColor: isShiftPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
                 onMouseEnter={(e) => !isShiftPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
@@ -50,35 +58,21 @@ function Tools({ currTool, setCurrTool, theme }) {
                     onMouseEnter={(e) => currTool !== 0 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
                     onMouseLeave={(e) => currTool !== 0 && (e.currentTarget.style.backgroundColor = theme.buttons)}
                     className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
-                    T1
+                    <img src={`${frogTheme ? defaultBlack : defaultWhite}`} className='w-4 h-4'/>
                 </button>
                 <button onClick={handleChangeToTool1}
                     style={{ backgroundColor: currTool === 1 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
                     onMouseEnter={(e) => currTool !== 1 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
                     onMouseLeave={(e) => currTool !== 1 && (e.currentTarget.style.backgroundColor = theme.buttons)}
                     className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
-                    T2
+                    <img src={`${frogTheme ? crosshairBlack : crosshairWhite}`} className='w-4 h-4'/>
                 </button>
                 <button onClick={handleChangeToTool2}
                     style={{ backgroundColor: currTool === 2 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
                     onMouseEnter={(e) => currTool !== 2 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
                     onMouseLeave={(e) => currTool !== 2 && (e.currentTarget.style.backgroundColor = theme.buttons)}
                     className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
-                    T3
-                </button>
-                <button onClick={handleChangeToTool3}
-                    style={{ backgroundColor: currTool === 3 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                    onMouseEnter={(e) => currTool !== 3 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                    onMouseLeave={(e) => currTool !== 3 && (e.currentTarget.style.backgroundColor = theme.buttons)}
-                    className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
-                    T4
-                </button>
-                <button onClick={handleChangeToTool4}
-                    style={{ backgroundColor: currTool === 4 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                    onMouseEnter={(e) => currTool !== 4 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                    onMouseLeave={(e) => currTool !== 4 && (e.currentTarget.style.backgroundColor = theme.buttons)}
-                    className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
-                    T5
+                    <img src={`${frogTheme ? moonBlack : moonWhite}`} className='w-4 h-4'/>
                 </button>
             </div>
         </div>
