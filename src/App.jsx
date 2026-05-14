@@ -153,8 +153,8 @@ function App() {
               codesDict={codesDict}
               boxes={boxes}
               setBoxes={setBoxes}
-              currSelectedBox={currSelectedBoxId}
-              setCurrSelectedBox={setCurrSelectedBoxId}
+              currSelectedBoxId={currSelectedBoxId}
+              setCurrSelectedBoxId={setCurrSelectedBoxId}
               isPlaying={isPlaying}
               togglePlayPause={togglePlayPause}
               theme={theme}
