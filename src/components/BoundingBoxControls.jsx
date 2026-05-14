@@ -1,96 +1,75 @@
 import { useState, useEffect, useRef } from 'react';
 
-function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSelectedBox, setCurrSelectedBox }) {
+function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSelectedBoxId, setCurrSelectedBoxId, theme }) {
   const inputRef = useRef(null);
   const [isError, setIsError] = useState(false);
-
+  
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [isTabPressed, setIsTabPressed] = useState(false);
   const [isShiftVPressed, setIsShiftVPressed] = useState(false);
   const [isShiftDPressed, setIsShiftDPressed] = useState(false);
   const [isEscPressed, setIsEscPressed] = useState(false);
-  // const [isZPressed, setIsZPressed] = useState(false);
-  // const [isXPressed, setIsXPressed] = useState(false);
 
   const handleSetCode = () => {
-    setCode('')
+    setCode('');
     inputRef.current?.focus();
     inputRef.current?.select();
-  }
+  };
 
   const handleCodeInput = (e) => {
     const value = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
-    if (value.length < 3) {
-      setCode(value);
-      setIsError(false);
-      return;
-    }
+    if (value.length < 3) { setCode(value); setIsError(false); return; }
     if (value.length === 3) {
       if (Object.keys(codesDict).includes(value)) {
-        setCode(value)
-        setIsError(false);
+        setCode(value); setIsError(false);
       } else {
-        setCode(''); // reset if not a valid code
-        setIsError(true);
-        setTimeout(() => setIsError(false), 1000); // clears after 1000ms
+        setCode(''); setIsError(true);
+        setTimeout(() => setIsError(false), 1000);
       }
       inputRef.current?.blur();
     }
-  }
-
-  const handleSelectBox = () => {
-    setCurrSelectedBox((prev) => {
-      if (boxes.length === 0) return -1;
-        return (prev + 1) % boxes.length;
-    });
   };
 
-  const handleSelectBoxRef = useRef(handleSelectBox);
-
-  useEffect(() => {
-    handleSelectBoxRef.current = handleSelectBox;
-  });
+  const handleSelectBox = () => {
+    if (boxes.length === 0) return;
+    const currentIndex = boxes.findIndex(b => b.id === currSelectedBoxId);
+    const nextIndex = (currentIndex + 1) % boxes.length;
+    setCurrSelectedBoxId(boxes[nextIndex].id);
+  };
 
   const handlePlayBoxAudio = () => console.log("Play Box Audio");
 
   const handleDeleteBox = () => {
-    if (currSelectedBox != -1) {
-      setBoxes((prev) => prev.filter((_, i) => i !== currSelectedBox));
-      setCurrSelectedBox(-1);
+    if (currSelectedBoxId !== -1) {
+      setBoxes((prev) => prev.filter((box) => box.id !== currSelectedBoxId));
+      setCurrSelectedBoxId(-1);
     }
-  }
+  };
 
-  const handleDeleteBoxRef = useRef(handleDeleteBox);
-  useEffect(() => { handleDeleteBoxRef.current = handleDeleteBox; });
+  const handleDeselectBox = () => setCurrSelectedBoxId(-1);
 
-  const handleDeselectBox = () => {
-    setCurrSelectedBox(-1)
-  }
-
-  // const handleUndo = () => console.log("Undo");
-  // const handleRedo = () => console.log("Redo");
+  const actionsRef = useRef({ handleSetCode, handleSelectBox, handlePlayBoxAudio, handleDeleteBox, handleDeselectBox });
+  useEffect(() => {
+    actionsRef.current = { handleSetCode, handleSelectBox, handlePlayBoxAudio, handleDeleteBox, handleDeselectBox };
+  });
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === ' ') { e.preventDefault(); setIsSpacePressed(true); handleSetCode(); }
-      if (e.key === 'Tab') { e.preventDefault(); setIsTabPressed(true); handleSelectBoxRef.current(); }
-      if (e.shiftKey && e.key == 'V') { e.preventDefault(); setIsShiftVPressed(true); handlePlayBoxAudio(); }
-      if (e.shiftKey && e.key == 'D') { e.preventDefault(); setIsShiftDPressed(true); handleDeleteBoxRef.current(); }
-      if (e.key === 'Escape') { setIsEscPressed(true); handleDeselectBox(); }
-      // if (e.key === 'z') { e.preventDefault(); setIsZPressed(true); handleUndo(); }
-      // if (e.key === 'x') { e.preventDefault(); setIsXPressed(true); handleRedo(); }
-    };
+      if (document.activeElement === inputRef.current && e.key !== 'Escape') return;
 
+      if (e.key === ' ') { e.preventDefault(); setIsSpacePressed(true); actionsRef.current.handleSetCode(); }
+      if (e.key === 'Tab') { e.preventDefault(); setIsTabPressed(true); actionsRef.current.handleSelectBox(); }
+      if (e.shiftKey && e.key.toUpperCase() === 'V') { e.preventDefault(); setIsShiftVPressed(true); actionsRef.current.handlePlayBoxAudio(); }
+      if (e.shiftKey && e.key.toUpperCase() === 'D') { e.preventDefault(); setIsShiftDPressed(true); actionsRef.current.handleDeleteBox(); }
+      if (e.key === 'Escape') { setIsEscPressed(true); actionsRef.current.handleDeselectBox(); }
+    };
     const handleKeyUp = (e) => {
       if (e.key === ' ') setIsSpacePressed(false);
       if (e.key === 'Tab') setIsTabPressed(false);
-      if (e.key === 'Shift' || e.key === 'V') setIsShiftVPressed(false);
-      if (e.key === 'Shift' || e.key === 'D') setIsShiftDPressed(false);
+      if (e.key === 'Shift' || e.key.toUpperCase() === 'V') setIsShiftVPressed(false);
+      if (e.key === 'Shift' || e.key.toUpperCase() === 'D') setIsShiftDPressed(false);
       if (e.key === 'Escape') setIsEscPressed(false);
-      // if (e.key === 'z') setIsZPressed(false);
-      // if (e.key === 'x') setIsXPressed(false);
     };
-
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     return () => {
@@ -101,72 +80,73 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
 
   return (
     <div className='flex items-center justify-center gap-2 flex-wrap'>
-      <div className='p-1.5 bg-[#C8D9A3] rounded-xl flex items-center gap-1 font-display'>
-        <button onClick={handleSetCode} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1 
-          ${isSpacePressed ? 'bg-[#FFDE9E]': 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
+      <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1 font-display'>
+        <button onClick={handleSetCode}
+          style={{ backgroundColor: isSpacePressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+          onMouseEnter={(e) => !isSpacePressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+          onMouseLeave={(e) => !isSpacePressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
+          className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Set Code
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Space</div>
+          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Space</div>
         </button>
         +
-        <input 
+        <input
           ref={inputRef}
           value={code}
           onChange={handleCodeInput}
           onKeyDown={(e) => e.stopPropagation()}
           placeholder='Code'
           maxLength={3}
-          className={`bg-[#FFFFFF] w-15 px-2 py-1.5 text-xs rounded-md font-display placeholder-[#E6E5C9] uppercase placeholder:normal-case
+          className={`w-15 px-2 py-1.5 text-xs rounded-md font-display uppercase placeholder:normal-case
             ${isError ? 'border-2 border-[#FFAAAA]' : 'border-none'}`}
+          style={{ 
+            backgroundColor: theme.textInput, 
+            color: theme.textInputText,
+            '--placeholder-color': theme.placeholderText 
+          }}
         />
         :
-        <div className={`bg-[#F3F3E4] px-2 py-1.5 text-xs rounded-md font-display`}>
+        <div style={{ backgroundColor: theme.cream, color: theme.textInputText }} className='px-2 py-1.5 text-xs rounded-md font-display'>
           {codesDict[code] || '—'}
         </div>
       </div>
 
-      <div className='p-1.5 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
-        <button onClick={handleSelectBox} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-          ${isTabPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
+      <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1'>
+        <button onClick={handleSelectBox}
+          style={{ backgroundColor: isTabPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+          onMouseEnter={(e) => !isTabPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+          onMouseLeave={(e) => !isTabPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
+          className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Select Box
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Tab</div>
+          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Tab</div>
         </button>
-
-        <button onClick={handlePlayBoxAudio} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-          ${isShiftVPressed ? 'bg-[#B4D2EF]' : 'bg-[#CAE4EF] hover:bg-[#B4D2EF]'}`}>
+        <button onClick={handlePlayBoxAudio}
+          style={{ backgroundColor: isShiftVPressed ? theme.audioButtonPressed : theme.audioButton, color: theme.buttonsText }}
+          onMouseEnter={(e) => !isShiftVPressed && (e.currentTarget.style.backgroundColor = theme.audioButtonHover)}
+          onMouseLeave={(e) => !isShiftVPressed && (e.currentTarget.style.backgroundColor = theme.audioButton)}
+          className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Play Box Audio
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Shift</div>
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>V</div>
+          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift</div>
+          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>V</div>
         </button>
-
-        <button onClick={handleDeleteBox} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-          ${isShiftDPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
+        <button onClick={handleDeleteBox}
+          style={{ backgroundColor: isShiftDPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+          onMouseEnter={(e) => !isShiftDPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+          onMouseLeave={(e) => !isShiftDPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
+          className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Delete Box
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Shift</div>
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>D</div>
+          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift</div>
+          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>D</div>
         </button>
-
-        <button onClick={handleDeselectBox} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-          ${isEscPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
+        <button onClick={handleDeselectBox}
+          style={{ backgroundColor: isEscPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+          onMouseEnter={(e) => !isEscPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+          onMouseLeave={(e) => !isEscPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
+          className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Deselect Box
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Esc</div>
+          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Esc</div>
         </button>
       </div>
-      
-      {/*
-      <div className='p-2 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
-        <button onClick={handleUndo} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-          ${isZPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-          Undo
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Z</div>
-        </button>
-
-        <button onClick={handleRedo} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-          ${isXPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-          Redo
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>X</div>
-        </button>
-      </div>
-      */}
     </div>
   );
 }

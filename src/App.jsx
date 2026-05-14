@@ -10,11 +10,15 @@ import BoxFilePanel from './components/BoxFilePanel'
 import SpectrogramPanel from './components/SpectrogramPanel'
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { yToFreq } from './utils/spectrogramScale'
+import { defaultColors, frogThemeColors } from './utils/theme'
 import greenAudio from './assets/green_tree.mp3';
 import peronsAudio from './assets/perons_tree.mp3';
 import redEyedAudio from './assets/red_eyed_tree.mp3';
 
 function App() {
+  const [frogTheme, setFrogTheme] = useState(false)
+  const theme = frogTheme ? frogThemeColors : defaultColors;
+
   const [selectedAudio, setSelectedAudio] = useState(greenAudio)
   const [sampleRate, setSampleRate] = useState(null);
 
@@ -34,16 +38,14 @@ function App() {
     'BRE': "Brereton's Frog",
     'GIA': 'Giant Burrowing Frog',
   });
-  // Update selection logic to use IDs
-  const [currSelectedBoxId, setCurrSelectedBoxId] = useState(null);
 
-  // Find the index in the master list when needed
+  const [currSelectedBoxId, setCurrSelectedBoxId] = useState(null);
   const currSelectedIndex = boxes.findIndex(b => b.id === currSelectedBoxId);
 
   const [zoomX, setZoomX] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showLeftPanel, setShowLeftPanel] = useState(false);
-  const [rightPanel, setRightPanel] = useState(null); // null | 2 | 3
+  const [rightPanel, setRightPanel] = useState(null);
   const [showDataset, setShowDataset] = useState(false);
   const [duration, setDuration] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -56,22 +58,15 @@ function App() {
     if (!ws) return;
     ws.playPause();
   }, []);
-  
-  const [visibleTime, setVisibleTime] = useState({start: 0, end: duration});
 
-  // Convert a raw pixel box to time/frequency row data
-  // Convert a time-based box to a row for the Dataset Panel
+  const [visibleTime, setVisibleTime] = useState({ start: 0, end: duration });
+
   const boxToRow = useCallback((box) => {
     if (!box) return null;
-    
-    // We no longer need to calculate these from percentages!
     const startTime = box.startTime;
-    const endTime   = box.endTime;
-    
-    // Frequency calculation remains the same
+    const endTime = box.endTime;
     const startFreq = yToFreq(box.top + box.height, sampleRate);
-    const endFreq   = yToFreq(box.top, sampleRate);
-
+    const endFreq = yToFreq(box.top, sampleRate);
     return {
       ...box,
       name:      codesDict[box.code] ?? '—',
@@ -82,15 +77,12 @@ function App() {
       endFreq:   Math.round(endFreq),
       bandwidth: Math.round(endFreq - startFreq),
     };
-  }, [codesDict, sampleRate]); // Removed containerWidth and duration from deps as they aren't needed now
+  }, [codesDict, sampleRate]);
 
-  // Derived rows — boxes converted to time/freq values
   const rows = useMemo(() => boxes.map(boxToRow), [boxes, boxToRow]);
-
   const selectedRow = rows[currSelectedIndex] ?? null;
-  const drawingRow  = boxToRow(drawingBox);
+  const drawingRow = boxToRow(drawingBox);
 
-  // Keyboard shortcuts: 1=left panel, 2=box panel, 3=spectrogram panel, 4=dataset
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === '1') setShowLeftPanel(prev => !prev);
@@ -102,7 +94,6 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Resizable dataset panel
   const [datasetHeight, setDatasetHeight] = useState(160);
   const isDragging = useRef(false);
   const dragStartY = useRef(0);
@@ -135,28 +126,26 @@ function App() {
   }, []);
 
   return (
-    <div className='flex flex-col h-screen overflow-hidden'>
-      <Header />
+    <div className='flex flex-col h-screen overflow-hidden' style={{ backgroundColor: theme.background }}>
+      <Header frogTheme={frogTheme} setFrogTheme={setFrogTheme} theme={theme} />
 
       <div className='flex gap-2 px-2 py-2 flex-1 min-h-0 overflow-hidden items-stretch'>
 
-        {/* Left Panel (key: 1) — Codes */}
         {showLeftPanel && (
-          <div className='w-48 shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'>
-            <CodesPanel codesDict={codesDict} setCodesDict={setCodesDict} />
+          <div style={{ backgroundColor: theme.panels }} className='w-48 shrink-0 rounded-xl p-2 overflow-y-auto'>
+            <CodesPanel codesDict={codesDict} setCodesDict={setCodesDict} theme={theme} />
           </div>
         )}
 
-        {/* Middle: Controls + Waveform + Tools */}
         <div className='flex-1 min-w-0 min-h-0 flex flex-col relative'>
 
-          {/* Controls bar */}
-            <div className='p-2 bg-[#82A062] rounded-xl flex flex-wrap justify-center items-center gap-1.5'>
-              <SpectrogramControls
+          <div style={{ backgroundColor: theme.panels }} className='p-2 rounded-xl flex flex-wrap justify-center items-center gap-1.5'>
+            <SpectrogramControls
               zoomX={zoomX}
               setZoomX={setZoomX}
               duration={duration}
               setVisibleTime={setVisibleTime}
+              theme={theme}
             />
             <BoundingBoxControls
               code={code}
@@ -164,14 +153,14 @@ function App() {
               codesDict={codesDict}
               boxes={boxes}
               setBoxes={setBoxes}
-              currSelectedBox={currSelectedBoxId} // The ID
-              setCurrSelectedBox={setCurrSelectedBoxId} // The function to change the ID
+              currSelectedBoxId={currSelectedBoxId}
+              setCurrSelectedBoxId={setCurrSelectedBoxId}
               isPlaying={isPlaying}
               togglePlayPause={togglePlayPause}
+              theme={theme}
             />
           </div>
 
-          {/* Waveform + Spectrogram */}
           <div className='flex-1 min-h-0 overflow-hidden flex flex-col'>
             <WaveformSpectrogram
               selectedAudio={selectedAudio}
@@ -181,50 +170,46 @@ function App() {
               setBoxes={setBoxes}
               currSelectedBoxId={currSelectedBoxId}
               setCurrSelectedBoxId={setCurrSelectedBoxId}
-              duration={duration} // Total audio duration
+              duration={duration}
               setDuration={setDuration}
               setContainerWidth={setContainerWidth}
               setDrawingBox={setDrawingBox}
               visibleTime={visibleTime}
               setVisibleTime={setVisibleTime}
+              theme={theme}
             />
-            <Tools
-              currTool={currTool}
-              setCurrTool={setCurrTool}/>
+            <Tools currTool={currTool} setCurrTool={setCurrTool} theme={theme} />
           </div>
 
-          {/* Bottom Dataset Panel (key: 4) */}
           {showDataset && (
             <div
-              className='absolute bottom-0 left-0 right-0 z-[100] bg-[#82A062] rounded-t-xl shadow-2xl overflow-y-auto'
-              style={{ height: datasetHeight }}
+              style={{ backgroundColor: theme.panels, height: datasetHeight }}
+              className='absolute bottom-0 left-0 right-0 z-[100] rounded-t-xl shadow-2xl overflow-y-auto'
             >
-              <div
-                className='h-2 cursor-ns-resize'
-                onMouseDown={handleDragStart}
-              />
+              <div className='h-2 cursor-ns-resize' onMouseDown={handleDragStart} />
               <div className='px-2 pb-2'>
                 <DatasetPanel
                   rows={rows}
                   onDeleteRow={(i) => setBoxes(prev => prev.filter((_, idx) => idx !== i))}
+                  theme={theme}
                 />
               </div>
             </div>
           )}
         </div>
 
-        {/* Right Panel (key: 2 or 3) */}
         {rightPanel !== null && (
-          <div className='w-48 shrink-0 bg-[#82A062] rounded-xl p-2 overflow-y-auto'>
+          <div style={{ backgroundColor: theme.panels }} className='w-48 shrink-0 rounded-xl p-2 overflow-y-auto'>
             {rightPanel === 2 && (
               <BoxFilePanel
                 selectedRow={selectedRow}
                 drawingRow={drawingRow}
                 selectedAudio={selectedAudio}
                 setSelectedAudio={setSelectedAudio}
+                theme={theme}
               />
             )}
-            {rightPanel === 3 && <SpectrogramPanel />}
+            {rightPanel === 3 && <SpectrogramPanel theme={theme} />}
           </div>
         )}
 
