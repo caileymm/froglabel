@@ -8,7 +8,7 @@ const BoundingBoxLayer = ({
     setCurrSelectedBoxId, 
     setDrawingBox, 
     canvasWidth, 
-    visibleTime, // ADDED: Must be in props to react to zoom/scroll
+    visibleTime,
 }) => {
     const [activeBox, setActiveBox] = useState(null);
     const [isDrawing, setIsDrawing] = useState(false);
@@ -30,13 +30,14 @@ const BoundingBoxLayer = ({
 
     const effectiveWidth = canvasWidth > 0 ? canvasWidth : localWidth > 0 ? localWidth : 1;
 
-    // ─── Converters ──────────────────────────────────────────────────────────
-    
-    // Calculate the duration of the current "window" (e.g., 5 seconds visible)
+    // Converters
+    // Calculate the duration of the current spectrogram "window"
     const viewDuration = visibleTime.end - visibleTime.start;
 
     // Time -> Pixels (relative to the left edge of the visible window)
     const timeToPx = (time) => {
+        if (viewDuration <= 0) return 0; 
+        
         const offsetTime = time - visibleTime.start;
         return (offsetTime / viewDuration) * effectiveWidth;
     };
@@ -55,8 +56,7 @@ const BoundingBoxLayer = ({
         height: box.height,
     });
 
-    // ─── Mouse Handlers ──────────────────────────────────────────────────────
-
+    // Mouse Handlers
     const handleMouseDown = (e) => {
         if (!code || code.length < 3) return;
         const rect = e.currentTarget.getBoundingClientRect();

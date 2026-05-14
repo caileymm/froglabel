@@ -16,7 +16,7 @@ function WaveformSpectrogram({
     setBoxes, 
     currSelectedBoxId, 
     setCurrSelectedBoxId, 
-    duration, 
+    duration,
     setDuration, 
     setDrawingBox, 
     visibleTime,
@@ -95,7 +95,7 @@ function WaveformSpectrogram({
         <div className="bg-[#82A062] p-6 rounded-xl my-2 overflow-hidden">
             <div className="flex">
 
-                {/* Frequency labels */}
+                {/* Frequency Labels */}
                 <div
                     className="relative shrink-0 w-11 items-end pr-1"
                     style={{ marginTop: spectroTop, height: spectroHeight }}
@@ -111,12 +111,12 @@ function WaveformSpectrogram({
                     ))}
                 </div>
 
-                {/* Main Viewing Area */}
+                {/* Waveform + Spectrogram + Bounding Box Overlay */}
                 <div className="relative w-full overflow-hidden">
                     {/* WaveSurfer UI */}
                     <div ref={containerRef} className="relative z-10" />
 
-                    {/* Bounding Box Overlay - Now fixed to the view width */}
+                    {/* Bounding Box Overlay */}
                     <div
                         className="absolute z-50 left-0 right-0"
                         style={{ 
@@ -133,7 +133,6 @@ function WaveformSpectrogram({
                                 currSelectedBoxId={currSelectedBoxId}
                                 setCurrSelectedBoxId={setCurrSelectedBoxId}
                                 setDrawingBox={setDrawingBox}
-                                // Pass the state-tracked width instead of the ref directly
                                 canvasWidth={viewWidth} 
                                 visibleTime={visibleTime}
                             />
