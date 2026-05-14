@@ -1,108 +1,106 @@
-import { useState, useEffect, useRef} from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import defaultBlack from '../assets/default_black.png';
+import defaultWhite from '../assets/default_white.png';
+import crosshairBlack from '../assets/crosshair_black.png';
+import crosshairWhite from '../assets/crosshair_white.png';
+import moonBlack from '../assets/moon_black.png';
+import moonWhite from '../assets/moon_white.png';
 import { usePanels } from './PanelContext';
 
-function Tools() {
+function Tools({ currTool, setCurrTool, theme, frogTheme }) {
     const [isShiftPressed, setIsShiftPressed] = useState(false);
-    const [currTool, setCurrTool] = useState(null);
     const shiftAloneRef = useRef(true);
-1
-    const { showLeftPanel, setShowLeftPanel, rightPanel, setRightPanel, showDataset, setShowDataset} = usePanels();
-     
-    useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === '1') setShowLeftPanel(prev => !prev);
-      if (e.key === '2') setRightPanel(prev => prev === 2 ? null : 2);
-      if (e.key === '3') setRightPanel(prev => prev === 3 ? null : 3);
-      if (e.key === '4') setShowDataset(prev => !prev);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
 
-    const handleChangeTool = () => {
-        setCurrTool((prev) => ((prev + 1) % 5));
-    }
+    const { setRightPanel } = usePanels();
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === '1') handleChangeToTool0();
+            if (e.key === '2') handleChangeToTool1();
+            if (e.key === '3') handleChangeToTool2();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     const handleChangeToTool0 = () => {
-        setCurrTool(0)
-    }
+        setCurrTool(0);
+        setRightPanel(null);
+    };
 
     const handleChangeToTool1 = () => {
-        setCurrTool(1)
-        setShowLeftPanel(prev => !prev)
-    }
+        setCurrTool(1);
+        setRightPanel(prev => prev === 2 ? null : 2);
+    };
 
     const handleChangeToTool2 = () => {
-        setCurrTool(2)
-        setRightPanel(prev => prev === 2 ? null : 2);
-    }
+        setCurrTool(2);
+        setRightPanel(prev => prev === 3 ? null : 3);
+    };
 
-    const handleChangeToTool3 = () => {
-        setCurrTool(3)
-        setRightPanel(prev => prev === 3 ? null : 3)
-    }
+    const handleChangeTool = useCallback(
+        () => setCurrTool((prev) => ((prev + 1) % 3)),
+        []
+    );
 
-    const handleChangeToTool4 = () => {
-        setCurrTool(4)
-        setShowDataset(prev => !prev);
-    }
-
-    
     useEffect(() => {
-    const handleKeyDown = (e) => {
-        if (e.key === 'Shift') {
-        shiftAloneRef.current = true; // assume alone until proven otherwise
-        setIsShiftPressed(true);
-        } else if (e.shiftKey) {
-        shiftAloneRef.current = false; // another key was pressed with Shift
-        }
-    };
+        const handleKeyDown = (e) => {
+            if (e.key === 'Shift') {
+                shiftAloneRef.current = true;
+                setIsShiftPressed(true);
+            } else if (e.shiftKey) {
+                shiftAloneRef.current = false;
+            }
+        };
+        const handleKeyUp = (e) => {
+            if (e.key === 'Shift') {
+                if (shiftAloneRef.current) handleChangeTool();
+                setIsShiftPressed(false);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, [handleChangeTool]);
 
-    const handleKeyUp = (e) => {
-        if (e.key === 'Shift') {
-        if (shiftAloneRef.current) handleChangeTool(); // only cycle if Shift was alone
-        setIsShiftPressed(false);
-        }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => {
-        window.removeEventListener('keydown', handleKeyDown);
-        window.removeEventListener('keyup', handleKeyUp);
-    };
-    }, []);
-
-  return (
-    <div className='py-2 bg-[#82A062] rounded-xl flex items-center justify-center gap-2 w-80  mx-auto'>
-        <button className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-          ${isShiftPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-          Change Tool
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Shift</div>
-        </button>
-        <div eventHandler={handleChangeToTool0} className='p-1.5 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
-            <button onClick={handleChangeToTool1} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-                ${currTool == 1 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T1
+    return (
+        <div style={{ backgroundColor: theme.panels }} className='py-2 rounded-xl flex items-center justify-center gap-2 w-70 mx-auto'>
+            <button
+                style={{ backgroundColor: isShiftPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                onMouseEnter={(e) => !isShiftPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                onMouseLeave={(e) => !isShiftPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
+                Change Tool
+                <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift</div>
             </button>
-
-            <button onClick={handleChangeToTool2} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-                ${currTool == 2 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T2
-            </button>
-
-            <button onClick={handleChangeToTool3} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-                ${currTool == 3 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T3
-            </button>
-
-            <button onClick={handleChangeToTool4} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-                ${currTool == 4 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T4
-            </button>
-      </div>
-    </div>
-  );
+            <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1'>
+                <button onClick={handleChangeToTool0}
+                    style={{ backgroundColor: currTool === 0 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                    onMouseEnter={(e) => currTool !== 0 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                    onMouseLeave={(e) => currTool !== 0 && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                    className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
+                    <img src={frogTheme ? defaultBlack : defaultWhite} className='w-4 h-4' />
+                </button>
+                <button onClick={handleChangeToTool1}
+                    style={{ backgroundColor: currTool === 1 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                    onMouseEnter={(e) => currTool !== 1 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                    onMouseLeave={(e) => currTool !== 1 && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                    className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
+                    <img src={frogTheme ? crosshairBlack : crosshairWhite} className='w-4 h-4' />
+                </button>
+                <button onClick={handleChangeToTool2}
+                    style={{ backgroundColor: currTool === 2 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                    onMouseEnter={(e) => currTool !== 2 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                    onMouseLeave={(e) => currTool !== 2 && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                    className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
+                    <img src={frogTheme ? moonBlack : moonWhite} className='w-4 h-4' />
+                </button>
+            </div>
+        </div>
+    );
 }
 
 export default Tools;

@@ -1,6 +1,16 @@
-import { sampleRate, channels, bitrate, version } from '../utils/audioInfo';
+import greenAudio from '../assets/green_tree.mp3';
+import peronsAudio from '../assets/perons_tree.mp3';
+import redEyedAudio from '../assets/red_eyed_tree.mp3';
+import { getAudioInfo } from '../utils/audioInfo';
+import { useEffect, useState } from 'react';
 
-function BoxFilePanel({ selectedRow, drawingRow }) {
+const audioFiles = [
+    { filename: 'green_tree.mp3', audio: greenAudio },
+    { filename: 'perons_tree.mp3', audio: peronsAudio },
+    { filename: 'red_eyed_tree.mp3', audio: redEyedAudio },
+];
+
+function BoxFilePanel({ selectedRow, drawingRow, selectedAudio, setSelectedAudio, theme }) {
     const box = drawingRow ?? selectedRow;
 
     const label     = box?.code      ?? '—';
@@ -11,104 +21,82 @@ function BoxFilePanel({ selectedRow, drawingRow }) {
     const endFreq   = box?.endFreq   ?? '—';
     const bandwidth = box?.bandwidth ?? '—';
 
-    const filename      = 'audio.mp3';
+    const [info, setInfo] = useState(null);
 
-    const boxClass    = 'bg-[#F3F3E4] rounded-md px-2 py-0.5 font-display text-sm inline-block self-start';
-    const rowClass    = 'flex flex-row items-center gap-1';
-    const headerClass = 'font-display text-sm text-[#1E1E1E]';
-    const unitClass   = 'font-display text-xs';
+    useEffect(() => {
+        getAudioInfo(selectedAudio).then(info => {
+            setInfo(info);
+        });
+    }, [selectedAudio]);
 
     return (
         <div className='flex flex-col gap-2'>
-            <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md w-5 flex items-center justify-center'>2</div>
+            <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-sm font-display px-2 rounded-md w-5 flex items-center justify-center'>2</div>
 
-            <div className='bg-[#C8D9A3] flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
+            {/* Added style here */}
+            <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
                 Box Details
                 <div className='flex flex-col gap-1'>
-                    <div className='flex flex-col'>
-                        <span className={headerClass}>Label</span>
-                        <div className={rowClass}>
-                            <span className={boxClass}>{label}</span>
+                    {[
+                        ['Label', label, ''],
+                        ['Start Time', startTime, 's'],
+                        ['End Time', endTime, 's'],
+                        ['Duration', duration, 's'],
+                        ['Start Frequency', startFreq, 'Hz'],
+                        ['End Frequency', endFreq, 'Hz'],
+                        ['Bandwidth', bandwidth, 'Hz'],
+                    ].map(([header, value, unit]) => (
+                        <div key={header} className='flex flex-col'>
+                            <span style={{ color: theme.text }} className='font-display text-sm'>{header}</span>
+                            <div className='flex flex-row items-center gap-1'>
+                                <span style={{ backgroundColor: theme.cream, color: theme.textInputText }} className='rounded-sm px-2 py-0.5 font-display text-sm inline-block self-start'>{value}</span>
+                                {unit && <span style={{ color: theme.text }} className='font-display text-xs'>{unit}</span>}
+                            </div>
                         </div>
-                    </div>
-                    <div className='flex flex-col'>
-                        <span className={headerClass}>Start Time</span>
-                        <div className={rowClass}>
-                            <span className={boxClass}>{startTime}</span>
-                            <span className={unitClass}>s</span>
-                        </div>
-                    </div>
-                    <div className='flex flex-col'>
-                        <span className={headerClass}>End Time</span>
-                        <div className={rowClass}>
-                            <span className={boxClass}>{endTime}</span>
-                            <span className={unitClass}>s</span>
-                        </div>
-                    </div>
-                    <div className='flex flex-col'>
-                        <span className={headerClass}>Duration</span>
-                        <div className={rowClass}>
-                            <span className={boxClass}>{duration}</span>
-                            <span className={unitClass}>s</span>
-                        </div>
-                    </div>
-                    <div className='flex flex-col'>
-                        <span className={headerClass}>Start Frequency</span>
-                        <div className={rowClass}>
-                            <span className={boxClass}>{startFreq}</span>
-                            <span className={unitClass}>Hz</span>
-                        </div>
-                    </div>
-                    <div className='flex flex-col'>
-                        <span className={headerClass}>End Frequency</span>
-                        <div className={rowClass}>
-                            <span className={boxClass}>{endFreq}</span>
-                            <span className={unitClass}>Hz</span>
-                        </div>
-                    </div>
-                    <div className='flex flex-col'>
-                        <span className={headerClass}>Bandwidth</span>
-                        <div className={rowClass}>
-                            <span className={boxClass}>{bandwidth}</span>
-                            <span className={unitClass}>Hz</span>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </div>
 
-            <div className='bg-[#C8D9A3] flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
+            {/* Added style here */}
+            <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
                 File Details
                 <div className='flex flex-col gap-1'>
+                    <span style={{ color: theme.text }} className='font-display text-sm'>Select Audio</span>
+                    {audioFiles.map(({ filename, audio }) => (
+                        <div
+                            key={filename}
+                            onClick={() => setSelectedAudio(audio)}
+                            className='flex flex-row items-center gap-2 cursor-pointer'
+                        >
+                            <div style={{ borderColor: theme.keyButtons }} className='w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0'>
+                                {selectedAudio === audio && <div style={{ backgroundColor: theme.keyButtons }} className='w-2 h-2 rounded-full' />}
+                            </div>
+                            <span style={{ backgroundColor: theme.cream, color: theme.textInputText }} className='rounded-sm px-2 py-0.5 font-display text-sm inline-block self-start'>{filename}</span>
+                        </div>
+                    ))}
                     <div className='flex flex-col'>
-                        <span className={headerClass}>Filename</span>
-                        <div className={rowClass}>
-                            <span className={boxClass}>{filename}</span>
+                        <span style={{ color: theme.text }} className='font-display text-sm'>Sample Rate</span>
+                        <div className='flex flex-row items-center gap-1'>
+                            <span style={{ backgroundColor: theme.cream, color: theme.textInputText }} className='rounded-sm px-2 py-0.5 font-display text-sm inline-block self-start'>{info?.sampleRate ?? '—'}</span>
+                            <span style={{ color: theme.text }} className='font-display text-xs'>Hz</span>
                         </div>
                     </div>
                     <div className='flex flex-col'>
-                        <span className={headerClass}>Sample Rate</span>
-                        <div className={rowClass}>
-                            <span className={boxClass}>{sampleRate}</span>
-                            <span className={unitClass}>Hz</span>
+                        <span style={{ color: theme.text }} className='font-display text-sm'>Channels</span>
+                        <div className='flex flex-row items-center gap-1'>
+                            <span style={{ backgroundColor: theme.cream, color: theme.textInputText }} className='rounded-sm px-2 py-0.5 font-display text-sm inline-block self-start'>{info?.channels ?? '—'}</span>
                         </div>
                     </div>
                     <div className='flex flex-col'>
-                        <span className={headerClass}>Channels</span>
-                        <div className={rowClass}>
-                            <span className={boxClass}>{channels}</span>
+                        <span style={{ color: theme.text }} className='font-display text-sm'>Bit Rate</span>
+                        <div className='flex flex-row items-center gap-1'>
+                            <span style={{ backgroundColor: theme.cream, color: theme.textInputText }} className='rounded-sm px-2 py-0.5 font-display text-sm inline-block self-start'>{info?.bitrate ?? '—'}</span>
                         </div>
                     </div>
                     <div className='flex flex-col'>
-                        <span className={headerClass}>Bit Rate</span>
-                        <div className={rowClass}>
-                            <span className={boxClass}>{bitrate}</span>
-                        </div>
-                    </div>
-
-                    <div className='flex flex-col'>
-                        <span className={headerClass}>Version</span>
-                        <div className={rowClass}>
-                            <span className={boxClass}>{version}</span>
+                        <span style={{ color: theme.text }} className='font-display text-sm'>Version</span>
+                        <div className='flex flex-row items-center gap-1'>
+                            <span style={{ backgroundColor: theme.cream, color: theme.textInputText }} className='rounded-sm px-2 py-0.5 font-display text-sm inline-block self-start'>{info?.version ?? '—'}</span>
                         </div>
                     </div>
                 </div>

@@ -1,147 +1,177 @@
-import audioSrc from "../assets/frogsounds.mp3";
 import BoundingBoxLayer from "./BoundingBoxLayer";
-import { useEffect, useState, useRef, useImperativeHandle } from "react";
+import { useEffect, useState, useRef } from "react";
 import Spectrogram from "wavesurfer.js/dist/plugins/spectrogram.esm.js";
 import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js';
-import { WAVEFORM_HEIGHT, SPECTROGRAM_HEIGHT, SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES, FREQ_LABELS } from "../utils/spectrogramConfig"
+import { WAVEFORM_HEIGHT, SPECTROGRAM_HEIGHT, SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES, FREQ_LABELS } from "../utils/spectrogramConfig";
 import { freqToY } from '../utils/spectrogramScale';
-import { audioInfoReady, sampleRate } from '../utils/audioInfo';
+import { getAudioInfo } from '../utils/audioInfo';
 import { usePanels } from './PanelContext';
+import moonCursor from '../assets/moon_cursor.png';
 
 export const wavesurferRef = { current: null };
 
-function WaveformSpectrogram({ code, boxes, setBoxes, currSelectedBox, setCurrSelectedBox, setDuration, setContainerWidth, setDrawingBox }) {
-  const containerRef = useRef(null);
-  const [spectroTop, setSpectroTop] = useState(WAVEFORM_HEIGHT);
-  const [spectroHeight, setSpectroHeight] = useState(SPECTROGRAM_HEIGHT);
+function WaveformSpectrogram({
+    selectedAudio,
+    setSampleRate,
+    code,
+    boxes,
+    setBoxes,
+    currSelectedBoxId,
+    setCurrSelectedBoxId,
+    duration,
+    setDuration,
+    setDrawingBox,
+    visibleTime,
+    setVisibleTime,
+    theme,
+    currTool
+}) {
+    const [localSampleRate, setLocalSampleRate] = useState(null);
 
-  const { brightness, setBrightness, contrast, setContrast, rightPanel } = usePanels();
-  const {handleSpectroMouseDown, handleSpectroMouseMove, handleSpectroMouseUp,} = usePanels();
+    const containerRef = useRef(null);
+    const [spectroTop] = useState(WAVEFORM_HEIGHT);
+    const [spectroHeight] = useState(SPECTROGRAM_HEIGHT);
+    const [viewWidth, setViewWidth] = useState(0);
 
-  const spectroPluginRef = useRef(null);
-  const spectroCanvasRef = useRef(null);
+    const { brightness, contrast } = usePanels();
 
+    useEffect(() => {
+        if (!containerRef.current) return;
 
+        const ro = new ResizeObserver(([entry]) => {
+            setViewWidth(entry.contentRect.width);
+        });
+        ro.observe(containerRef.current);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
+        let ws = null;
+        let cancelled = false;
 
-    let ws = null;
-    let cancelled = false;
-    
-    spectroPluginRef.current = Spectrogram.create({
-            labels: false,
-            height: SPECTROGRAM_HEIGHT,
-            splitChannels: false,
-            scale: SCALE,
-            frequencyMax: FREQUENCY_MAX,
-            frequencyMin: FREQUENCY_MIN,
-            fftSamples: FFT_SAMPLES,
-            labelsBackground: 'rgba(0, 0, 0, 0.1)',
-            useWebWorker: true,
-          });
+        getAudioInfo(selectedAudio).then(({ sampleRate }) => {
+            if (cancelled) return;
+            setLocalSampleRate(sampleRate);
+            setSampleRate(sampleRate);
 
-    audioInfoReady.then(() => {
-      if (cancelled) return;
+            ws = WaveSurfer.create({
+                container: containerRef.current,
+                height: WAVEFORM_HEIGHT,
+                url: selectedAudio,
+                minPxPerSec: 0,
+                fillParent: true,
+                autoCenter: false,
+                hideScrollbar: true,
+                waveColor: theme.waveform,
+                cursorColor: theme.cursor,
+                progressColor: theme.progress,
+                cursorWidth: 3,
+                sampleRate: sampleRate,
+                dragToSeek: true,
+                plugins: [
+                    Spectrogram.create({
+                        labels: false,
+                        height: SPECTROGRAM_HEIGHT,
+                        splitChannels: false,
+                        scale: SCALE,
+                        frequencyMax: FREQUENCY_MAX,
+                        frequencyMin: FREQUENCY_MIN,
+                        fftSamples: FFT_SAMPLES,
+                        labelsBackground: 'rgba(0, 0, 0, 0.1)',
+                        useWebWorker: true,
+                    }),
+                    TimelinePlugin.create({
+                        style: { fontSize: '12px', color: theme.text, fontFamily: 'Afacad, sans-serif' },
+                        formatTimeCallback: (seconds) => `${seconds.toFixed(1)} s`,
+                    }),
+                ],
+            });
 
-      ws = WaveSurfer.create({
-        container: containerRef.current,
-        height: WAVEFORM_HEIGHT,
-        url: audioSrc,
-        waveColor: '#1E1E1E',
-        cursorColor: '#CAE4EF',
-        progressColor: '#F3F3E4',
-        cursorWidth: 3,
-        sampleRate: sampleRate,
-        dragToSeek: true,
-        plugins: [
-          spectroPluginRef.current,
-          TimelinePlugin.create({
-            style: { fontSize: '12px', color: '#1E1E1E', fontFamily: 'Afacad, sans-serif' },
-            formatTimeCallback: (seconds) => `${seconds.toFixed(1)} s`,
-          }),
-        ],
-      });
+            ws.on('ready', () => {
+                const totalDur = ws.getDuration();
+                setDuration(totalDur);
+                setVisibleTime({ start: 0, end: totalDur });
+            });
 
-      ws.on('ready', () => {
-        setDuration(ws.getDuration());
-        setContainerWidth(containerRef.current.clientWidth);
-        const canvases = containerRef.current.querySelectorAll('canvas');
-        if (canvases.length > 1) {
-          const spectroCanvas = canvases[1];
-          spectroCanvasRef.current = spectroCanvas;
-          const containerTop = containerRef.current.getBoundingClientRect().top;
-          const canvasTop = spectroCanvas.getBoundingClientRect().top;
-          setSpectroTop(canvasTop - containerTop);
-          setSpectroHeight(spectroCanvas.getBoundingClientRect().height);
-        }
+            wavesurferRef.current = ws;
         });
 
-      wavesurferRef.current = ws;
-    });
+        return () => {
+            cancelled = true;
+            ro.disconnect();
+            if (wavesurferRef.current) {
+                wavesurferRef.current.destroy();
+            }
+            wavesurferRef.current = null;
+        };
+    }, [setDuration, selectedAudio]);
 
-    return () => {
-      cancelled = true;
-      ws?.destroy();
-      wavesurferRef.current = null;
+    const cursorMap = (tool) => {
+        if (tool === 0) return 'auto';
+        if (tool === 1) return 'crosshair';
+        if (tool === 2) return `url(${moonCursor}), auto`;
     };
-  }, []);
 
-  return (
-    <div className="bg-[#82A062] p-6 rounded-xl my-2">
-      <div className="flex">
+    return (
+        <div style={{ backgroundColor: theme.panels }} className="p-6 rounded-xl my-2 overflow-hidden">
+            <div className="flex">
 
-        {/* Frequency labels */}
-        <div
-          className="relative shrink-0 w-11 items-end pr-1"
-          style={{ marginTop: spectroTop, height: spectroHeight }}
-        >
-          {FREQ_LABELS.map((freq) => (
-            <span
-              key={freq}
-              className="absolute right-1 text-right text-[12px] text-[#1E1E1E] font-display leading-none"
-              style={{ top: Math.min(freqToY(freq), spectroHeight - 1), transform: 'translateY(-50%)' }}
-            >
-              {freq} Hz
-            </span>
-          ))}
+                {/* Frequency Labels */}
+                <div
+                    className="relative shrink-0 w-11 items-end pr-1"
+                    style={{ marginTop: spectroTop, height: spectroHeight }}
+                >
+                    {localSampleRate && FREQ_LABELS.map((freq) => (
+                        <span
+                            key={freq}
+                            className="absolute right-1 text-right text-[12px] font-display leading-none"
+                            style={{
+                                top: Math.min(freqToY(freq, localSampleRate), spectroHeight - 1),
+                                transform: 'translateY(-50%)',
+                                color: 'white',
+                            }}
+                        >
+                            {freq} Hz
+                        </span>
+                    ))}
+                </div>
+
+                {/* Waveform + Spectrogram + Bounding Box Overlay */}
+                <div className="relative w-full overflow-hidden">
+                    <div ref={containerRef} className="relative z-10" />
+
+                    <div
+                        className="absolute z-50 left-0 right-0"
+                        style={{ top: spectroTop, height: spectroHeight, pointerEvents: 'none' }}
+                    >
+                        {/* Brightness / Contrast filter */}
+                        <div
+                            className="absolute left-0 right-0 pointer-events-none"
+                            style={{
+                                top: 0,
+                                height: spectroHeight,
+                                backdropFilter: `brightness(${brightness}) contrast(${contrast})`,
+                                zIndex: 10,
+                            }}
+                        />
+
+                        <div className="w-full h-full relative" style={{ pointerEvents: currTool === 0 ? 'none' : 'auto', cursor: cursorMap(currTool) }}>
+                            <BoundingBoxLayer
+                                code={code}
+                                boxes={boxes}
+                                setBoxes={setBoxes}
+                                currSelectedBoxId={currSelectedBoxId}
+                                setCurrSelectedBoxId={setCurrSelectedBoxId}
+                                setDrawingBox={setDrawingBox}
+                                canvasWidth={viewWidth}
+                                visibleTime={visibleTime}
+                                theme={theme}
+                                currTool={currTool}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        {/* Waveform + Spectrogram + Bounding Box Overlay */}
-        <div className="relative w-full">
-          <div ref={containerRef} />
-          <div
-            className="absolute z-50 left-0 right-0"
-            style={{ top: spectroTop, height: spectroHeight }}
-            onMouseDown={handleSpectroMouseDown}
-            onMouseMove={handleSpectroMouseMove}
-            onMouseUp={handleSpectroMouseUp}
-            onMouseLeave={handleSpectroMouseUp}
-          >
-            <div
-              className="absolute left-0 right-0 pointer-events-none"
-              style={{
-                top: 0,
-                height: spectroHeight,
-                backdropFilter: `brightness(${brightness}) contrast(${contrast})`,
-                zIndex: 10,
-              }}
-            />
-            <BoundingBoxLayer
-              code={code}
-              boxes={boxes}
-              setBoxes={setBoxes}
-              currSelectedBox={currSelectedBox}
-              setCurrSelectedBox={setCurrSelectedBox}
-              setDrawingBox={setDrawingBox}
-            />
-          </div>
-        </div>
-
-      </div>
-    </div>
-  );
+    );
 }
 
 export default WaveformSpectrogram;
