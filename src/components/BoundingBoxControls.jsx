@@ -12,24 +12,29 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
 
   const handleSetCode = () => {
       setCode('');
-      setTimeout(() => setCurrTool(0), 0);
       inputRef.current?.focus();
       inputRef.current?.select();
   };
 
   const handleCodeInput = (e) => {
     const value = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
-    if (value.length < 3) { setCode(value); setIsError(false); return; }
-    if (value.length === 3) {
-      if (Object.keys(codesDict).includes(value)) {
-        setCode(value);
-        setIsError(false);
-        setCurrTool(1);
-      } else {
-        setCode(''); setIsError(true);
-        setTimeout(() => setIsError(false), 1000);
+    if (value.length <= 3) {
+      setCode(value);
+      setIsError(false);
+      if (value.length === 3) {
+        // Delay blur to allow typing to complete
+        setTimeout(() => {
+          if (Object.keys(codesDict).includes(value)) {
+            setCurrTool(1);
+            setIsError(false);
+          } else {
+            setCode(''); 
+            setIsError(true);
+            setTimeout(() => setIsError(false), 1000);
+          }
+          inputRef.current?.blur();
+        }, 100); // Short delay to prevent interruption
       }
-      inputRef.current?.blur();
     }
   };
 
@@ -58,9 +63,15 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
 
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Allow spacebar to trigger even if input is focused
+      if (e.key === ' ') { 
+        e.preventDefault(); 
+        setIsSpacePressed(true); 
+        actionsRef.current.handleSetCode(); 
+        return; // Early return after handling space
+      }
       if (document.activeElement === inputRef.current && e.key !== 'Escape') return;
 
-      if (e.key === ' ') { e.preventDefault(); setIsSpacePressed(true); actionsRef.current.handleSetCode(); }
       if (e.key === 'Tab') { e.preventDefault(); setIsTabPressed(true); actionsRef.current.handleSelectBox(); }
       if (e.shiftKey && e.key.toUpperCase() === 'V') { e.preventDefault(); setIsShiftVPressed(true); actionsRef.current.handlePlayBoxAudio(); }
       if (e.shiftKey && e.key.toUpperCase() === 'D') { e.preventDefault(); setIsShiftDPressed(true); actionsRef.current.handleDeleteBox(); }
