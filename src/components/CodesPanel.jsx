@@ -1,10 +1,9 @@
 import { useState } from 'react';
 
-function CodesPanel({ codesDict, setCodesDict }) {
+function CodesPanel({ codesDict, setCodesDict, theme }) {
     const [code, setCode] = useState('');
     const [speciesName, setSpeciesName] = useState('');
     const [search, setSearch] = useState('');
-
     const [isCodeError, setIsCodeError] = useState(false);
     const [isNameError, setIsNameError] = useState(false);
 
@@ -15,15 +14,14 @@ function CodesPanel({ codesDict, setCodesDict }) {
             setCode('');
             setIsCodeError(true);
             setTimeout(() => setIsCodeError(false), 1000);
-            return
+            return;
         } else if (Object.values(codesDict).includes(speciesName.trim())) {
             setSpeciesName('');
             setCode('');
             setIsNameError(true);
             setTimeout(() => setIsNameError(false), 1000);
             return;
-        }
-        else if (Object.keys(codesDict).includes(code)) {
+        } else if (Object.keys(codesDict).includes(code)) {
             setCode('');
             setIsCodeError(true);
             setTimeout(() => setIsCodeError(false), 1000);
@@ -49,8 +47,9 @@ function CodesPanel({ codesDict, setCodesDict }) {
 
     return (
         <div className='flex flex-col gap-2'>
-            <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md w-5 flex items-center justify-center'>1</div>
-            <div className='bg-[#C8D9A3] flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
+            <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-sm font-display px-2 rounded-md w-5 flex items-center justify-center'>1</div>
+
+            <div style={{ backgroundColor: theme.group }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
                 Create Code
                 <div className='flex flex-row items-center justify-center gap-1'>
                     <input
@@ -60,7 +59,8 @@ function CodesPanel({ codesDict, setCodesDict }) {
                         onKeyDown={e => e.stopPropagation()}
                         maxLength={3}
                         className={`w-15 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9] uppercase placeholder:normal-case
-                        ${isCodeError ? 'border-2 border-[#FFAAAA]' : 'border-none'}`}/>
+                        ${isCodeError ? 'border-2 border-[#FFAAAA]' : 'border-none'}`}
+                    />
                     <input
                         value={speciesName}
                         onChange={e => setSpeciesName(e.target.value)}
@@ -68,16 +68,18 @@ function CodesPanel({ codesDict, setCodesDict }) {
                         onKeyDown={e => e.stopPropagation()}
                         maxLength={35}
                         className={`w-25 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9]
-                        ${isNameError ? 'border-2 border-[#FFAAAA]' : 'border-none'}`}/>
+                        ${isNameError ? 'border-2 border-[#FFAAAA]' : 'border-none'}`}
+                    />
                 </div>
                 <button
                     onClick={handleCreate}
-                    className='w-full px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer bg-[#FEECBE] hover:bg-[#FFDE9E]'>
+                    style={{ backgroundColor: theme.buttons }}
+                    className='w-full px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer'>
                     Create
                 </button>
             </div>
 
-            <div className='bg-[#C8D9A3] flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
+            <div style={{ backgroundColor: theme.group }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
                 Codes
                 <div className='flex flex-row gap-1'>
                     <input
@@ -86,18 +88,18 @@ function CodesPanel({ codesDict, setCodesDict }) {
                         placeholder='Search...'
                         onKeyDown={e => e.stopPropagation()}
                         maxLength={35}
-                        className='w-40 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9]'/>
+                        className='w-40 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9]'
+                    />
                 </div>
-
                 <div className='rounded-lg flex flex-col gap-1 overflow-y-auto'>
                     {filteredCodes.length === 0 ? (
-                        <div className='font-display text-sm text-[#E6E5C9]'>No codes found</div>
+                        <div style={{ color: theme.keyText }} className='font-display text-sm'>No codes found</div>
                     ) : (
                         filteredCodes.map(([c, name]) => (
-                            <div key={c} className='bg-[#F3F3E4] rounded-md px-2 py-1 flex items-center justify-between'>
+                            <div key={c} style={{ backgroundColor: theme.cream }} className='rounded-md px-2 py-1 flex items-center justify-between'>
                                 <div>
-                                    <div className='font-display text-sm'>{c}</div>
-                                    <div className='font-display text-xs'>{name}</div>
+                                    <div style={{ color: theme.text }} className='font-display text-sm'>{c}</div>
+                                    <div style={{ color: theme.text }} className='font-display text-xs'>{name}</div>
                                 </div>
                                 <button
                                     onClick={() => handleDelete(c)}

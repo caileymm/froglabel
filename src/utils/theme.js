@@ -11,6 +11,14 @@ export const defaultColors = {
     text:                '#1F2937',
     cursor:              '#3B82F6',
     progress:            '#E5E7EB',
+    waveform:            '#1F2937',
+    cream:               '#E5E7EB',
+    box:                 '#3B82F6',
+    boxSelected:         '#1D4ED8',
+    boxFill:             'rgba(59, 130, 246, 0.15)',
+    boxFillSelected:     'rgba(29, 78, 216, 0.25)',
+    boxLabel:            '#1F2937',
+    boxLabelBg:          '#BFDBFE',
 };
 
 export const frogThemeColors = {
@@ -26,6 +34,12 @@ export const frogThemeColors = {
     text:                '#1E1E1E',
     cursor:              '#CAE4EF',
     progress:            '#F3F3E4',
-    boxes:                '#C8D9A3',
-    boxLabels:             '#C8D9A3'
+    waveform:            '#1E1E1E',
+    cream:               '#F3F3E4',
+    box:                 '#82A062',
+    boxSelected:         '#1E1E1E',
+    boxFill:             'rgba(130, 160, 98, 0.15)',
+    boxFillSelected:     'rgba(30, 30, 30, 0.25)',
+    boxLabel:            '#1E1E1E',
+    boxLabelBg:          '#C8D9A3',
 };

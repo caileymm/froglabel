@@ -9,33 +9,30 @@ import { getAudioInfo } from '../utils/audioInfo';
 
 export const wavesurferRef = { current: null };
 
-function WaveformSpectrogram({ 
+function WaveformSpectrogram({
     selectedAudio,
     setSampleRate,
-    code, 
-    boxes, 
-    setBoxes, 
-    currSelectedBoxId, 
-    setCurrSelectedBoxId, 
+    code,
+    boxes,
+    setBoxes,
+    currSelectedBoxId,
+    setCurrSelectedBoxId,
     duration,
     setDuration,
-    setDrawingBox, 
+    setDrawingBox,
     visibleTime,
-    setVisibleTime
+    setVisibleTime,
+    theme,
 }) {
-    const [localSampleRate, setLocalSampleRate] = useState(null);
-    
     const containerRef = useRef(null);
     const [spectroTop] = useState(WAVEFORM_HEIGHT);
     const [spectroHeight] = useState(SPECTROGRAM_HEIGHT);
-
-    // Track the actual visible width of the container
     const [viewWidth, setViewWidth] = useState(0);
+    const [localSampleRate, setLocalSampleRate] = useState(null);
 
     useEffect(() => {
         if (!containerRef.current) return;
 
-        // Use ResizeObserver to track the container's width safely
         const ro = new ResizeObserver(([entry]) => {
             setViewWidth(entry.contentRect.width);
         });
@@ -48,18 +45,18 @@ function WaveformSpectrogram({
             if (cancelled) return;
             setLocalSampleRate(sampleRate);
             setSampleRate(sampleRate);
-            
+
             ws = WaveSurfer.create({
                 container: containerRef.current,
                 height: WAVEFORM_HEIGHT,
                 url: selectedAudio,
-                minPxPerSec: 0, 
+                minPxPerSec: 0,
                 fillParent: true,
                 autoCenter: false,
                 hideScrollbar: true,
-                waveColor: '#1E1E1E',
-                cursorColor: '#CAE4EF',
-                progressColor: '#F3F3E4',
+                waveColor: theme.waveform,
+                cursorColor: theme.cursor,
+                progressColor: theme.progress,
                 cursorWidth: 3,
                 sampleRate: sampleRate,
                 dragToSeek: true,
@@ -76,7 +73,7 @@ function WaveformSpectrogram({
                         useWebWorker: true,
                     }),
                     TimelinePlugin.create({
-                        style: { fontSize: '12px', color: '#1E1E1E', fontFamily: 'Afacad, sans-serif' },
+                        style: { fontSize: '12px', color: theme.text, fontFamily: 'Afacad, sans-serif' },
                         formatTimeCallback: (seconds) => `${seconds.toFixed(1)} s`,
                     }),
                 ],
@@ -84,12 +81,12 @@ function WaveformSpectrogram({
 
             ws.on('ready', () => {
                 const totalDur = ws.getDuration();
-                setDuration(ws.getDuration());
+                setDuration(totalDur);
                 setVisibleTime({ start: 0, end: totalDur });
             });
 
             wavesurferRef.current = ws;
-        }, [setDuration, selectedAudio]);
+        });
 
         return () => {
             cancelled = true;
@@ -102,7 +99,7 @@ function WaveformSpectrogram({
     }, [setDuration, selectedAudio]);
 
     return (
-        <div className="bg-[#82A062] p-6 rounded-xl my-2 overflow-hidden">
+        <div style={{ backgroundColor: theme.panels }} className="p-6 rounded-xl my-2 overflow-hidden">
             <div className="flex">
 
                 {/* Frequency Labels */}
@@ -110,11 +107,15 @@ function WaveformSpectrogram({
                     className="relative shrink-0 w-11 items-end pr-1"
                     style={{ marginTop: spectroTop, height: spectroHeight }}
                 >
-                    {FREQ_LABELS.map((freq) => (
+                    {localSampleRate && FREQ_LABELS.map((freq) => (
                         <span
                             key={freq}
-                            className="absolute right-1 text-right text-[12px] text-[#1E1E1E] font-display leading-none"
-                            style={{ top: Math.min(freqToY(freq, localSampleRate), spectroHeight - 1), transform: 'translateY(-50%)' }}
+                            className="absolute right-1 text-right text-[12px] font-display leading-none"
+                            style={{
+                                top: Math.min(freqToY(freq, localSampleRate), spectroHeight - 1),
+                                transform: 'translateY(-50%)',
+                                color: theme.text,
+                            }}
                         >
                             {freq} Hz
                         </span>
@@ -123,17 +124,11 @@ function WaveformSpectrogram({
 
                 {/* Waveform + Spectrogram + Bounding Box Overlay */}
                 <div className="relative w-full overflow-hidden">
-                    {/* WaveSurfer UI */}
                     <div ref={containerRef} className="relative z-10" />
 
-                    {/* Bounding Box Overlay */}
                     <div
                         className="absolute z-50 left-0 right-0"
-                        style={{ 
-                            top: spectroTop, 
-                            height: spectroHeight, 
-                            pointerEvents: 'none'
-                        }}
+                        style={{ top: spectroTop, height: spectroHeight, pointerEvents: 'none' }}
                     >
                         <div className="w-full h-full relative" style={{ pointerEvents: 'auto' }}>
                             <BoundingBoxLayer
@@ -143,8 +138,9 @@ function WaveformSpectrogram({
                                 currSelectedBoxId={currSelectedBoxId}
                                 setCurrSelectedBoxId={setCurrSelectedBoxId}
                                 setDrawingBox={setDrawingBox}
-                                canvasWidth={viewWidth} 
+                                canvasWidth={viewWidth}
                                 visibleTime={visibleTime}
+                                theme={theme}
                             />
                         </div>
                     </div>

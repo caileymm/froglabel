@@ -1,94 +1,76 @@
-import { useState, useEffect, useRef} from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-function Tools({currTool, setCurrTool}) {
+function Tools({ currTool, setCurrTool, theme }) {
     const [isShiftPressed, setIsShiftPressed] = useState(false);
     const shiftAloneRef = useRef(true);
 
-    const handleChangeTool = () => {
-        setCurrTool((prev) => ((prev + 1) % 5));
-    }
+    const handleChangeTool = () => setCurrTool((prev) => ((prev + 1) % 5));
+    const handleChangeToTool0 = () => setCurrTool(0);
+    const handleChangeToTool1 = () => setCurrTool(1);
+    const handleChangeToTool2 = () => setCurrTool(2);
+    const handleChangeToTool3 = () => setCurrTool(3);
+    const handleChangeToTool4 = () => setCurrTool(4);
 
-    const handleChangeToTool0 = () => {
-        setCurrTool(0)
-    }
-
-    const handleChangeToTool1 = () => {
-        setCurrTool(1)
-    }
-
-    const handleChangeToTool2 = () => {
-        setCurrTool(2)
-    }
-
-    const handleChangeToTool3 = () => {
-        setCurrTool(3)
-    }
-
-    const handleChangeToTool4 = () => {
-        setCurrTool(4)
-    }
-
-    
     useEffect(() => {
-    const handleKeyDown = (e) => {
-        if (e.key === 'Shift') {
-        shiftAloneRef.current = true; // assume alone until proven otherwise
-        setIsShiftPressed(true);
-        } else if (e.shiftKey) {
-        shiftAloneRef.current = false; // another key was pressed with Shift
-        }
-    };
-
-    const handleKeyUp = (e) => {
-        if (e.key === 'Shift') {
-        if (shiftAloneRef.current) handleChangeTool(); // only cycle if Shift was alone
-        setIsShiftPressed(false);
-        }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => {
-        window.removeEventListener('keydown', handleKeyDown);
-        window.removeEventListener('keyup', handleKeyUp);
-    };
+        const handleKeyDown = (e) => {
+            if (e.key === 'Shift') {
+                shiftAloneRef.current = true;
+                setIsShiftPressed(true);
+            } else if (e.shiftKey) {
+                shiftAloneRef.current = false;
+            }
+        };
+        const handleKeyUp = (e) => {
+            if (e.key === 'Shift') {
+                if (shiftAloneRef.current) handleChangeTool();
+                setIsShiftPressed(false);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
     }, []);
 
-  return (
-    <div className='py-2 bg-[#82A062] rounded-xl flex items-center justify-center gap-2 w-80  mx-auto'>
-        <button className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-          ${isShiftPressed ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-          Change Tool
-          <div className='bg-[#1E1E1E] text-[#E6E5C9] text-xs font-display px-2 rounded-md'>Shift</div>
-        </button>
-        <div eventHandler={handleChangeToTool0} className='p-1.5 bg-[#C8D9A3] rounded-xl flex items-center gap-1'>
-            <button className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1 
-                ${currTool == 0 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T1
+    return (
+        <div style={{ backgroundColor: theme.panels }} className='py-2 rounded-xl flex items-center justify-center gap-2 w-80 mx-auto'>
+            <button
+                style={{ backgroundColor: isShiftPressed ? theme.buttonsPressed : theme.buttons }}
+                className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
+                Change Tool
+                <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift</div>
             </button>
-
-            <button onClick={handleChangeToTool1} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-                ${currTool == 1 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T2
-            </button>
-
-            <button onClick={handleChangeToTool2} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-                ${currTool == 2 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T3
-            </button>
-
-            <button onClick={handleChangeToTool3} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-                ${currTool == 3 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T4
-            </button>
-
-            <button onClick={handleChangeToTool4} className={`px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1
-                ${currTool == 4 ? 'bg-[#FFDE9E]' : 'bg-[#FEECBE] hover:bg-[#FFDE9E]'}`}>
-            T5
-            </button>
-      </div>
-    </div>
-  );
+            <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1'>
+                <button onClick={handleChangeToTool0}
+                    style={{ backgroundColor: currTool === 0 ? theme.buttonsPressed : theme.buttons }}
+                    className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
+                    T1
+                </button>
+                <button onClick={handleChangeToTool1}
+                    style={{ backgroundColor: currTool === 1 ? theme.buttonsPressed : theme.buttons }}
+                    className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
+                    T2
+                </button>
+                <button onClick={handleChangeToTool2}
+                    style={{ backgroundColor: currTool === 2 ? theme.buttonsPressed : theme.buttons }}
+                    className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
+                    T3
+                </button>
+                <button onClick={handleChangeToTool3}
+                    style={{ backgroundColor: currTool === 3 ? theme.buttonsPressed : theme.buttons }}
+                    className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
+                    T4
+                </button>
+                <button onClick={handleChangeToTool4}
+                    style={{ backgroundColor: currTool === 4 ? theme.buttonsPressed : theme.buttons }}
+                    className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
+                    T5
+                </button>
+            </div>
+        </div>
+    );
 }
 
 export default Tools;

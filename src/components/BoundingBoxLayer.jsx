@@ -9,6 +9,7 @@ const BoundingBoxLayer = ({
     setDrawingBox, 
     canvasWidth, 
     visibleTime,
+    theme 
 }) => {
     const [activeBox, setActiveBox] = useState(null);
     const [isDrawing, setIsDrawing] = useState(false);
@@ -29,20 +30,16 @@ const BoundingBoxLayer = ({
     }, []);
 
     const effectiveWidth = canvasWidth > 0 ? canvasWidth : localWidth > 0 ? localWidth : 1;
-
-    // Converters
-    // Calculate the duration of the current spectrogram "window"
     const viewDuration = visibleTime.end - visibleTime.start;
 
-    // Time -> Pixels (relative to the left edge of the visible window)
+    // Time -> Pixels
     const timeToPx = (time) => {
         if (viewDuration <= 0) return 0; 
-        
         const offsetTime = time - visibleTime.start;
         return (offsetTime / viewDuration) * effectiveWidth;
     };
     
-    // Pixels -> Time (converts a click on the screen to an absolute timestamp)
+    // Pixels -> Time
     const pxToTime = (px) => {
         const timeOffset = (px / effectiveWidth) * viewDuration;
         return visibleTime.start + timeOffset;
@@ -56,7 +53,6 @@ const BoundingBoxLayer = ({
         height: box.height,
     });
 
-    // Mouse Handlers
     const handleMouseDown = (e) => {
         if (!code || code.length < 3) return;
         const rect = e.currentTarget.getBoundingClientRect();
@@ -188,59 +184,105 @@ const BoundingBoxLayer = ({
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
         >
-            {boxes.map((box) => {
+            {boxes.map((box, index) => {
                 const px = toPixels(box);
                 const isSelected = box.id === currSelectedBoxId;
                 
-                // Optimization: Don't render if completely out of view
                 if (px.left + px.width < 0 || px.left > effectiveWidth) return null;
 
                 return (
                     <div
                         key={box.id}
-                        className={`absolute border-2 z-40 bg-[#C8D9A3]/20 cursor-pointer 
-                                   ${isSelected ? 'border-[#60B2D5]' : 'border-[#C8D9A3]'}`}
-                        style={{ left: px.left, top: px.top, width: px.width, height: px.height }}
+                        className="absolute border-2 z-40 cursor-pointer"
+                        style={{ 
+                            left: px.left, 
+                            top: px.top, 
+                            width: px.width, 
+                            height: px.height,
+                            borderColor: isSelected ? theme.boxSelected : theme.box,
+                            backgroundColor: isSelected ? theme.boxFillSelected : theme.boxFill
+                        }}
                     >
+                        {/* Box Metadata Labels */}
+                        <div className="absolute -top-4 left-0 right-0 flex justify-between pointer-events-none px-0.5">
+                            {/* Top Left: Box Index */}
+                            <div 
+                                className='font-display text-[9px] px-1 rounded-t-sm flex items-center justify-center'
+                                style={{ 
+                                    backgroundColor: theme.keyButtons, 
+                                    color: theme.keyText,
+                                    height: '14px'
+                                }}
+                            >
+                                {index + 1}
+                            </div>
+
+                            {/* Top Right: Label Code */}
+                            {box.code && (
+                                <div 
+                                    className='font-display text-[9px] px-1 rounded-t-sm flex items-center justify-center'
+                                    style={{ 
+                                        backgroundColor: theme.boxLabelBg, 
+                                        color: theme.boxLabel,
+                                        border: `1px solid ${isSelected ? theme.boxSelected : theme.box}`,
+                                        borderBottom: 'none',
+                                        height: '14px'
+                                    }}
+                                >
+                                    {box.code}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Selected State & Resize Handles */}
                         {isSelected && (
-                            <div className="absolute -inset-[3px] border-2 border-[#60B2D5] pointer-events-none">
+                            <div className="absolute -inset-[2px] border-2 pointer-events-none" style={{ borderColor: theme.boxSelected }}>
                                 {[
-                                    { pos: '-top-1 -left-1',     corner: 'tl', cursor: 'cursor-nwse-resize' },
-                                    { pos: '-top-1 -right-1',    corner: 'tr', cursor: 'cursor-nesw-resize' },
-                                    { pos: '-bottom-1 -left-1',  corner: 'bl', cursor: 'cursor-nesw-resize' },
-                                    { pos: '-bottom-1 -right-1', corner: 'br', cursor: 'cursor-nwse-resize' },
+                                    { pos: '-top-1.5 -left-1.5',     corner: 'tl', cursor: 'cursor-nwse-resize' },
+                                    { pos: '-top-1.5 -right-1.5',    corner: 'tr', cursor: 'cursor-nesw-resize' },
+                                    { pos: '-bottom-1.5 -left-1.5',  corner: 'bl', cursor: 'cursor-nesw-resize' },
+                                    { pos: '-bottom-1.5 -right-1.5', corner: 'br', cursor: 'cursor-nwse-resize' },
                                 ].map(({ pos, corner, cursor }) => (
                                     <div
                                         key={corner}
-                                        className={`absolute ${pos} ${cursor} w-2.5 h-2.5 bg-[#60B2D5] rounded-full pointer-events-auto shadow-sm`}
+                                        className={`absolute ${pos} ${cursor} w-2.5 h-2.5 rounded-full pointer-events-auto shadow-sm`}
+                                        style={{ backgroundColor: theme.boxSelected }}
                                         onMouseDown={(e) => handleCornerMouseDown(e, corner, box.id)}
                                     />
                                 ))}
-                            </div>
-                        )}
-
-                        {box.code && (
-                            <div className='flex justify-between items-center pointer-events-none'>
-                                <div className='font-display text-[10px] px-1 bg-[#C8D9A3] text-black'>
-                                    {box.code}
-                                </div>
                             </div>
                         )}
                     </div>
                 );
             })}
 
+            {/* Ghost Box while drawing */}
             {isDrawing && activeBox && (
                 <div
-                    className='absolute border-2 border-[#C8D9A3] bg-[#C8D9A3]/20 pointer-events-none z-50'
+                    className='absolute border-2 pointer-events-none z-50'
                     style={{
                         left:   Math.min(activeBox.startX, activeBox.currentX),
                         top:    Math.min(activeBox.startY, activeBox.currentY),
                         width:  Math.abs(activeBox.currentX - activeBox.startX),
                         height: Math.abs(activeBox.currentY - activeBox.startY),
+                        borderColor: theme.box,
+                        backgroundColor: theme.boxFill
                     }}
                 >
-                    <div className='font-display text-[10px] bg-[#C8D9A3] w-fit px-1'>{code}</div>
+                    <div className="absolute -top-4 right-0 flex pointer-events-none px-0.5">
+                        <div 
+                            className='font-display text-[9px] px-1 rounded-t-sm flex items-center justify-center'
+                            style={{ 
+                                backgroundColor: theme.boxLabelBg, 
+                                color: theme.boxLabel,
+                                border: `1px solid ${theme.box}`,
+                                borderBottom: 'none',
+                                height: '14px'
+                            }}
+                        >
+                            {code}
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
