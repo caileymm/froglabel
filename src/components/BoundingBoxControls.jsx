@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSelectedBoxId, setCurrSelectedBoxId, theme }) {
+function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSelectedBoxId, setCurrSelectedBoxId, setCurrTool, theme }) {
   const inputRef = useRef(null);
   const [isError, setIsError] = useState(false);
   
@@ -11,9 +11,10 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
   const [isEscPressed, setIsEscPressed] = useState(false);
 
   const handleSetCode = () => {
-    setCode('');
-    inputRef.current?.focus();
-    inputRef.current?.select();
+      setCode('');
+      setTimeout(() => setCurrTool(0), 0);
+      inputRef.current?.focus();
+      inputRef.current?.select();
   };
 
   const handleCodeInput = (e) => {
@@ -21,7 +22,9 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
     if (value.length < 3) { setCode(value); setIsError(false); return; }
     if (value.length === 3) {
       if (Object.keys(codesDict).includes(value)) {
-        setCode(value); setIsError(false);
+        setCode(value);
+        setIsError(false);
+        setCurrTool(1);
       } else {
         setCode(''); setIsError(true);
         setTimeout(() => setIsError(false), 1000);
@@ -120,17 +123,6 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
           Select Box
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Tab</div>
         </button>
-        {/*
-        <button onClick={handlePlayBoxAudio}
-          style={{ backgroundColor: isShiftVPressed ? theme.audioButtonPressed : theme.audioButton, color: theme.buttonsText }}
-          onMouseEnter={(e) => !isShiftVPressed && (e.currentTarget.style.backgroundColor = theme.audioButtonHover)}
-          onMouseLeave={(e) => !isShiftVPressed && (e.currentTarget.style.backgroundColor = theme.audioButton)}
-          className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
-          Play Box Audio
-          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift</div>
-          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>V</div>
-        </button>
-        */}
         <button onClick={handleDeleteBox}
           style={{ backgroundColor: isShiftDPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
           onMouseEnter={(e) => !isShiftDPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}

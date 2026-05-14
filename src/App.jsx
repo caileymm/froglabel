@@ -157,7 +157,7 @@ function App() {
               setCurrSelectedBoxId={setCurrSelectedBoxId}
               isPlaying={isPlaying}
               togglePlayPause={togglePlayPause}
-              currTool={currTool}
+              setCurrTool={currTool}
               theme={theme}
             />
           </div>

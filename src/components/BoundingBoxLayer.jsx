@@ -9,7 +9,8 @@ const BoundingBoxLayer = ({
     setDrawingBox, 
     canvasWidth, 
     visibleTime,
-    theme 
+    theme,
+    currTool
 }) => {
     const [activeBox, setActiveBox] = useState(null);
     const [isDrawing, setIsDrawing] = useState(false);
@@ -54,6 +55,7 @@ const BoundingBoxLayer = ({
     });
 
     const handleMouseDown = (e) => {
+        if (currTool !== 1) return; // only draw with crosshair
         if (!code || code.length < 3) return;
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;

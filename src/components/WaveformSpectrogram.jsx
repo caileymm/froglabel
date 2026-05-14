@@ -139,7 +139,7 @@ function WaveformSpectrogram({
                         className="absolute z-50 left-0 right-0"
                         style={{ top: spectroTop, height: spectroHeight, pointerEvents: 'none' }}
                     >
-                        <div className="w-full h-full relative" style={{ pointerEvents: 'auto', cursor: cursorMap(currTool) }}>
+                        <div className="w-full h-full relative" style={{ pointerEvents: currTool === 0 ? 'none' : 'auto', cursor: cursorMap(currTool) }}>
                             <BoundingBoxLayer
                                 code={code}
                                 boxes={boxes}
@@ -150,6 +150,7 @@ function WaveformSpectrogram({
                                 canvasWidth={viewWidth}
                                 visibleTime={visibleTime}
                                 theme={theme}
+                                currTool={currTool}
                             />
                         </div>
                     </div>
