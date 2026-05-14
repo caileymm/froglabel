@@ -103,7 +103,7 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
           Set Code
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Space</div>
         </button>
-        +
+        <div style={{ color: theme.text }}>+</div>
         <input
           ref={inputRef}
           value={code}
@@ -119,7 +119,7 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
             '--placeholder-color': theme.placeholderText 
           }}
         />
-        :
+        <div style={{ color: theme.text }}>:</div>
         <div style={{ backgroundColor: theme.cream, color: theme.textInputText }} className='px-2 py-1.5 text-xs rounded-md font-display'>
           {codesDict[code] || '—'}
         </div>
