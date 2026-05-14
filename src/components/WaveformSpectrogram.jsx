@@ -114,7 +114,7 @@ function WaveformSpectrogram({
                             style={{
                                 top: Math.min(freqToY(freq, localSampleRate), spectroHeight - 1),
                                 transform: 'translateY(-50%)',
-                                color: theme.text,
+                                color: 'white',
                             }}
                         >
                             {freq} Hz

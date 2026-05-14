@@ -116,7 +116,10 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme 
     <div className='flex items-center justify-center gap-2 flex-wrap'>
 
       <button onClick={handlePlayAudio}
-        style={{ backgroundColor: isVPressed ? theme.audioButtonPressed : theme.audioButton }}
+        style={{ 
+          backgroundColor: isVPressed ? theme.audioButtonPressed : theme.audioButton,
+          color: theme.buttonsText 
+        }}
         className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
         {isPlaying ? 'Pause Audio' : 'Play Audio'}
         <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>V</div>
@@ -124,13 +127,19 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme 
 
       <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1'>
         <button onClick={handlePanLeft}
-          style={{ backgroundColor: isAPressed ? theme.buttonsPressed : theme.buttons }}
+          style={{ 
+            backgroundColor: isAPressed ? theme.buttonsPressed : theme.buttons,
+            color: theme.buttonsText 
+          }}
           className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Pan Left
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>A</div>
         </button>
         <button onClick={handlePanRight}
-          style={{ backgroundColor: isDPressed ? theme.buttonsPressed : theme.buttons }}
+          style={{ 
+            backgroundColor: isDPressed ? theme.buttonsPressed : theme.buttons,
+            color: theme.buttonsText 
+          }}
           className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Pan Right
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>D</div>
@@ -139,19 +148,28 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme 
 
       <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1'>
         <button onClick={handleZoomInX}
-          style={{ backgroundColor: isQPressed ? theme.buttonsPressed : theme.buttons }}
+          style={{ 
+            backgroundColor: isQPressed ? theme.buttonsPressed : theme.buttons,
+            color: theme.buttonsText 
+          }}
           className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Zoom In (X)
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Q</div>
         </button>
         <button onClick={handleZoomOutX}
-          style={{ backgroundColor: isEPressed ? theme.buttonsPressed : theme.buttons }}
+          style={{ 
+            backgroundColor: isEPressed ? theme.buttonsPressed : theme.buttons,
+            color: theme.buttonsText 
+          }}
           className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Zoom Out (X)
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>E</div>
         </button>
         <button onClick={handleResetView}
-          style={{ backgroundColor: isCPressed ? theme.buttonsPressed : theme.buttons }}
+          style={{ 
+            backgroundColor: isCPressed ? theme.buttonsPressed : theme.buttons,
+            color: theme.buttonsText 
+          }}
           className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Reset View
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>C</div>

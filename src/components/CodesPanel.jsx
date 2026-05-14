@@ -49,7 +49,7 @@ function CodesPanel({ codesDict, setCodesDict, theme }) {
         <div className='flex flex-col gap-2'>
             <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-sm font-display px-2 rounded-md w-5 flex items-center justify-center'>1</div>
 
-            <div style={{ backgroundColor: theme.group }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
+            <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
                 Create Code
                 <div className='flex flex-row items-center justify-center gap-1'>
                     <input
@@ -58,7 +58,12 @@ function CodesPanel({ codesDict, setCodesDict, theme }) {
                         placeholder='Code'
                         onKeyDown={e => e.stopPropagation()}
                         maxLength={3}
-                        className={`w-15 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9] uppercase placeholder:normal-case
+                        style={{ 
+                            backgroundColor: theme.textInput, 
+                            color: theme.textInputText,
+                            '--placeholder-color': theme.placeholderText 
+                        }}
+                        className={`w-15 px-2 py-1.5 text-sm rounded-md font-display uppercase placeholder:normal-case
                         ${isCodeError ? 'border-2 border-[#FFAAAA]' : 'border-none'}`}
                     />
                     <input
@@ -67,19 +72,24 @@ function CodesPanel({ codesDict, setCodesDict, theme }) {
                         placeholder='Species Name'
                         onKeyDown={e => e.stopPropagation()}
                         maxLength={35}
-                        className={`w-25 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9]
+                        style={{ 
+                            backgroundColor: theme.textInput, 
+                            color: theme.textInputText,
+                            '--placeholder-color': theme.placeholderText 
+                        }}
+                        className={`w-25 px-2 py-1.5 text-sm  rounded-md font-display
                         ${isNameError ? 'border-2 border-[#FFAAAA]' : 'border-none'}`}
                     />
                 </div>
                 <button
                     onClick={handleCreate}
-                    style={{ backgroundColor: theme.buttons }}
+                    style={{ backgroundColor: theme.buttons, color: theme.buttonsText }}
                     className='w-full px-2 py-1.5 text-sm rounded-md font-display whitespace-nowrap cursor-pointer'>
                     Create
                 </button>
             </div>
 
-            <div style={{ backgroundColor: theme.group }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
+            <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
                 Codes
                 <div className='flex flex-row gap-1'>
                     <input
@@ -88,7 +98,12 @@ function CodesPanel({ codesDict, setCodesDict, theme }) {
                         placeholder='Search...'
                         onKeyDown={e => e.stopPropagation()}
                         maxLength={35}
-                        className='w-40 px-2 py-1.5 text-sm bg-[#FFFFFF] rounded-md font-display placeholder-[#E6E5C9]'
+                        style={{ 
+                            backgroundColor: theme.textInput, 
+                            color: theme.textInputText,
+                            '--placeholder-color': theme.placeholderText 
+                        }}
+                        className='w-40 px-2 py-1.5 text-sm rounded-md font-display'
                     />
                 </div>
                 <div className='rounded-lg flex flex-col gap-1 overflow-y-auto'>
@@ -98,8 +113,8 @@ function CodesPanel({ codesDict, setCodesDict, theme }) {
                         filteredCodes.map(([c, name]) => (
                             <div key={c} style={{ backgroundColor: theme.cream }} className='rounded-md px-2 py-1 flex items-center justify-between'>
                                 <div>
-                                    <div style={{ color: theme.text }} className='font-display text-sm'>{c}</div>
-                                    <div style={{ color: theme.text }} className='font-display text-xs'>{name}</div>
+                                    <div style={{ color: theme.textInputText }} className='font-display text-sm'>{c}</div>
+                                    <div style={{ color: theme.textInputText }} className='font-display text-xs'>{name}</div>
                                 </div>
                                 <button
                                     onClick={() => handleDelete(c)}

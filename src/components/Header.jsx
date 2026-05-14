@@ -3,7 +3,7 @@ import frog from '.././assets/frog.png'
 
 function Header({ frogTheme, setFrogTheme, theme }) {
     return (
-        <div style={{ backgroundColor: theme.keyButtons }} className='w-full h-15 flex items-center justify-between p-5'>
+        <div style={{ backgroundColor: theme.header }} className='w-full h-15 flex items-center justify-between p-5'>
             <div className='w-[100px] flex items-center'>
                 <a href='https://www.frogid.net.au' target='_blank' rel='noreferrer'>
                     <img src={frogIdLogo} alt='frogid logo' className='w-[35px] h-[40px]' />
@@ -14,8 +14,7 @@ function Header({ frogTheme, setFrogTheme, theme }) {
                 <button onClick={() => setFrogTheme(prev => !prev)}>
                     <img
                         src={frog}
-                        className='w-[40px] h-[40px] rounded-md'
-                        style={{ backgroundColor: frogTheme ? theme.panels : theme.buttons }}
+                        className='w-[40px] h-[40px] rounded-md bg-[#FFDE9E] cursor-pointer'
                     />
                 </button>
             </div>
