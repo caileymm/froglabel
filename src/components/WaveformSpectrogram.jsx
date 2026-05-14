@@ -34,7 +34,7 @@ function WaveformSpectrogram({
     const [spectroHeight] = useState(SPECTROGRAM_HEIGHT);
     const [viewWidth, setViewWidth] = useState(0);
 
-    const { brightness, contrast } = usePanels();
+    const { brightness, setBrightness, contrast, setContrast } = usePanels();
 
     useEffect(() => {
         if (!containerRef.current) return;

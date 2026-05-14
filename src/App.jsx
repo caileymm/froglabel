@@ -183,7 +183,7 @@ function App() {
               visibleTime={visibleTime}
               setVisibleTime={setVisibleTime}
               theme={theme}
-              currTool={currTool}
+              currTool={currTool}x
             />
             <Tools
               currTool={currTool}
