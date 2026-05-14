@@ -31,7 +31,6 @@ function SpectrogramPanel({ theme }) {
     const inputClass = 'bg-transparent font-display text-sm outline-none w-16';
 
 
-
     return (
         <div className='flex flex-col gap-2'>
             <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-sm font-display px-2 rounded-md w-5 flex items-center justify-center'>3</div>
