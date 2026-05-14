@@ -179,7 +179,7 @@ const BoundingBoxLayer = ({
     return (
         <div
             ref={containerRef}
-            className={`absolute inset-0 z-40 select-none ${code ? 'cursor-crosshair' : 'cursor-default'}`}
+            className={`absolute inset-0 z-40 select-none }`} // ${code ? 'cursor-crosshair' : 'cursor-default'
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
