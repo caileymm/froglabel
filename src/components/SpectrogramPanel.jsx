@@ -25,6 +25,8 @@ function SpectrogramPanel() {
     const unitClass = 'font-display text-sm';
     const inputClass = 'bg-transparent font-display text-sm outline-none w-16';
 
+    
+
     return (
         <div className='flex flex-col gap-2'>
             <div className='bg-[#1E1E1E] text-[#E6E5C9] text-sm font-display px-2 rounded-md w-5 flex items-center justify-center'>3</div>

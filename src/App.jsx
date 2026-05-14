@@ -1,4 +1,5 @@
 import './App.css'
+import { usePanels } from './components/PanelContext';
 import Header from './components/Header'
 import BoundingBoxControls from './components/BoundingBoxControls'
 import WaveformSpectrogram from './components/WaveformSpectrogram'
@@ -30,9 +31,10 @@ function App() {
   const [zoomX, setZoomX] = useState(1);
   const [zoomY, setZoomY] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showLeftPanel, setShowLeftPanel] = useState(false);
-  const [rightPanel, setRightPanel] = useState(null); // null | 2 | 3
-  const [showDataset, setShowDataset] = useState(false);
+  // const [showLeftPanel, setShowLeftPanel] = useState(false);
+  // const [rightPanel, setRightPanel] = useState(null); // null | 2 | 3
+  // const [showDataset, setShowDataset] = useState(false);
+  const { showLeftPanel, setShowLeftPanel, rightPanel, setRightPanel, showDataset, setShowDataset} = usePanels();
   const [duration, setDuration] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
   const [drawingBox, setDrawingBox] = useState(null);
@@ -163,7 +165,9 @@ function App() {
               setContainerWidth={setContainerWidth}
               setDrawingBox={setDrawingBox}
             />
-            <Tools />
+            <Tools showDataset={showDataset} 
+                   showRightPanel = {rightPanel}
+                   showLeftPanel = {showLeftPanel}/>
           </div>
 
           {/* Bottom Dataset Panel (key: 4) */}

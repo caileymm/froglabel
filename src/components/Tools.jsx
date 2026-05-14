@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef} from 'react';
 
-function Tools() {
+function Tools(showDataset, showRightPanel, showLeftPanel) {
     const [isShiftPressed, setIsShiftPressed] = useState(false);
     const [currTool, setCurrTool] = useState(null);
     const shiftAloneRef = useRef(true);
