@@ -1,4 +1,3 @@
-import audioSrc from "../assets/frogsounds.mp3";
 import BoundingBoxLayer from "./BoundingBoxLayer";
 import { useEffect, useState, useRef } from "react";
 import Spectrogram from "wavesurfer.js/dist/plugins/spectrogram.esm.js";
@@ -6,25 +5,30 @@ import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js';
 import { WAVEFORM_HEIGHT, SPECTROGRAM_HEIGHT, SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES, FREQ_LABELS } from "../utils/spectrogramConfig"
 import { freqToY } from '../utils/spectrogramScale';
-import { audioInfoReady, sampleRate } from '../utils/audioInfo';
+import { getAudioInfo } from '../utils/audioInfo';
 
 export const wavesurferRef = { current: null };
 
 function WaveformSpectrogram({ 
+    selectedAudio,
+    setSampleRate,
     code, 
     boxes, 
     setBoxes, 
     currSelectedBoxId, 
     setCurrSelectedBoxId, 
     duration,
-    setDuration, 
+    setDuration,
     setDrawingBox, 
     visibleTime,
     setVisibleTime
 }) {
+    const [localSampleRate, setLocalSampleRate] = useState(null);
+    
     const containerRef = useRef(null);
     const [spectroTop] = useState(WAVEFORM_HEIGHT);
     const [spectroHeight] = useState(SPECTROGRAM_HEIGHT);
+
     // Track the actual visible width of the container
     const [viewWidth, setViewWidth] = useState(0);
 
@@ -40,13 +44,15 @@ function WaveformSpectrogram({
         let ws = null;
         let cancelled = false;
 
-        audioInfoReady.then(() => {
+        getAudioInfo(selectedAudio).then(({ sampleRate }) => {
             if (cancelled) return;
-
+            setLocalSampleRate(sampleRate);
+            setSampleRate(sampleRate);
+            
             ws = WaveSurfer.create({
                 container: containerRef.current,
                 height: WAVEFORM_HEIGHT,
-                url: audioSrc,
+                url: selectedAudio,
                 minPxPerSec: 0, 
                 fillParent: true,
                 autoCenter: false,
@@ -83,7 +89,7 @@ function WaveformSpectrogram({
             });
 
             wavesurferRef.current = ws;
-        });
+        }, [setDuration, selectedAudio]);
 
         return () => {
             cancelled = true;
@@ -93,7 +99,7 @@ function WaveformSpectrogram({
             }
             wavesurferRef.current = null;
         };
-    }, [setDuration]);
+    }, [setDuration, selectedAudio]);
 
     return (
         <div className="bg-[#82A062] p-6 rounded-xl my-2 overflow-hidden">
@@ -108,7 +114,7 @@ function WaveformSpectrogram({
                         <span
                             key={freq}
                             className="absolute right-1 text-right text-[12px] text-[#1E1E1E] font-display leading-none"
-                            style={{ top: Math.min(freqToY(freq), spectroHeight - 1), transform: 'translateY(-50%)' }}
+                            style={{ top: Math.min(freqToY(freq, localSampleRate), spectroHeight - 1), transform: 'translateY(-50%)' }}
                         >
                             {freq} Hz
                         </span>
