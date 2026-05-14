@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { wavesurferRef } from './WaveformSpectrogram.jsx';
 
-function SpectrogramControls({ zoomY, setZoomY }) {
+function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime }) {
   const [isVPressed, setIsVPressed] = useState(false);
   const [isAPressed, setIsAPressed] = useState(false);
   const [isDPressed, setIsDPressed] = useState(false);
@@ -22,42 +22,67 @@ function SpectrogramControls({ zoomY, setZoomY }) {
     return ws.getWrapper()?.parentElement;
   };
 
-  const handlePanLeft = useCallback(() => {
-    const container = getWsScrollContainer();
-    if (container) container.scrollLeft -= 100;
-  }, []);
-
-  const handlePanRight = useCallback(() => {
-    const container = getWsScrollContainer();
-    if (container) container.scrollLeft += 100;
-  }, []);
-
-  const handleZoomInX = useCallback(() => {
+  const updateVisibleTime = useCallback((currentZoom) => {
     const ws = wavesurferRef.current;
-    if (!ws) return;
-    const newZoom = Math.min(wsZoom + 20, 500);
-    ws.zoom(newZoom);
-    setWsZoom(newZoom);
-  }, [wsZoom]);
+    const container = getWsScrollContainer();
+    if (!container || !currentZoom) return;
 
-  const handleZoomOutX = useCallback(() => {
-    const ws = wavesurferRef.current;
-    if (!ws) return;
-    const newZoom = Math.max(wsZoom - 20, 5);
-    ws.zoom(newZoom);
-    setWsZoom(newZoom);
-  }, [wsZoom]);
+    // Time = Distance / PixelsPerSecond
+    const start = container.scrollLeft / currentZoom;
+    let end = (container.scrollLeft + container.clientWidth) / currentZoom;
 
-  const handleZoomInY  = () => console.log("Y zoom in");
-  const handleZoomOutY = () => console.log("Y zoom out");
+    if (end > duration) {
+      end = duration;
+    }
+
+    setVisibleTime({start: start, end: end});
+  }, [setVisibleTime, duration]);
+
+const handleZoomInX = useCallback(() => {
+  const ws = wavesurferRef.current;
+  if (!ws || !duration) return;
+  const newZoom = Math.min(wsZoom + 20, 500);
+  ws.zoom(newZoom);
+  setWsZoom(newZoom);
+  
+  // Wait for the container to expand before calculating
+  requestAnimationFrame(() => updateVisibleTime(newZoom));
+}, [wsZoom, duration, updateVisibleTime]);
+
+const handleZoomOutX = useCallback(() => {
+  const ws = wavesurferRef.current;
+  if (!ws || !duration) return;
+  const newZoom = Math.max(wsZoom - 20, 5);
+  ws.zoom(newZoom);
+  setWsZoom(newZoom);
+
+  requestAnimationFrame(() => updateVisibleTime(newZoom));
+}, [wsZoom, duration, updateVisibleTime]);
+
+const handlePanLeft = useCallback(() => {
+  const container = getWsScrollContainer();
+  if (container) {
+    container.scrollLeft -= 100;
+    // Panning doesn't change zoom, so use current wsZoom
+    requestAnimationFrame(() => updateVisibleTime(wsZoom));
+  }
+}, [wsZoom, updateVisibleTime]);
+
+const handlePanRight = useCallback(() => {
+  const container = getWsScrollContainer();
+  if (container) {
+    container.scrollLeft += 100;
+    requestAnimationFrame(() => updateVisibleTime(wsZoom));
+  }
+}, [wsZoom, updateVisibleTime]);
 
   const handleResetView = useCallback(() => {
     const ws = wavesurferRef.current;
     if (!ws) return;
     ws.zoom(5);
     setWsZoom(5);
-    setZoomY(1);
-  }, [setZoomY]);
+    setZoomX(1);
+  }, [setZoomX]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {

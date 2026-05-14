@@ -12,6 +12,8 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { yToFreq } from './utils/spectrogramScale'
 
 function App() {
+  const [currTool, setCurrTool] = useState(0);
+
   const [boxes, setBoxes] = useState([]);
   const [code, setCode] = useState('');
   const [codesDict, setCodesDict] = useState({
@@ -26,9 +28,13 @@ function App() {
     'BRE': "Brereton's Frog",
     'GIA': 'Giant Burrowing Frog',
   });
-  const [currSelectedBox, setCurrSelectedBox] = useState(-1);
+  // Update selection logic to use IDs
+  const [currSelectedBoxId, setCurrSelectedBoxId] = useState(null);
+
+  // Find the index in the master list when needed
+  const currSelectedIndex = boxes.findIndex(b => b.id === currSelectedBoxId);
+
   const [zoomX, setZoomX] = useState(1);
-  const [zoomY, setZoomY] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showLeftPanel, setShowLeftPanel] = useState(false);
   const [rightPanel, setRightPanel] = useState(null); // null | 2 | 3
@@ -44,14 +50,22 @@ function App() {
     if (!ws) return;
     ws.playPause();
   }, []);
+  
+  const [visibleTime, setVisibleTime] = useState({start: 0, end: duration});
 
   // Convert a raw pixel box to time/frequency row data
+  // Convert a time-based box to a row for the Dataset Panel
   const boxToRow = useCallback((box) => {
     if (!box) return null;
-    const startTime = containerWidth > 0 ? (box.left / containerWidth) * duration : 0;
-    const endTime   = containerWidth > 0 ? ((box.left + box.width) / containerWidth) * duration : 0;
+    
+    // We no longer need to calculate these from percentages!
+    const startTime = box.startTime;
+    const endTime   = box.endTime;
+    
+    // Frequency calculation remains the same
     const startFreq = yToFreq(box.top + box.height);
     const endFreq   = yToFreq(box.top);
+
     return {
       ...box,
       name:      codesDict[box.code] ?? '—',
@@ -62,12 +76,12 @@ function App() {
       endFreq:   Math.round(endFreq),
       bandwidth: Math.round(endFreq - startFreq),
     };
-  }, [containerWidth, duration, codesDict]);
+  }, [codesDict]); // Removed containerWidth and duration from deps as they aren't needed now
 
   // Derived rows — boxes converted to time/freq values
   const rows = useMemo(() => boxes.map(boxToRow), [boxes, boxToRow]);
 
-  const selectedRow = rows[currSelectedBox] ?? null;
+  const selectedRow = rows[currSelectedIndex] ?? null;
   const drawingRow  = boxToRow(drawingBox);
 
   // Keyboard shortcuts: 1=left panel, 2=box panel, 3=spectrogram panel, 4=dataset
@@ -128,15 +142,15 @@ function App() {
         )}
 
         {/* Middle: Controls + Waveform + Tools */}
-        <div className='flex-1 min-w-0 min-h-0 flex flex-col'>
+        <div className='flex-1 min-w-0 min-h-0 flex flex-col relative'>
 
           {/* Controls bar */}
-          <div className='p-2 bg-[#82A062] rounded-xl flex flex-wrap justify-center items-center gap-1.5'>
-            <SpectrogramControls
+            <div className='p-2 bg-[#82A062] rounded-xl flex flex-wrap justify-center items-center gap-1.5'>
+              <SpectrogramControls
               zoomX={zoomX}
               setZoomX={setZoomX}
-              zoomY={zoomY}
-              setZoomY={setZoomY}
+              duration={duration}
+              setVisibleTime={setVisibleTime}
             />
             <BoundingBoxControls
               code={code}
@@ -144,8 +158,8 @@ function App() {
               codesDict={codesDict}
               boxes={boxes}
               setBoxes={setBoxes}
-              currSelectedBox={currSelectedBox}
-              setCurrSelectedBox={setCurrSelectedBox}
+              currSelectedBox={currSelectedBoxId} // The ID
+              setCurrSelectedBox={setCurrSelectedBoxId} // The function to change the ID
               isPlaying={isPlaying}
               togglePlayPause={togglePlayPause}
             />
@@ -157,19 +171,24 @@ function App() {
               code={code}
               boxes={boxes}
               setBoxes={setBoxes}
-              currSelectedBox={currSelectedBox}
-              setCurrSelectedBox={setCurrSelectedBox}
+              currSelectedBoxId={currSelectedBoxId}
+              setCurrSelectedBoxId={setCurrSelectedBoxId}
+              duration={duration} // Total audio duration
               setDuration={setDuration}
               setContainerWidth={setContainerWidth}
               setDrawingBox={setDrawingBox}
+              visibleTime={visibleTime}
+              setVisibleTime={setVisibleTime}
             />
-            <Tools />
+            <Tools
+              currTool={currTool}
+              setCurrTool={setCurrTool}/>
           </div>
 
           {/* Bottom Dataset Panel (key: 4) */}
           {showDataset && (
             <div
-              className='shrink-0 bg-[#82A062] rounded-xl overflow-y-auto'
+              className='absolute bottom-0 left-0 right-0 z-[100] bg-[#82A062] rounded-t-xl shadow-2xl overflow-y-auto'
               style={{ height: datasetHeight }}
             >
               <div
