@@ -10,8 +10,14 @@ import BoxFilePanel from './components/BoxFilePanel'
 import SpectrogramPanel from './components/SpectrogramPanel'
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { yToFreq } from './utils/spectrogramScale'
+import greenAudio from './assets/green_tree.mp3';
+import peronsAudio from './assets/perons_tree.mp3';
+import redEyedAudio from './assets/red_eyed_tree.mp3';
 
 function App() {
+  const [selectedAudio, setSelectedAudio] = useState(greenAudio)
+  const [sampleRate, setSampleRate] = useState(null);
+
   const [currTool, setCurrTool] = useState(0);
 
   const [boxes, setBoxes] = useState([]);
@@ -63,8 +69,8 @@ function App() {
     const endTime   = box.endTime;
     
     // Frequency calculation remains the same
-    const startFreq = yToFreq(box.top + box.height);
-    const endFreq   = yToFreq(box.top);
+    const startFreq = yToFreq(box.top + box.height, sampleRate);
+    const endFreq   = yToFreq(box.top, sampleRate);
 
     return {
       ...box,
@@ -76,7 +82,7 @@ function App() {
       endFreq:   Math.round(endFreq),
       bandwidth: Math.round(endFreq - startFreq),
     };
-  }, [codesDict]); // Removed containerWidth and duration from deps as they aren't needed now
+  }, [codesDict, sampleRate]); // Removed containerWidth and duration from deps as they aren't needed now
 
   // Derived rows — boxes converted to time/freq values
   const rows = useMemo(() => boxes.map(boxToRow), [boxes, boxToRow]);
@@ -168,6 +174,8 @@ function App() {
           {/* Waveform + Spectrogram */}
           <div className='flex-1 min-h-0 overflow-hidden flex flex-col'>
             <WaveformSpectrogram
+              selectedAudio={selectedAudio}
+              setSampleRate={setSampleRate}
               code={code}
               boxes={boxes}
               setBoxes={setBoxes}
@@ -212,6 +220,8 @@ function App() {
               <BoxFilePanel
                 selectedRow={selectedRow}
                 drawingRow={drawingRow}
+                selectedAudio={selectedAudio}
+                setSelectedAudio={setSelectedAudio}
               />
             )}
             {rightPanel === 3 && <SpectrogramPanel />}
