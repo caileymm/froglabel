@@ -46,7 +46,6 @@ coverage/
 
 # Large audio/media files
 *.wav
-*.mp3
 *.mp4
 *.ogg
 *.flac

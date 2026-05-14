@@ -1,4 +1,4 @@
-import audioSrc from '../assets/audio.mp3';
+import audioSrc from '../assets/frogsounds.mp3';
 
 export let sampleRate = null;
 export let channels = null;

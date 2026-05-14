@@ -91,4 +91,4 @@ function BoundingBoxControls({currTool, setCurrTool}) {
   );
 }
 
-export default BoundingBoxControls;
+export default Tools;
