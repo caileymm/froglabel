@@ -1,4 +1,5 @@
 import './App.css'
+import { usePanels } from './components/PanelContext';
 import Header from './components/Header'
 import BoundingBoxControls from './components/BoundingBoxControls'
 import WaveformSpectrogram from './components/WaveformSpectrogram'
@@ -44,9 +45,9 @@ function App() {
 
   const [zoomX, setZoomX] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showLeftPanel, setShowLeftPanel] = useState(false);
-  const [rightPanel, setRightPanel] = useState(null);
-  const [showDataset, setShowDataset] = useState(false);
+
+  const { showLeftPanel, setShowLeftPanel, rightPanel, setRightPanel, showDataset, setShowDataset } = usePanels();
+
   const [duration, setDuration] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
   const [drawingBox, setDrawingBox] = useState(null);
@@ -82,21 +83,6 @@ function App() {
   const rows = useMemo(() => boxes.map(boxToRow), [boxes, boxToRow]);
   const selectedRow = rows[currSelectedIndex] ?? null;
   const drawingRow = boxToRow(drawingBox);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === '1') setShowLeftPanel(prev => !prev);
-      if (e.key === '2') setRightPanel(prev => prev === 2 ? null : 2);
-      if (e.key === '3') setRightPanel(prev => prev === 3 ? null : 3);
-      if (e.key === '4') setShowDataset(prev => !prev);
-      if (e.key === ' ') {
-        e.preventDefault();
-        setCurrTool(1);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   const [datasetHeight, setDatasetHeight] = useState(160);
   const isDragging = useRef(false);
@@ -184,11 +170,12 @@ function App() {
               theme={theme}
               currTool={currTool}
             />
-            <Tools 
+            <Tools
               currTool={currTool}
               setCurrTool={setCurrTool}
               theme={theme}
-              frogTheme={frogTheme} />
+              frogTheme={frogTheme}
+            />
           </div>
 
           {showDataset && (
