@@ -1,29 +1,39 @@
-import { useState } from 'react';
+import { useOptimistic, useState, useEffect } from 'react';
 import { usePanels } from './PanelContext';
 
 
 function SpectrogramPanel({ theme }) {
     const [fftSize, setFftSize] = useState('1024');
     const [hopSize, setHopSize] = useState('512');
-    const [minFreq, setMinFreq] = useState('0');
-    const [maxFreq, setMaxFreq] = useState('22050');
-    const [lowCutoff, setLowCutoff] = useState(800);
-    const [highCutoff, setHighCutoff] = useState(4000);     
     
-    const [colorScale, setColorScale] = useState('viridis');
 
-    const { brightness, setBrightness, contrast, setContrast } = usePanels();
 
+    const { brightness, setBrightness} = usePanels(); 
+    const { contrast, setContrast } = usePanels();
+    const { colorScale, setColorScale } = usePanels();
+    const { FFTSamples, setFFTSamples } = usePanels();
+    const { windowFunction, setWindowFunction } = usePanels();
+    const { overlap, setOverlap } = usePanels();
+    const {minFreq, setMinFreq} = usePanels();
+    const {maxFreq, setMaxFreq} = usePanels();
+    const {ApplyBandPass,setApplyBandPass} = usePanels();
+    const {lowCutoff, setLowCutoff} = usePanels();
+    const {highCutoff, setHighCutoff} = usePanels();
+    const [pendingLow, setPendingLow] = useState(lowCutoff);
+    const [pendingHigh, setPendingHigh] = useState(highCutoff);
+
+
+    // Sync pending when context values change (e.g. on new audio load)
+    useEffect(() => { setPendingLow(lowCutoff); }, [lowCutoff]);
+    useEffect(() => { setPendingHigh(highCutoff); }, [highCutoff]);
 
     const colorScales = [
-        { name: 'viridis', gradient: 'linear-gradient(to right, #440154, #31688e, #35b779, #fde725)', dbfs: [-120, -90, -60, -30, 0] },
-        { name: 'magma',   gradient: 'linear-gradient(to right, #000004, #7b2d8b, #f96d3a, #fcfdbf)', dbfs: [-120, -90, -60, -30, 0] },
-        { name: 'inferno', gradient: 'linear-gradient(to right, #000004, #7c0c42, #f57d15, #fcffa4)', dbfs: [-120, -90, -60, -30, 0] },
-        { name: 'plasma',  gradient: 'linear-gradient(to right, #0d0887, #a632a8, #f89441, #f0f921)', dbfs: [-120, -90, -60, -30, 0] },
-        { name: 'greys',   gradient: 'linear-gradient(to right, #000000, #ffffff)',                   dbfs: [-120, -90, -60, -30, 0] },
+        { name: 'roseus',  gradient: 'linear-gradient(to right, #dbc642, #f36e1c, #d94f8a, #7a1b6c, #2b0a3d )',dbfs: [-120, -90, -60, -30, 0]},
+        { name: 'igray',  gradient: 'linear-gradient(to right, #ffffff, #000000 ', dbfs: [-120, -90, -60, -30, 0] },
+        { name: 'gray',   gradient: 'linear-gradient(to right, #000000, #ffffff)',                   dbfs: [-120, -90, -60, -30, 0] },
     ];
-
-    const selected = colorScales.find(c => c.name === colorScale);
+        
+    const selected = colorScales.find(c => c.name === colorScale) || colorScales[0];
 
     // Dynamic styles based on theme
     const boxClass = 'rounded-md px-2 py-0.5 font-display text-sm inline-block self-start';
@@ -33,61 +43,285 @@ function SpectrogramPanel({ theme }) {
     const inputClass = 'bg-transparent font-display text-sm outline-none w-16';
 
 
-    const handleColorScaleChange = () => {}; 
+    const handleColorScaleChange = (name) => {setColorScale(name)}; 
+    
+    const handleBandPassFilter = () => {
+        setLowCutoff(pendingLow);
+        setHighCutoff(pendingHigh);
+        setApplyBandPass(true);
+    };
 
 
 
     return (
         <div className='flex flex-col gap-2'>
-            <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-sm font-display px-2 rounded-md w-5 flex items-center justify-center'>3</div>
+            <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-sm font-display px-2 rounded-md w-6 flex items-center justify-center'>3</div>
 
             <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
-                FFT & Hop Size
-                <div className='flex flex-col gap-1'>
-                    <div className='flex flex-col'>
-                        <span className={headerClass} style={{ color: theme.text }}>FFT Size</span>
-                        <div className={rowClass}>
-                            <div className={boxClass} style={{ backgroundColor: theme.cream }}>
-                                <input value={fftSize} onChange={e => setFftSize(e.target.value)} onKeyDown={e => e.stopPropagation()} className={inputClass} style={{ color: theme.text }}/>
-                            </div>
-                            <span className={unitClass} style={{ color: theme.text }}>samples</span>
-                        </div>
-                    </div>
-                    <div className='flex flex-col'>
-                        <span className={headerClass} style={{ color: theme.text }}>Hop Size</span>
-                        <div className={rowClass}>
-                            <div className={boxClass} style={{ backgroundColor: theme.cream }}>
-                                <input value={hopSize} onChange={e => setHopSize(e.target.value)} onKeyDown={e => e.stopPropagation()} className={inputClass} style={{ color: theme.text }}/>
-                            </div>
-                            <span className={unitClass} style={{ color: theme.text }}>samples</span>
-                        </div>
-                    </div>
+                FFT
+                <div className='flex gap-1'>
+                    <button
+                        onClick={() => setFFTSamples(512)}
+                        style={{ backgroundColor: (FFTSamples==512) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(FFTSamples==512) && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(FFTSamples==512) && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        className='px-1.5 py-2 text-xs rounded-md font-display cursor-pointer'>
+                        512
+                    </button>
+                    <button
+                        onClick={() => setFFTSamples(1024)}
+                        style={{ backgroundColor: (FFTSamples==1024) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(FFTSamples==1024) && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(FFTSamples==1024) && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        className='px-1.5 py-2 text-xs rounded-md font-display cursor-pointer'>
+                        1024
+                    </button>
+                    <button
+                        onClick={() => setFFTSamples(2048)}
+                        style={{ backgroundColor: (FFTSamples==2048) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(FFTSamples==2048)&& (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(FFTSamples==2048) && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        className='px-1.5 py-2 text-xs rounded-md font-display cursor-pointer'>
+                        2048
+                    </button>
+                    <button
+                        onClick={() => setFFTSamples(4096)}
+                        style={{ backgroundColor: (FFTSamples==4096) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(FFTSamples==4096) && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(FFTSamples==4096)&& (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        className='px-1.5 py-2 text-xs rounded-md font-display cursor-pointer'>
+                        4096
+                    </button>
                 </div>
             </div>
 
-            <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
-                Frequency Limits
+            <div
+                style={{ backgroundColor: theme.group, color: theme.text }}
+                className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'
+            >
+                Window Function
+
                 <div className='flex flex-col gap-1'>
-                    <div className='flex flex-col'>
-                        <span className={headerClass} style={{ color: theme.text }}>Min Frequency</span>
-                        <div className={rowClass}>
-                            <div className={boxClass} style={{ backgroundColor: theme.cream }}>
-                                <input value={minFreq} onChange={e => setMinFreq(e.target.value)} onKeyDown={e => e.stopPropagation()} className={inputClass} style={{ color: theme.text }}/>
-                            </div>
-                            <span className={unitClass} style={{ color: theme.text }}>Hz</span>
-                        </div>
-                    </div>
-                    <div className='flex flex-col'>
-                        <span className={headerClass} style={{ color: theme.text }}>Max Frequency</span>
-                        <div className={rowClass}>
-                            <div className={boxClass} style={{ backgroundColor: theme.cream }}>
-                                <input value={maxFreq} onChange={e => setMaxFreq(e.target.value)} onKeyDown={e => e.stopPropagation()} className={inputClass} style={{ color: theme.text }}/>
-                            </div>
-                            <span className={unitClass} style={{ color: theme.text }}>Hz</span>
-                        </div>
-                    </div>
+                    <button
+                        onClick={() => setWindowFunction('hann')}
+                        style={{
+                            backgroundColor:
+                                windowFunction === 'hann'
+                                    ? theme.buttonsPressed
+                                    : theme.buttons,
+                            color: theme.buttonsText
+                        }}
+                        onMouseEnter={(e) =>
+                            windowFunction !== 'hann' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttonsHover)
+                        }
+                        onMouseLeave={(e) =>
+                            windowFunction !== 'hann' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttons)
+                        }
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'
+                    >
+                        Hann
+                    </button>
+
+                    <button
+                        onClick={() => setWindowFunction('hamming')}
+                        style={{
+                            backgroundColor:
+                                windowFunction === 'hamming'
+                                    ? theme.buttonsPressed
+                                    : theme.buttons,
+                            color: theme.buttonsText
+                        }}
+                        onMouseEnter={(e) =>
+                            windowFunction !== 'hamming' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttonsHover)
+                        }
+                        onMouseLeave={(e) =>
+                            windowFunction !== 'hamming' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttons)
+                        }
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'
+                    >
+                        Hamming
+                    </button>
+
+                    <button
+                        onClick={() => setWindowFunction('blackman')}
+                        style={{
+                            backgroundColor:
+                                windowFunction === 'blackman'
+                                    ? theme.buttonsPressed
+                                    : theme.buttons,
+                            color: theme.buttonsText
+                        }}
+                        onMouseEnter={(e) =>
+                            windowFunction !== 'blackman' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttonsHover)
+                        }
+                        onMouseLeave={(e) =>
+                            windowFunction !== 'blackman' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttons)
+                        }
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'
+                    >
+                        Blackman
+                    </button>
+                    <button
+                        onClick={() => setWindowFunction('bartlett')}
+                        style={{
+                            backgroundColor:
+                                windowFunction === 'bartlett'
+                                    ? theme.buttonsPressed
+                                    : theme.buttons,
+                            color: theme.buttonsText
+                        }}
+                        onMouseEnter={(e) =>
+                            windowFunction !== 'bartlett' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttonsHover)
+                        }
+                        onMouseLeave={(e) =>
+                            windowFunction !== 'bartlett' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttons)
+                        }
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'
+                    >
+                        Bartlett
+                    </button>
+                    <button
+                        onClick={() => setWindowFunction('cosine')}
+                        style={{
+                            backgroundColor:
+                                windowFunction === 'cosine'
+                                    ? theme.buttonsPressed
+                                    : theme.buttons,
+                            color: theme.buttonsText
+                        }}
+                        onMouseEnter={(e) =>
+                            windowFunction !== 'cosine' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttonsHover)
+                        }
+                        onMouseLeave={(e) =>
+                            windowFunction !== 'cosine' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttons)
+                        }
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'
+                    >
+                        Cosine
+                    </button>
+                    <button
+                        onClick={() => setWindowFunction('gauss')}
+                        style={{
+                            backgroundColor:
+                                windowFunction === 'gauss'
+                                    ? theme.buttonsPressed
+                                    : theme.buttons,
+                            color: theme.buttonsText
+                        }}
+                        onMouseEnter={(e) =>
+                            windowFunction !== 'gauss' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttonsHover)
+                        }
+                        onMouseLeave={(e) =>
+                            windowFunction !== 'gauss' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttons)
+                        }
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'
+                    >
+                        Gauss
+                    </button>
+                    <button
+                        onClick={() => setWindowFunction('lanczoz')}
+                        style={{
+                            backgroundColor:
+                                windowFunction === 'lanczoz'
+                                    ? theme.buttonsPressed
+                                    : theme.buttons,
+                            color: theme.buttonsText
+                        }}
+                        onMouseEnter={(e) =>
+                            windowFunction !== 'lanczoz' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttonsHover)
+                        }
+                        onMouseLeave={(e) =>
+                            windowFunction !== 'lanczoz' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttons)
+                        }
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'
+                    >
+                        Lanczoz
+                    </button>
+                    <button
+                        onClick={() => setWindowFunction('rectangular')}
+                        style={{
+                            backgroundColor:
+                                windowFunction === 'rectangular'
+                                    ? theme.buttonsPressed
+                                    : theme.buttons,
+                            color: theme.buttonsText
+                        }}
+                        onMouseEnter={(e) =>
+                            windowFunction !== 'rectangular' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttonsHover)
+                        }
+                        onMouseLeave={(e) =>
+                            windowFunction !== 'rectangular' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttons)
+                        }
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'
+                    >
+                        Rectangular
+                    </button>
+                     <button
+                        onClick={() => setWindowFunction('triangular')}
+                        style={{
+                            backgroundColor:
+                                windowFunction === 'triangular'
+                                    ? theme.buttonsPressed
+                                    : theme.buttons,
+                            color: theme.buttonsText
+                        }}
+                        onMouseEnter={(e) =>
+                            windowFunction !== 'triangular' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttonsHover)
+                        }
+                        onMouseLeave={(e) =>
+                            windowFunction !== 'triangular' &&
+                            (e.currentTarget.style.backgroundColor = theme.buttons)
+                        }
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'
+                    >
+                        Triangular
+                    </button>
                 </div>
             </div>
+
+            <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-3'>
+                <span className={headerClass} style={{ color: theme.text }}>
+                    Overlap
+                </span>
+
+                {/* Overlap */}
+                <div className='flex flex-col gap-1'>
+                    <div className='flex justify-between items-center'>
+                        <span className='text-sm'>Overlap</span>
+                        <span className='text-sm'>
+                            {overlap} %
+                        </span>
+                    </div>
+
+                    <input
+                        type='range'
+                        min='0'
+                        max='100'
+                        step='1'
+                        value={overlap} 
+                        onChange={e => setOverlap( e.target.value)}
+                        className='w-full cursor-pointer'
+                    />
+            </div>
+            </div>
+
 
             <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-3'>
                 <span className={headerClass} style={{ color: theme.text }}>
@@ -156,49 +390,50 @@ function SpectrogramPanel({ theme }) {
             </div>
 
             <div
-            style={{ backgroundColor: theme.group, color: theme.text }}
-            className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-3'
+                style={{ backgroundColor: theme.group, color: theme.text }}
+                className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-3'
             >
                 <span className={headerClass}>Band-Pass Filter</span>
 
                 {/* Low Cutoff */}
                 <div className='flex flex-col gap-1'>
-                        <div className='flex justify-between items-center'>
-                            <span className='text-sm'>Low Cutoff</span>
-                            <span className='text-sm'>{lowCutoff} Hz</span>
-                        </div>
-
-                        <input
+                    <div className='flex justify-between items-center'>
+                        <span className='text-sm'>Low Cutoff</span>
+                        <span className='text-sm'>{pendingLow} Hz</span>
+                    </div>
+                    <input
                         type='range'
-                        min='0'
-                        max='12000'
+                        min={0}
+                        max={maxFreq}
                         step='50'
-                        value={lowCutoff}
-                        onChange={(e) => setLowCutoff(Number(e.target.value))}
+                        value={pendingLow}
+                        onChange={(e) => setPendingLow(Number(e.target.value))}
                         className='w-full cursor-pointer'
-                        />
+                    />
                 </div>
 
                 {/* High Cutoff */}
                 <div className='flex flex-col gap-1'>
                     <div className='flex justify-between items-center'>
                         <span className='text-sm'>High Cutoff</span>
-                        <span className='text-sm'>{highCutoff} Hz</span>
+                        <span className='text-sm'>{pendingHigh} Hz</span>
                     </div>
-
                     <input
                         type='range'
-                        min='0'
-                        max='12000'
+                        min={0}
+                        max={maxFreq}
                         step='50'
-                        value={highCutoff}
-                        onChange={(e) => setHighCutoff(Number(e.target.value))}
+                        value={pendingHigh}
+                        onChange={(e) => setPendingHigh(Number(e.target.value))}
                         className='w-full cursor-pointer'
                     />
                 </div>
 
-                {/* Optional Apply Button */}
-                <button style={{ backgroundColor: theme.keyButtons, color: theme.background }} className='rounded-md py-1 mt-1 hover:opacity-90'>
+                <button
+                    onClick={handleBandPassFilter}
+                    style={{ backgroundColor: theme.keyButtons, color: theme.background }}
+                    className='rounded-md py-1 mt-1 hover:opacity-90'
+                >
                     Apply Filter
                 </button>
             </div>
@@ -211,9 +446,8 @@ function SpectrogramPanel({ theme }) {
                         {colorScales.map(({ name, gradient }) => (
                             <div
                                 key={name}
-                                onClick={() => {setColorScale(name); 
-                                                // console.log(colorScale);
-                                                handleColorScaleChange(); }}
+                                onClick={() => {
+                                                handleColorScaleChange(name); }}
                                 className='flex flex-row items-center gap-2 cursor-pointer'>
                                 <div style={{ borderColor: theme.keyButtons }} className='w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0'>
                                     {colorScale === name && (

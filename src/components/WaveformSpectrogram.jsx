@@ -1,10 +1,10 @@
 import BoundingBoxLayer from "./BoundingBoxLayer";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import Spectrogram from "wavesurfer.js/dist/plugins/spectrogram.esm.js";
 import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js';
-import { WAVEFORM_HEIGHT, SPECTROGRAM_HEIGHT, SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES, FREQ_LABELS } from "../utils/spectrogramConfig";
-import { freqToY } from '../utils/spectrogramScale';
+import { WAVEFORM_HEIGHT, SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES } from "../utils/spectrogramConfig";
+import { freqToY, yToFreq } from '../utils/spectrogramScale';
 import { getAudioInfo } from '../utils/audioInfo';
 import { usePanels } from './PanelContext';
 import moonCursor from '../assets/moon_cursor.png';
@@ -13,7 +13,6 @@ export const wavesurferRef = { current: null };
 
 function WaveformSpectrogram({
     selectedAudio,
-    setSampleRate,
     code,
     boxes,
     setBoxes,
@@ -28,6 +27,8 @@ function WaveformSpectrogram({
     currTool
 }) {
     const [localSampleRate, setLocalSampleRate] = useState(null);
+    const SPECTROGRAM_HEIGHT = 425;
+    
 
     const containerRef = useRef(null);
     const [spectroTop] = useState(WAVEFORM_HEIGHT);
@@ -35,6 +36,29 @@ function WaveformSpectrogram({
     const [viewWidth, setViewWidth] = useState(0);
 
     const { brightness, contrast, handleSpectroMouseDown, handleSpectroMouseMove, handleSpectroMouseUp} = usePanels();
+    const { colorScale } = usePanels();
+    const { yScale } = usePanels();
+    const { FFTSamples } = usePanels();
+    const { winowFunction } = usePanels();
+    const { overlap } = usePanels();
+    const { ApplyBandPass, setApplyBandPass } = usePanels();
+    const {lowCutoff, highCutoff, setHighCutoff} = usePanels();
+    const {maxFreq, setMaxFreq} = usePanels();
+    const {sampleRate, setSampleRate} = usePanels();
+    
+
+    const generateFreqLabels = (minFreq, maxFreq, numLabels = 10) => {
+        return Array.from({ length: numLabels }, (_, i) => {
+            // evenly spaced Y positions from top (0) to bottom (spectroHeight)
+            const y = (i / (numLabels - 1)) * spectroHeight;
+            return Math.round(yToFreq(y, Math.max(minFreq, 1), maxFreq, yScale));
+        });
+    };
+
+    const FREQ_LABELS = useMemo(
+        () => generateFreqLabels(lowCutoff, highCutoff),
+        [lowCutoff, highCutoff, yScale, spectroHeight]
+    );
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -47,26 +71,36 @@ function WaveformSpectrogram({
         let ws = null;
         let cancelled = false;
 
-        const spectroPlugin = Spectrogram.create({
-                        labels: false,
-                        height: SPECTROGRAM_HEIGHT,
-                        splitChannels: false,
-                        scale: SCALE,
-                        frequencyMax: FREQUENCY_MAX,
-                        frequencyMin: FREQUENCY_MIN,
-                        fftSamples: FFT_SAMPLES,
-                        labelsBackground: 'rgba(0, 0, 0, 0.1)',
-                        useWebWorker: true,
-        })
 
-        getAudioInfo(selectedAudio).then(({ sampleRate }) => {
+        getAudioInfo(selectedAudio).then(({ sampleRate, maxFrequency }) => {
             if (cancelled) return;
             setLocalSampleRate(sampleRate);
             setSampleRate(sampleRate);
+            setMaxFreq(maxFrequency);
+            if (highCutoff==0) setHighCutoff(maxFrequency)
+
+            console.log(highCutoff);
+            console.log(lowCutoff);
+
+        
+            const spectroPlugin = Spectrogram.create({
+                            labels: false,
+                            height: SPECTROGRAM_HEIGHT,
+                            splitChannels: false,
+                            scale: yScale,
+                            frequencyMax: highCutoff,
+                            frequencyMin: lowCutoff,
+                            fftSamples: FFTSamples,
+                            labelsBackground: 'rgba(0, 0, 0, 0.1)',
+                            useWebWorker: true,
+                            colorMap : colorScale,
+                            overlap : overlap,
+            })
 
             ws = WaveSurfer.create({
                 container: containerRef.current,
                 height: WAVEFORM_HEIGHT,
+                barHeight: 3,
                 url: selectedAudio,
                 minPxPerSec: 0,
                 fillParent: true,
@@ -86,6 +120,7 @@ function WaveformSpectrogram({
                     }),
                 ],
             });
+             setApplyBandPass(false); 
 
             ws.on('ready', () => {
                 const totalDur = ws.getDuration();
@@ -104,13 +139,16 @@ function WaveformSpectrogram({
             }
             wavesurferRef.current = null;
         };
-    }, [setDuration, selectedAudio]);
+        
+    }, [setDuration, selectedAudio, colorScale, FFTSamples, ApplyBandPass]);
 
     const cursorMap = (tool) => {
         if (tool === 0) return 'auto';
         if (tool === 1) return 'crosshair';
         if (tool === 2) return `url(${moonCursor}), auto`;
     };
+
+
 
     return (
         <div style={{ backgroundColor: theme.panels }} className="p-6 rounded-xl my-2 overflow-hidden">
@@ -121,19 +159,22 @@ function WaveformSpectrogram({
                     className="relative shrink-0 w-11 items-end pr-1"
                     style={{ marginTop: spectroTop, height: spectroHeight }}
                 >
-                    {localSampleRate && FREQ_LABELS.map((freq) => (
-                        <span
-                            key={freq}
-                            className="absolute right-1 text-right text-[12px] font-display leading-none"
-                            style={{
-                                top: Math.min(freqToY(freq, localSampleRate), spectroHeight - 1),
-                                transform: 'translateY(-50%)',
-                                color: 'white',
-                            }}
-                        >
-                            {freq} Hz
-                        </span>
-                    ))}
+                    {localSampleRate && lowCutoff != null && highCutoff != null
+                        ? FREQ_LABELS.map((freq) => (
+                            <span
+                                key={freq}
+                                className="absolute right-1 text-right text-[12px] font-display leading-none"
+                                style={{
+                                    top: Math.min(freqToY(freq, Math.max(lowCutoff, 1), highCutoff, yScale), spectroHeight - 1),
+                                    transform: 'translateY(-50%)',
+                                    color: 'white',
+                                }}
+                            >
+                                {freq} Hz
+                            </span>
+                        ))
+                        : <span className="absolute right-1 text-[12px] font-display" style={{ color: 'white' }}>0 Hz</span>
+                    }
                 </div>
 
                 {/* Waveform + Spectrogram + Bounding Box Overlay */}

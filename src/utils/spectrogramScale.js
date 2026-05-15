@@ -3,23 +3,32 @@ import { SPECTROGRAM_HEIGHT, FREQUENCY_MAX, FREQUENCY_MIN, FFT_SAMPLES } from ".
 const melFromHz = (hz) => 2595 * Math.log10(1 + hz / 700);
 const hzFromMel = (mel) => 700 * (Math.pow(10, mel / 2595) - 1);
 
-function getScale(sampleRate) {
-    const FREQ_EFF_MIN = sampleRate / FFT_SAMPLES / 2;
-    const MEL_EFF_MIN = melFromHz(FREQ_EFF_MIN);
-    const MEL_MAX = melFromHz(FREQUENCY_MAX);
-    return { MEL_EFF_MIN, MEL_MAX };
-}
-
-export function freqToY(hz, sampleRate) {
-    const { MEL_EFF_MIN, MEL_MAX } = getScale(sampleRate);
-    const mel = melFromHz(hz);
-    const fraction = 1 - (mel - MEL_EFF_MIN) / (MEL_MAX - MEL_EFF_MIN);
+export function freqToY(hz, freqMin, freqMax, scale = 'mel') {
+    const fraction = (() => {
+        if (scale === 'mel') {
+            const melMin = melFromHz(freqMin);
+            const melMax = melFromHz(freqMax);
+            return 1 - (melFromHz(hz) - melMin) / (melMax - melMin);
+        } else if (scale === 'log') {
+            return 1 - (Math.log10(hz) - Math.log10(freqMin)) / (Math.log10(freqMax) - Math.log10(freqMin));
+        } else {
+            return 1 - (hz - freqMin) / (freqMax - freqMin);
+        }
+    })();
     return fraction * SPECTROGRAM_HEIGHT;
 }
 
-export function yToFreq(y, sampleRate) {
-    const { MEL_EFF_MIN, MEL_MAX } = getScale(sampleRate);
+export function yToFreq(y, freqMin, freqMax, scale = 'mel') {
     const fraction = 1 - y / SPECTROGRAM_HEIGHT;
-    const mel = MEL_EFF_MIN + fraction * (MEL_MAX - MEL_EFF_MIN);
-    return Math.max(FREQUENCY_MIN, Math.min(FREQUENCY_MAX, hzFromMel(mel)));
+    if (scale === 'mel') {
+        const melMin = melFromHz(freqMin);
+        const melMax = melFromHz(freqMax);
+        return Math.max(freqMin, Math.min(freqMax, hzFromMel(melMin + fraction * (melMax - melMin))));
+    } else if (scale === 'log') {
+        const logMin = Math.log10(freqMin);
+        const logMax = Math.log10(freqMax);
+        return Math.max(freqMin, Math.min(freqMax, Math.pow(10, logMin + fraction * (logMax - logMin))));
+    } else {
+        return Math.max(freqMin, Math.min(freqMax, freqMin + fraction * (freqMax - freqMin)));
+    }
 }
