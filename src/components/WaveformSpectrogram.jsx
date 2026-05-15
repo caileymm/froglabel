@@ -90,7 +90,7 @@ function WaveformSpectrogram({
                             labelsBackground: 'rgba(0, 0, 0, 0.1)',
                             useWebWorker: true,
                             colorMap : colorScale,
-                            overlap : overlap,
+                            noverlap : overlap,
                             windowFunc: windowFunction,
                             noverlap : overlap,
             })
