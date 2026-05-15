@@ -16,7 +16,7 @@ function SpectrogramPanel({ theme }) {
     const { overlap, setOverlap } = usePanels();
     const {minFreq, setMinFreq} = usePanels();
     const {maxFreq, setMaxFreq} = usePanels();
-    const {ApplyBandPass,setApplyBandPass} = usePanels();
+    const {modifyBandPass,setModifyBandPass} = usePanels();
     const {lowCutoff, setLowCutoff} = usePanels();
     const {highCutoff, setHighCutoff} = usePanels();
     const [pendingLow, setPendingLow] = useState(lowCutoff);
@@ -48,8 +48,14 @@ function SpectrogramPanel({ theme }) {
     const handleBandPassFilter = () => {
         setLowCutoff(pendingLow);
         setHighCutoff(pendingHigh);
-        setApplyBandPass(true);
+        setModifyBandPass(true);
     };
+
+    const handleRemoveBandPassFilter = () => {
+        setLowCutoff(0);
+        setHighCutoff(maxFreq);
+        setModifyBandPass(true); 
+    }
 
 
 
@@ -428,14 +434,22 @@ function SpectrogramPanel({ theme }) {
                         className='w-full cursor-pointer'
                     />
                 </div>
-
-                <button
-                    onClick={handleBandPassFilter}
-                    style={{ backgroundColor: theme.keyButtons, color: theme.background }}
-                    className='rounded-md py-1 mt-1 hover:opacity-90'
-                >
-                    Apply Filter
-                </button>
+                <div className="flex gap-2 mt-1">
+                    <button
+                        onClick={handleBandPassFilter}
+                        style={{ backgroundColor: theme.keyButtons, color: theme.background }}
+                        className='flex-1 rounded-md mt-1 hover:opacity-90'
+                    >
+                        Apply 
+                    </button>
+                    <button
+                        onClick={handleRemoveBandPassFilter}
+                        style={{ backgroundColor: theme.keyButtons, color: theme.background }}
+                        className='flex-1 rounded-md mt-1 hover:opacity-90'
+                    >
+                        Remove 
+                    </button>
+                </div>
             </div>
 
             <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
