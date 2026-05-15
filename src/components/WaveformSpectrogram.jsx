@@ -77,12 +77,8 @@ function WaveformSpectrogram({
             setLocalSampleRate(sampleRate);
             setSampleRate(sampleRate);
             setMaxFreq(maxFrequency);
-            if (highCutoff==0) setHighCutoff(maxFrequency)
+            if (highCutoff==0) setHighCutoff(maxFrequency);
 
-            console.log(highCutoff);
-            console.log(lowCutoff);
-
-        
             const spectroPlugin = Spectrogram.create({
                             labels: false,
                             height: SPECTROGRAM_HEIGHT,
@@ -102,7 +98,7 @@ function WaveformSpectrogram({
                 height: WAVEFORM_HEIGHT,
                 barHeight: 3,
                 url: selectedAudio,
-                minPxPerSec: 0,
+                //minPxPerSec: 0,
                 fillParent: true,
                 autoCenter: false,
                 hideScrollbar: true,
