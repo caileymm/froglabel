@@ -39,9 +39,9 @@ function WaveformSpectrogram({
     const { colorScale } = usePanels();
     const { yScale } = usePanels();
     const { FFTSamples } = usePanels();
-    const { winowFunction } = usePanels();
+    const { windowFunction } = usePanels();
     const { overlap } = usePanels();
-    const { ApplyBandPass, setApplyBandPass } = usePanels();
+    const { modifyBandPass, setModifyBandPass } = usePanels();
     const {lowCutoff, highCutoff, setHighCutoff} = usePanels();
     const {maxFreq, setMaxFreq} = usePanels();
     const {sampleRate, setSampleRate} = usePanels();
@@ -91,6 +91,8 @@ function WaveformSpectrogram({
                             useWebWorker: true,
                             colorMap : colorScale,
                             overlap : overlap,
+                            windowFunc: windowFunction,
+                            noverlap : overlap,
             })
 
             ws = WaveSurfer.create({
@@ -116,7 +118,7 @@ function WaveformSpectrogram({
                     }),
                 ],
             });
-             setApplyBandPass(false); 
+             setModifyBandPass(false); 
 
             ws.on('ready', () => {
                 const totalDur = ws.getDuration();
@@ -136,7 +138,7 @@ function WaveformSpectrogram({
             wavesurferRef.current = null;
         };
         
-    }, [setDuration, selectedAudio, colorScale, FFTSamples, ApplyBandPass]);
+    }, [setDuration, selectedAudio, colorScale, FFTSamples, modifyBandPass, windowFunction, overlap]);
 
     const cursorMap = (tool) => {
         if (tool === 0) return 'auto';

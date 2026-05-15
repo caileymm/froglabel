@@ -18,7 +18,7 @@ export function PanelProvider({ children }) {
   const [ overlap, setOverlap ] = useState(0);
   const [minFreq, setMinFreq] = useState(0);
   const [maxFreq, setMaxFreq] = useState(0);
-  const [ApplyBandPass, setApplyBandPass] = useState(false);
+  const [modifyBandPass, setModifyBandPass] = useState(false);
   const [lowCutoff, setLowCutoff] = useState(0);
   const [highCutoff, setHighCutoff] = useState(0); 
   const [sampleRate, setSampleRate] = useState(null);
@@ -61,7 +61,7 @@ export function PanelProvider({ children }) {
       overlap,       setOverlap, 
       lowCutoff,     setLowCutoff,
       highCutoff,    setHighCutoff,
-      ApplyBandPass, setApplyBandPass,
+      modifyBandPass, setModifyBandPass,
       maxFreq,       setMaxFreq,
       sampleRate, setSampleRate,
       handleSpectroMouseDown,
