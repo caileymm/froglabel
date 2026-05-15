@@ -21,9 +21,8 @@ function App() {
   const theme = frogTheme ? frogThemeColors : defaultColors;
 
   const [selectedAudio, setSelectedAudio] = useState(greenAudio)
-  const [sampleRate, setSampleRate] = useState(null);
-
-  const [currTool, setCurrTool] = useState(0);
+  const {sampleRate, setSampleRate} = usePanels();
+  const {currTool, setCurrTool} = usePanels();
 
   const [boxes, setBoxes] = useState([]);
   const [code, setCode] = useState('');
@@ -155,7 +154,6 @@ function App() {
           <div className='flex-1 min-h-0 overflow-hidden flex flex-col'>
             <WaveformSpectrogram
               selectedAudio={selectedAudio}
-              setSampleRate={setSampleRate}
               code={code}
               boxes={boxes}
               setBoxes={setBoxes}

@@ -1,4 +1,4 @@
-export const WAVEFORM_HEIGHT = 30;
+export const WAVEFORM_HEIGHT = 50;
 export const SPECTROGRAM_HEIGHT = 425;
 export const SCALE = 'mel';
 export const FREQUENCY_MIN = 0;

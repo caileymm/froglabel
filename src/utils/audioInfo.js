@@ -3,7 +3,7 @@ export async function getAudioInfo(audioSrc) {
   const buf = await r.arrayBuffer();
   const bytes = new Uint8Array(buf);
 
-  let sampleRate = null, channels = null, bitrate = null, version = null;
+  let sampleRate = null, channels = null, bitrate = null, version = null,  maxFrequency = null;
   
   let start = 0;
   if (bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) { // "ID3"
@@ -32,6 +32,7 @@ export async function getAudioInfo(audioSrc) {
       const sampleRates = [[44100,48000,32000],[22050,24000,16000],[11025,12000,8000]];
       const vIdx = versionBits === 3 ? 0 : versionBits === 2 ? 1 : 2;
       sampleRate = sampleRates[vIdx][sampleIdx];
+      maxFrequency = sampleRate ? sampleRate / 2 : null;// nyquist theorem
 
       const channelMode = (b3 >> 6) & 0x03;
       channels = channelMode === 3 ? 'mono' : 'stereo';
@@ -39,5 +40,5 @@ export async function getAudioInfo(audioSrc) {
     }
   }
 
-  return { sampleRate, channels, bitrate, version };
+  return { sampleRate, channels, bitrate, version, maxFrequency };
 }

@@ -9,7 +9,7 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme 
   const [isEPressed, setIsEPressed] = useState(false);
   const [isCPressed, setIsCPressed] = useState(false);
   const [isPlaying, setPlaying] = useState(false);
-  const [wsZoom, setWsZoom] = useState(5);
+  const [wsZoom, setWsZoom] = useState(0);
 
   const handlePlayAudio = useCallback(() => {
     wavesurferRef.current?.playPause();
@@ -34,7 +34,7 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme 
   const handleZoomInX = useCallback(() => {
     const ws = wavesurferRef.current;
     if (!ws || !duration) return;
-    const newZoom = Math.min(wsZoom + 20, 500);
+    const newZoom = Math.min(wsZoom + 50, 500);
     ws.zoom(newZoom);
     setWsZoom(newZoom);
     requestAnimationFrame(() => updateVisibleTime(newZoom));
@@ -43,7 +43,7 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme 
   const handleZoomOutX = useCallback(() => {
     const ws = wavesurferRef.current;
     if (!ws || !duration) return;
-    const newZoom = Math.max(wsZoom - 20, 5);
+    const newZoom = Math.max(wsZoom - 50, 0);
     ws.zoom(newZoom);
     setWsZoom(newZoom);
     requestAnimationFrame(() => updateVisibleTime(newZoom));
@@ -68,10 +68,11 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme 
   const handleResetView = useCallback(() => {
     const ws = wavesurferRef.current;
     if (!ws) return;
-    ws.zoom(5);
-    setWsZoom(5);
-    setZoomX(1);
-  }, [setZoomX]);
+    const newZoom = 0;
+    ws.zoom(newZoom);
+    setWsZoom(newZoom);
+    requestAnimationFrame(() => updateVisibleTime(newZoom))
+  }, [updateVisibleTime]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
