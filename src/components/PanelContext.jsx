@@ -14,7 +14,7 @@ export function PanelProvider({ children }) {
   const lastPos = useRef({ x: 0, y: 0 });
 
   const handleSpectroMouseDown = (e) => {
-    if (rightPanel !== 3) return;
+    if (rightPanel != 3) return;
     isDragging.current = true;
     lastPos.current = { x: e.clientX, y: e.clientY };
     e.stopPropagation();
@@ -25,11 +25,12 @@ export function PanelProvider({ children }) {
     const dx = e.clientX - lastPos.current.x;
     const dy = e.clientY - lastPos.current.y;
     lastPos.current = { x: e.clientX, y: e.clientY };
-    setBrightness(prev => Math.max(0.1, Math.min(5.0, prev + dx * 0.01)));
-    setContrast(prev =>   Math.max(0.1, Math.min(5.0, prev - dy * 0.01)));
+    setBrightness(prev => Math.max(0.0, Math.min(5.0, prev + dx * 0.01)));
+    setContrast(prev =>   Math.max(0.0, Math.min(5.0, prev - dy * 0.01)));
   };
 
   const handleSpectroMouseUp = () => { isDragging.current = false; };
+  
 
 
   return (

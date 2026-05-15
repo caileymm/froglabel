@@ -34,7 +34,7 @@ function WaveformSpectrogram({
     const [spectroHeight] = useState(SPECTROGRAM_HEIGHT);
     const [viewWidth, setViewWidth] = useState(0);
 
-    const { brightness, contrast } = usePanels();
+    const { brightness, contrast, handleSpectroMouseDown, handleSpectroMouseMove, handleSpectroMouseUp} = usePanels();
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -46,6 +46,18 @@ function WaveformSpectrogram({
 
         let ws = null;
         let cancelled = false;
+
+        const spectroPlugin = Spectrogram.create({
+                        labels: false,
+                        height: SPECTROGRAM_HEIGHT,
+                        splitChannels: false,
+                        scale: SCALE,
+                        frequencyMax: FREQUENCY_MAX,
+                        frequencyMin: FREQUENCY_MIN,
+                        fftSamples: FFT_SAMPLES,
+                        labelsBackground: 'rgba(0, 0, 0, 0.1)',
+                        useWebWorker: true,
+        })
 
         getAudioInfo(selectedAudio).then(({ sampleRate }) => {
             if (cancelled) return;
@@ -67,17 +79,7 @@ function WaveformSpectrogram({
                 sampleRate: sampleRate,
                 dragToSeek: true,
                 plugins: [
-                    Spectrogram.create({
-                        labels: false,
-                        height: SPECTROGRAM_HEIGHT,
-                        splitChannels: false,
-                        scale: SCALE,
-                        frequencyMax: FREQUENCY_MAX,
-                        frequencyMin: FREQUENCY_MIN,
-                        fftSamples: FFT_SAMPLES,
-                        labelsBackground: 'rgba(0, 0, 0, 0.1)',
-                        useWebWorker: true,
-                    }),
+                   spectroPlugin,
                     TimelinePlugin.create({
                         style: { fontSize: '12px', color: theme.text, fontFamily: 'Afacad, sans-serif' },
                         formatTimeCallback: (seconds) => `${seconds.toFixed(1)} s`,
@@ -137,10 +139,14 @@ function WaveformSpectrogram({
                 {/* Waveform + Spectrogram + Bounding Box Overlay */}
                 <div className="relative w-full overflow-hidden">
                     <div ref={containerRef} className="relative z-10" />
-
+                    {/* mouse events for contrast/brightness  */}
                     <div
-                        className="absolute z-50 left-0 right-0"
-                        style={{ top: spectroTop, height: spectroHeight, pointerEvents: 'none' }}
+                      className="absolute z-50 left-0 right-0"
+                      style={{ top: spectroTop, height: spectroHeight }}
+                      onMouseDown={handleSpectroMouseDown}
+                      onMouseMove={handleSpectroMouseMove}
+                      onMouseUp={handleSpectroMouseUp}
+                      onMouseLeave={handleSpectroMouseUp}
                     >
                         {/* Brightness / Contrast filter */}
                         <div

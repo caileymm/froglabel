@@ -7,6 +7,8 @@ function SpectrogramPanel({ theme }) {
     const [hopSize, setHopSize] = useState('512');
     const [minFreq, setMinFreq] = useState('0');
     const [maxFreq, setMaxFreq] = useState('22050');
+    const [lowCutoff, setLowCutoff] = useState(800);
+    const [highCutoff, setHighCutoff] = useState(4000);     
     
     const [colorScale, setColorScale] = useState('viridis');
 
@@ -29,6 +31,9 @@ function SpectrogramPanel({ theme }) {
     const headerClass = 'font-display text-sm';
     const unitClass = 'font-display text-sm';
     const inputClass = 'bg-transparent font-display text-sm outline-none w-16';
+
+
+    const handleColorScaleChange = () => {}; 
 
 
 
@@ -84,26 +89,118 @@ function SpectrogramPanel({ theme }) {
                 </div>
             </div>
 
-            <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
-                Brightness & Contrast
+            <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-3'>
+                <span className={headerClass} style={{ color: theme.text }}>
+                    Brightness & Contrast
+                </span>
+
+                {/* Brightness */}
                 <div className='flex flex-col gap-1'>
-                    <div className='flex flex-col'>
-                        <span className={headerClass} style={{ color: theme.text }}>Brightness</span>
-                        <div className={rowClass}>
-                            <div className={boxClass} style={{ backgroundColor: theme.cream }}>
-                                <input value={typeof brightness === 'number' ? brightness.toFixed(2) : brightness} onChange={e => setBrightness(parseFloat(e.target.value) || 1)} onKeyDown={e => e.stopPropagation()} className={inputClass} style={{ color: theme.text }}/>
-                            </div>
-                        </div>
+                    <div className='flex justify-between items-center'>
+                        <span className='text-sm'>Brightness</span>
+                        <span className='text-sm'>
+                            {typeof brightness === 'number'
+                                ? brightness.toFixed(2)
+                                : brightness}
+                        </span>
                     </div>
-                    <div className='flex flex-col'>
-                        <span className={headerClass} style={{ color: theme.text }}>Contrast</span>
-                        <div className={rowClass}>
-                            <div className={boxClass} style={{ backgroundColor: theme.cream }}>
-                                <input value={typeof contrast === 'number' ? contrast.toFixed(2) : contrast} onChange={e => setContrast(parseFloat(e.target.value) || 1)} onKeyDown={e => e.stopPropagation()} className={inputClass} style={{ color: theme.text }}/>
-                            </div>
-                        </div>
-                    </div>
+
+                    <input
+                        type='range'
+                        min='0'
+                        max='5'
+                        step='0.01'
+                        value={brightness}
+                        onChange={e => setBrightness(parseFloat(e.target.value))}
+                        className='w-full cursor-pointer'
+                    />
                 </div>
+
+                {/* Contrast */}
+                <div className='flex flex-col gap-1'>
+                    <div className='flex justify-between items-center'>
+                        <span className='text-sm'>Contrast</span>
+                        <span className='text-sm'>
+                            {typeof contrast === 'number'
+                                ? contrast.toFixed(2)
+                                : contrast}
+                        </span>
+                    </div>
+
+                    <input
+                        type='range'
+                        min='0'
+                        max='5'
+                        step='0.01'
+                        value={contrast}
+                        onChange={e => setContrast(parseFloat(e.target.value))}
+                        className='w-full cursor-pointer'
+                    />
+
+                </div>
+                {/* Reset Button */}
+                <button
+                    onClick={() => {
+                        setBrightness(1);
+                        setContrast(1);
+                    }}
+                    style={{
+                        backgroundColor: theme.keyButtons,
+                        color: theme.background
+                    }}
+                    className='rounded-md py-1 mt-1 hover:opacity-90'
+                >
+                    Reset
+                </button>
+                
+            </div>
+
+            <div
+            style={{ backgroundColor: theme.group, color: theme.text }}
+            className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-3'
+            >
+                <span className={headerClass}>Band-Pass Filter</span>
+
+                {/* Low Cutoff */}
+                <div className='flex flex-col gap-1'>
+                        <div className='flex justify-between items-center'>
+                            <span className='text-sm'>Low Cutoff</span>
+                            <span className='text-sm'>{lowCutoff} Hz</span>
+                        </div>
+
+                        <input
+                        type='range'
+                        min='0'
+                        max='12000'
+                        step='50'
+                        value={lowCutoff}
+                        onChange={(e) => setLowCutoff(Number(e.target.value))}
+                        className='w-full cursor-pointer'
+                        />
+                </div>
+
+                {/* High Cutoff */}
+                <div className='flex flex-col gap-1'>
+                    <div className='flex justify-between items-center'>
+                        <span className='text-sm'>High Cutoff</span>
+                        <span className='text-sm'>{highCutoff} Hz</span>
+                    </div>
+
+                    <input
+                        type='range'
+                        min='0'
+                        max='12000'
+                        step='50'
+                        value={highCutoff}
+                        onChange={(e) => setHighCutoff(Number(e.target.value))}
+                        className='w-full cursor-pointer'
+                    />
+                </div>
+
+                {/* Optional Apply Button */}
+                <button style={{ backgroundColor: theme.keyButtons, color: theme.background }} className='rounded-md py-1 mt-1 hover:opacity-90'>
+                    Apply Filter
+                </button>
             </div>
 
             <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
@@ -114,12 +211,14 @@ function SpectrogramPanel({ theme }) {
                         {colorScales.map(({ name, gradient }) => (
                             <div
                                 key={name}
-                                onClick={() => setColorScale(name)}
+                                onClick={() => {setColorScale(name); 
+                                                // console.log(colorScale);
+                                                handleColorScaleChange(); }}
                                 className='flex flex-row items-center gap-2 cursor-pointer'>
                                 <div style={{ borderColor: theme.keyButtons }} className='w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0'>
                                     {colorScale === name && (
                                         <div style={{ backgroundColor: theme.keyButtons }} className='w-2 h-2 rounded-full'/>
-                                    )}
+                                    ) }
                                 </div>
                                 <div className='h-4 rounded-sm flex-1' style={{ background: gradient }}/>
                             </div>
