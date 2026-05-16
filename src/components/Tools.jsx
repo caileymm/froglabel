@@ -8,14 +8,11 @@ import moonWhite from '../assets/moon_white.png';
 import { usePanels } from './PanelContext';
 
 function Tools({ currTool, setCurrTool, theme, frogTheme }) {
-    const [isShiftPressed, setIsShiftPressed] = useState(false);
-    const [nextTool, setnextTool] = useState(false);
-    const shiftAloneRef = useRef(true);
+    const [isTPressed, setIsTPressed] = useState(false);
     const { showLeftPanel, setShowLeftPanel, rightPanel, setRightPanel, showDataset, setShowDataset} = usePanels();
 
     const handleChangeToTool1 = () => {
         setCurrTool(0); // Default cursor
-        // setShowLeftPanel(prev => !prev); // Toggle CodePanel
     };
 
     const handleChangeToTool2 = () => {
@@ -52,18 +49,15 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
 
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.key === 'Shift') {
-                shiftAloneRef.current = true;
-                setIsShiftPressed(true);
-            } else if (e.shiftKey) {
-                shiftAloneRef.current = false;
+            const isInputFocused = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName);
+            if (isInputFocused) return;
+            if (e.key.toUpperCase() === 'T') {
+                setIsTPressed(true);
+                handleChangeTool();
             }
         };
         const handleKeyUp = (e) => {
-            if (e.key === 'Shift') {
-                if (shiftAloneRef.current) handleChangeTool();
-                setIsShiftPressed(false);
-            }
+            if (e.key.toUpperCase() === 'T') setIsTPressed(false);
         };
         window.addEventListener('keydown', handleKeyDown);
         window.addEventListener('keyup', handleKeyUp);
@@ -77,12 +71,12 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
         <div style={{ backgroundColor: theme.panels }} className='py-2 rounded-xl flex items-center justify-center gap-2 w-70 mx-auto'>
             <button
                 onClick={handleChangeTool}
-                style={{ backgroundColor: isShiftPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                onMouseEnter={(e) => !isShiftPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                onMouseLeave={(e) => !isShiftPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                style={{ backgroundColor: isTPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                onMouseEnter={(e) => !isTPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                onMouseLeave={(e) => !isTPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
                 className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
                 Change Tool
-                <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift</div>
+                <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>T</div>
             </button>
             <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1'>
                 <button onClick={handleChangeToTool1}
