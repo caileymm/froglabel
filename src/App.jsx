@@ -124,6 +124,7 @@ function App() {
       if (e.key === '1') setShowLeftPanel(p => !p);
       if (e.key === '2') setRightPanel(p => p === 2 ? null : 2);
       if (e.key === '3') setRightPanel(p => p === 3 ? null : 3);
+      if (e.key === '4') setShowDataset(p => !p);
     };
 
     window.addEventListener('keydown', handleKey);
@@ -199,11 +200,13 @@ function App() {
             >
               <div className='h-2 cursor-ns-resize' onMouseDown={handleDragStart} />
               <div className='px-2 pb-2'>
+                {showDataset && (
                 <DatasetPanel
                   rows={rows}
                   onDeleteRow={(i) => setBoxes(prev => prev.filter((_, idx) => idx !== i))}
                   theme={theme}
                 />
+                )}
               </div>
             </div>
           )}
