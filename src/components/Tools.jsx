@@ -30,7 +30,7 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
 
     const handleChangeToTool1 = () => {
         setCurrTool(0); // Default cursor
-        setShowLeftPanel(prev => !prev); // Toggle CodePanel
+        // setShowLeftPanel(prev => !prev); // Toggle CodePanel
     };
 
     const handleChangeToTool2 = () => {

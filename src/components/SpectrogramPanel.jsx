@@ -6,8 +6,6 @@ function SpectrogramPanel({ theme }) {
     const [fftSize, setFftSize] = useState('1024');
     const [hopSize, setHopSize] = useState('512');
     
-
-
     const { brightness, setBrightness} = usePanels(); 
     const { contrast, setContrast } = usePanels();
     const { colorScale, setColorScale } = usePanels();
