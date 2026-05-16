@@ -1,27 +1,28 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES } from "../utils/spectrogramConfig";
 
 //all variables that need to be accessed by multiple files will be created and saved here to be accessed. 
 const PanelContext = createContext(null);
 
 export function PanelProvider({ children }) {
-  const [currTool, setCurrTool] = useState(0);
+  const [currTool,      setCurrTool] = useState(0);
   const [showLeftPanel, setShowLeftPanel] = useState(false);
-  const [rightPanel, setRightPanel] = useState(null);
-  const [showDataset, setShowDataset] = useState(false);
-  const [brightness, setBrightness] = useState(1.0);
-  const [contrast, setContrast] = useState(1.0);
-  const [yScale, setYScale] = useState('mel');
-  const [colorScale, setColorScale] = useState('roseus');
-  const [bandPassFilter, setbandPassFilter] = useState(false);
-  const [FFTSamples, setFFTSamples] = useState(512);
-  const [windowFunction, setWindowFunction ] = useState('hann');
-  const [ overlap, setOverlap ] = useState(0);
-  const [minFreq, setMinFreq] = useState(0);
-  const [maxFreq, setMaxFreq] = useState(0);
-  const [modifyBandPass, setModifyBandPass] = useState(false);
-  const [lowCutoff, setLowCutoff] = useState(0);
-  const [highCutoff, setHighCutoff] = useState(0); 
-  const [sampleRate, setSampleRate] = useState(null);
+  const [rightPanel,    setRightPanel] = useState(null);
+  const [showDataset,   setShowDataset] = useState(false);
+  const [brightness,    setBrightness] = useState(1.0);
+  const [contrast,      setContrast] = useState(1.0);
+  const [yScale,        setYScale] = useState(SCALE);
+  const [colorScale,    setColorScale] = useState('roseus');
+  const [bandPassFilter,setbandPassFilter] = useState(false);
+  const [FFTSamples,    setFFTSamples] = useState(FFT_SAMPLES);
+  const [windowFunction,setWindowFunction ] = useState('hann');
+  const [overlap,       setOverlap ] = useState(0);
+  const [minFreq,       setMinFreq] = useState(FREQUENCY_MIN);
+  const [maxFreq,       setMaxFreq] = useState(FREQUENCY_MAX);
+  const [modifyBandPass,setModifyBandPass] = useState(false);
+  const [lowCutoff,     setLowCutoff] = useState(0);
+  const [highCutoff,    setHighCutoff] = useState(0); 
+  const [sampleRate,    setSampleRate] = useState(null);
 
 
   const isDragging = useRef(false);
@@ -46,7 +47,6 @@ export function PanelProvider({ children }) {
   const handleSpectroMouseUp = () => { isDragging.current = false; };
   
 
-
   return (
     <PanelContext.Provider value={{
       currTool,      setCurrTool,
@@ -61,9 +61,9 @@ export function PanelProvider({ children }) {
       overlap,       setOverlap, 
       lowCutoff,     setLowCutoff,
       highCutoff,    setHighCutoff,
-      modifyBandPass, setModifyBandPass,
+      modifyBandPass,setModifyBandPass,
       maxFreq,       setMaxFreq,
-      sampleRate, setSampleRate,
+      sampleRate,    setSampleRate,
       handleSpectroMouseDown,
       handleSpectroMouseMove,
       handleSpectroMouseUp,

@@ -44,11 +44,11 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
     };
 
     const handleChangeTool = useCallback(() => {
-        const nextTool = (currTool % 3) + 1;
+        const nextTool = (currTool % 4) + 1;
         // Close current tool's panel
         if (currTool === 1) setShowLeftPanel(null);
         else if (currTool === 2) setRightPanel(null);
-        else if (currTool === 3) {setRightPanel(null);}
+        else if (currTool === 3) setRightPanel(null);
 
         // Open next tool's panel
         if (nextTool === 1) setShowLeftPanel(1);

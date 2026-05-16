@@ -3,7 +3,7 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import Spectrogram from "wavesurfer.js/dist/plugins/spectrogram.esm.js";
 import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js';
-import { WAVEFORM_HEIGHT, SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES } from "../utils/spectrogramConfig";
+import { WAVEFORM_HEIGHT, SCALE, SPECTROGRAM_HEIGHT, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES } from "../utils/spectrogramConfig";
 import { freqToY, yToFreq } from '../utils/spectrogramScale';
 import { getAudioInfo } from '../utils/audioInfo';
 import { usePanels } from './PanelContext';
@@ -27,24 +27,22 @@ function WaveformSpectrogram({
     currTool
 }) {
     const [localSampleRate, setLocalSampleRate] = useState(null);
-    const SPECTROGRAM_HEIGHT = 425;
-    
-
     const containerRef = useRef(null);
     const [spectroTop] = useState(WAVEFORM_HEIGHT);
     const [spectroHeight] = useState(SPECTROGRAM_HEIGHT);
     const [viewWidth, setViewWidth] = useState(0);
 
-    const { brightness, contrast, handleSpectroMouseDown, handleSpectroMouseMove, handleSpectroMouseUp} = usePanels();
+    const { brightness, contrast}= usePanels();
+    const {handleSpectroMouseDown, handleSpectroMouseMove, handleSpectroMouseUp} = usePanels();
     const { colorScale } = usePanels();
     const { yScale } = usePanels();
     const { FFTSamples } = usePanels();
     const { windowFunction } = usePanels();
     const { overlap } = usePanels();
     const { modifyBandPass, setModifyBandPass } = usePanels();
-    const {lowCutoff, highCutoff, setHighCutoff} = usePanels();
-    const {maxFreq, setMaxFreq} = usePanels();
-    const {sampleRate, setSampleRate} = usePanels();
+    const { lowCutoff, highCutoff, setHighCutoff} = usePanels();
+    const { maxFreq, setMaxFreq} = usePanels();
+    const { sampleRate, setSampleRate} = usePanels();
     
 
     const generateFreqLabels = (minFreq, maxFreq, numLabels = 10) => {
