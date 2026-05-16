@@ -26,12 +26,14 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
 
     const handleChangeToTool1 = () => {
         setCurrTool(1);
-        setShowLeftPanel(prev => prev === 1 ? null : 1);
+        setRightPanel(prev => prev === 2 ? null : 2);
     };
 
     const handleChangeToTool2 = () => {
         setCurrTool(2);
-        setRightPanel(prev => prev === 2 ? null : 2);
+        setShowLeftPanel(null);
+        setRightPanel(null);
+        setShowDataset(null);
     };
 
     const handleChangeToTool3 = () => {
@@ -46,13 +48,13 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
     const handleChangeTool = useCallback(() => {
         const nextTool = (currTool % 4) + 1;
         // Close current tool's panel
-        if (currTool === 1) setShowLeftPanel(null);
-        else if (currTool === 2) setRightPanel(null);
+        if (currTool === 1) setRightPanel(null);
+        else if (currTool === 2) { setShowLeftPanel(null); setRightPanel(null); setShowDataset(null); }
         else if (currTool === 3) setRightPanel(null);
 
         // Open next tool's panel
-        if (nextTool === 1) setShowLeftPanel(1);
-        else if (nextTool === 2) setRightPanel(2);
+        if (nextTool === 1) setRightPanel(2);
+        else if (nextTool === 2) { setShowLeftPanel(null); setRightPanel(null); }
         else if (nextTool === 3) setRightPanel(3);
         setCurrTool(nextTool);
     }, [currTool]);
@@ -91,17 +93,17 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
                 <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift</div>
             </button>
             <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1'>
-                <button onClick={handleChangeToTool1}
-                    style={{ backgroundColor: currTool === 1 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                    onMouseEnter={(e) => currTool !== 1 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                    onMouseLeave={(e) => currTool !== 1 && (e.currentTarget.style.backgroundColor = theme.buttons)}
-                    className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
-                    <img src={frogTheme ? defaultBlack : defaultWhite} className='w-4 h-4' />
-                </button>
                 <button onClick={handleChangeToTool2}
                     style={{ backgroundColor: currTool === 2 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
                     onMouseEnter={(e) => currTool !== 2 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
                     onMouseLeave={(e) => currTool !== 2 && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                    className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
+                    <img src={frogTheme ? defaultBlack : defaultWhite} className='w-4 h-4' />
+                </button>
+                <button onClick={handleChangeToTool1}
+                    style={{ backgroundColor: currTool === 1 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                    onMouseEnter={(e) => currTool !== 1 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                    onMouseLeave={(e) => currTool !== 1 && (e.currentTarget.style.backgroundColor = theme.buttons)}
                     className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
                     <img src={frogTheme ? crosshairBlack : crosshairWhite} className='w-4 h-4' />
                 </button>
