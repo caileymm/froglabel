@@ -144,9 +144,7 @@ function WaveformSpectrogram({
         if (tool === 2) return 'auto';
         if (tool === 3) return `url(${moonCursor}), auto`;
     };
-
-
-
+    
     return (
         <div style={{ backgroundColor: theme.panels }} className="p-6 rounded-xl my-2 overflow-hidden">
             <div className="flex">
@@ -180,7 +178,12 @@ function WaveformSpectrogram({
                     {/* mouse events for contrast/brightness  */}
                     <div
                       className="absolute z-50 left-0 right-0"
-                      style={{ top: spectroTop, height: spectroHeight, pointerEvents: currTool === 0 ? 'none' : 'auto' }}
+                      style={{ 
+                        top: spectroTop, 
+                        height: spectroHeight, 
+                        pointerEvents: currTool === 0 ? 'none' : 'auto',
+                        cursor: 'inherit'
+                    }}
                       onMouseDown={currTool === 0 ? undefined : handleSpectroMouseDown}
                       onMouseMove={currTool === 0 ? undefined : handleSpectroMouseMove}
                       onMouseUp={currTool === 0 ? undefined : handleSpectroMouseUp}
