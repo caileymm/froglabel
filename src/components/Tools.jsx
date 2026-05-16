@@ -25,15 +25,11 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
     }, []);
 
     const handleChangeToTool1 = () => {
-        setCurrTool(1);
-        setRightPanel(prev => prev === 2 ? null : 2);
+        setShowLeftPanel(prev => !prev);
     };
 
     const handleChangeToTool2 = () => {
-        setCurrTool(2);
-        setShowLeftPanel(null);
-        setRightPanel(null);
-        setShowDataset(null);
+        setRightPanel(prev => prev === 2 ? null : 2);
     };
 
     const handleChangeToTool3 = () => {
