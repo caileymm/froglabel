@@ -13,21 +13,6 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
     const shiftAloneRef = useRef(true);
     const { showLeftPanel, setShowLeftPanel, rightPanel, setRightPanel, showDataset, setShowDataset} = usePanels();
 
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.key === '1') handleChangeToTool1();
-            if (e.key === '2') handleChangeToTool2();
-            if (e.key === '3') handleChangeToTool3();
-            if (e.key === '4') handleChangeToTool4();
-            if (e.key === ' ') {
-                e.preventDefault();
-                handleChangeToTool2();
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
-
     const handleChangeToTool1 = () => {
         setCurrTool(0); // Default cursor
         // setShowLeftPanel(prev => !prev); // Toggle CodePanel
