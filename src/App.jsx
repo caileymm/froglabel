@@ -23,6 +23,8 @@ function App() {
   const [selectedAudio, setSelectedAudio] = useState(greenAudio)
   const {sampleRate, setSampleRate} = usePanels();
   const {currTool, setCurrTool} = usePanels();
+  const {lowCutoff, highCutoff} = usePanels();
+  const {yScale} = usePanels();
 
   const [boxes, setBoxes] = useState([]);
   const [code, setCode] = useState('');
@@ -65,8 +67,8 @@ function App() {
     if (!box) return null;
     const startTime = box.startTime;
     const endTime = box.endTime;
-    const startFreq = yToFreq(box.top + box.height, sampleRate);
-    const endFreq = yToFreq(box.top, sampleRate);
+    const startFreq = yToFreq(box.top + box.height, lowCutoff, highCutoff, yScale);
+    const endFreq = yToFreq(box.top, lowCutoff, highCutoff, yScale);
     return {
       ...box,
       name:      codesDict[box.code] ?? '—',
@@ -77,7 +79,7 @@ function App() {
       endFreq:   Math.round(endFreq),
       bandwidth: Math.round(endFreq - startFreq),
     };
-  }, [codesDict, sampleRate]);
+  }, [codesDict, lowCutoff, highCutoff, yScale]);
 
   const rows = useMemo(() => boxes.map(boxToRow), [boxes, boxToRow]);
   const selectedRow = rows[currSelectedIndex] ?? null;

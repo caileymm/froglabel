@@ -30,6 +30,7 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
 
     const handleChangeToTool1 = () => {
         setCurrTool(0); // Default cursor
+        setShowLeftPanel(prev => !prev); // Toggle CodePanel
     };
 
     const handleChangeToTool2 = () => {
@@ -39,11 +40,11 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
 
     const handleChangeToTool3 = () => {
         setCurrTool(3); // Moon cursor
-        setRightPanel(prev => prev === 3 ? null : 3);
+        setRightPanel(prev => prev === 3 ? null : 3); // Toggle SpectrogramPanel
     };
 
     const handleChangeToTool4 = () => {
-        setShowDataset(prev => prev === 4 ? null : 4); //no need to set the curr tool right now 
+        setShowDataset(prev => !prev); // Toggle DatasetPanel
     };
 
     const handleChangeTool = useCallback(() => {
@@ -90,6 +91,7 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
     return (
         <div style={{ backgroundColor: theme.panels }} className='py-2 rounded-xl flex items-center justify-center gap-2 w-70 mx-auto'>
             <button
+                onClick={handleChangeTool}
                 style={{ backgroundColor: isShiftPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
                 onMouseEnter={(e) => !isShiftPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
                 onMouseLeave={(e) => !isShiftPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
