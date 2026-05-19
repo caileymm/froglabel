@@ -6,8 +6,6 @@ function SpectrogramPanel({ theme }) {
     const [fftSize, setFftSize] = useState('1024');
     const [hopSize, setHopSize] = useState('512');
     
-
-
     const { brightness, setBrightness} = usePanels(); 
     const { contrast, setContrast } = usePanels();
     const { colorScale, setColorScale } = usePanels();
@@ -38,7 +36,7 @@ function SpectrogramPanel({ theme }) {
     // Dynamic styles based on theme
     const boxClass = 'rounded-md px-2 py-0.5 font-display text-sm inline-block self-start';
     const rowClass = 'flex flex-row items-center gap-1';
-    const headerClass = 'font-display text-sm';
+    const headerClass = 'font-display text-md';
     const unitClass = 'font-display text-sm';
     const inputClass = 'bg-transparent font-display text-sm outline-none w-16';
 
@@ -431,12 +429,14 @@ function SpectrogramPanel({ theme }) {
                         setContrast(1);
                     }}
                     style={{
-                        backgroundColor: theme.keyButtons,
-                        color: theme.background
+                        backgroundColor: theme.buttons,
+                        color: theme.buttonsText
                     }}
-                    className='rounded-md py-1 mt-1 hover:opacity-90'
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = theme.buttons)}
+                    className='rounded-md py-1 mt-1 cursor-pointer'
                 >
-                    Reset
+                    <span className='text-sm'>Reset</span>
                 </button>
                 
             </div>
@@ -483,17 +483,21 @@ function SpectrogramPanel({ theme }) {
                 <div className="flex gap-2 mt-1">
                     <button
                         onClick={handleBandPassFilter}
-                        style={{ backgroundColor: theme.keyButtons, color: theme.background }}
-                        className='flex-1 rounded-md mt-1 hover:opacity-90'
+                        style={{ backgroundColor: theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        className='flex-1 rounded-md mt-1 py-1 cursor-pointer'
                     >
-                        Apply 
+                        <span className='text-sm'>Apply</span> 
                     </button>
                     <button
                         onClick={handleRemoveBandPassFilter}
-                        style={{ backgroundColor: theme.keyButtons, color: theme.background }}
-                        className='flex-1 rounded-md mt-1 hover:opacity-90'
+                        style={{ backgroundColor: theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        className='flex-1 rounded-md mt-1 py-1 cursor-pointer'
                     >
-                        Remove 
+                        <span className='text-sm'>Remove</span> 
                     </button>
                 </div>
             </div>

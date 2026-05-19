@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import moonCursor from '../assets/moon_cursor.png';
 
 const BoundingBoxLayer = ({ 
     code,
@@ -12,6 +13,7 @@ const BoundingBoxLayer = ({
     theme,
     currTool
 }) => {
+    console.log('currTool:', currTool);
     const [activeBox, setActiveBox] = useState(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [localWidth, setLocalWidth] = useState(0);
@@ -182,6 +184,7 @@ const BoundingBoxLayer = ({
         <div
             ref={containerRef}
             className={`absolute inset-0 z-40 select-none }`} // ${code ? 'cursor-crosshair' : 'cursor-default'
+            style={{ cursor: currTool === 1 ? 'crosshair' : currTool === 3 ? `url(${moonCursor}), auto` : 'auto' }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -194,17 +197,18 @@ const BoundingBoxLayer = ({
 
                 return (
                     <div
-                        key={box.id}
-                        className="absolute border-2 z-40 cursor-pointer"
-                        style={{ 
-                            left: px.left, 
-                            top: px.top, 
-                            width: px.width, 
-                            height: px.height,
-                            borderColor: isSelected ? theme.boxSelected : theme.box,
-                            backgroundColor: isSelected ? theme.boxFillSelected : theme.boxFill
-                        }}
-                    >
+    key={box.id}
+    className="absolute border-2 z-40"
+    style={{ 
+        left: px.left, 
+        top: px.top, 
+        width: px.width, 
+        height: px.height,
+        cursor: currTool === 1 ? 'crosshair' : currTool === 3 ? `url(${moonCursor}), auto` : 'auto',
+        borderColor: isSelected ? theme.boxSelected : theme.box,
+        backgroundColor: isSelected ? theme.boxFillSelected : theme.boxFill
+    }}
+>
                         {/* Box Metadata Labels */}
                         <div className="absolute -top-4 left-0 right-0 flex justify-between pointer-events-none px-0.5">
                             {/* Top Left: Box Index */}

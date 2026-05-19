@@ -23,6 +23,8 @@ function App() {
   const [selectedAudio, setSelectedAudio] = useState(greenAudio)
   const {sampleRate, setSampleRate} = usePanels();
   const {currTool, setCurrTool} = usePanels();
+  const {lowCutoff, highCutoff} = usePanels();
+  const {yScale} = usePanels();
 
   const [boxes, setBoxes] = useState([]);
   const [code, setCode] = useState('');
@@ -65,8 +67,8 @@ function App() {
     if (!box) return null;
     const startTime = box.startTime;
     const endTime = box.endTime;
-    const startFreq = yToFreq(box.top + box.height, sampleRate);
-    const endFreq = yToFreq(box.top, sampleRate);
+    const startFreq = yToFreq(box.top + box.height, lowCutoff, highCutoff, yScale);
+    const endFreq = yToFreq(box.top, lowCutoff, highCutoff, yScale);
     return {
       ...box,
       name:      codesDict[box.code] ?? '—',
@@ -77,7 +79,7 @@ function App() {
       endFreq:   Math.round(endFreq),
       bandwidth: Math.round(endFreq - startFreq),
     };
-  }, [codesDict, sampleRate]);
+  }, [codesDict, lowCutoff, highCutoff, yScale]);
 
   const rows = useMemo(() => boxes.map(boxToRow), [boxes, boxToRow]);
   const selectedRow = rows[currSelectedIndex] ?? null;
@@ -113,6 +115,21 @@ function App() {
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, []);
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      const tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+
+      if (e.key === '1') setShowLeftPanel(p => !p);
+      if (e.key === '2') setRightPanel(p => p === 2 ? null : 2);
+      if (e.key === '3') setRightPanel(p => p === 3 ? null : 3);
+      if (e.key === '4') setShowDataset(p => !p);
+    };
+
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [setShowLeftPanel, setRightPanel]);
 
   return (
     <div className='flex flex-col h-screen overflow-hidden' style={{ backgroundColor: theme.background }}>
@@ -183,11 +200,13 @@ function App() {
             >
               <div className='h-2 cursor-ns-resize' onMouseDown={handleDragStart} />
               <div className='px-2 pb-2'>
+                {showDataset && (
                 <DatasetPanel
                   rows={rows}
                   onDeleteRow={(i) => setBoxes(prev => prev.filter((_, idx) => idx !== i))}
                   theme={theme}
                 />
+                )}
               </div>
             </div>
           )}
