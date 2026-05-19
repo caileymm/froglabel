@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import { freqToY, yToFreq } from '../utils/spectrogramScale';
+import { SPECTROGRAM_HEIGHT } from '../utils/spectrogramConfig';
 import moonCursor from '../assets/moon_cursor.png';
 
 const BoundingBoxLayer = ({ 
@@ -11,7 +13,10 @@ const BoundingBoxLayer = ({
     canvasWidth, 
     visibleTime,
     theme,
-    currTool
+    currTool,
+    lowCutoff,
+    highCutoff,
+    yScale
 }) => {
     console.log('currTool:', currTool);
     const [activeBox, setActiveBox] = useState(null);
@@ -55,12 +60,22 @@ const BoundingBoxLayer = ({
         return visibleTime.start + timeOffset;
     };
 
+    // Frequency -> Pixels (Y-axis)
+    const freqToPx = (freq) => {
+        return freqToY(freq, lowCutoff, highCutoff, yScale);
+    };
+
+    // Pixels -> Frequency (Y-axis)
+    const pxToFreq = (px) => {
+        return yToFreq(px, lowCutoff, highCutoff, yScale);
+    };
+
     const toPixels = (box) => ({
         ...box,
         left:   timeToPx(box.startTime),
         width:  timeToPx(box.endTime) - timeToPx(box.startTime),
-        top:    box.top,
-        height: box.height,
+        top:    freqToPx(box.endFreq),
+        height: freqToPx(box.startFreq) - freqToPx(box.endFreq),
     });
 
     const handleMouseDown = (e) => {
@@ -92,10 +107,14 @@ const BoundingBoxLayer = ({
         const y = e.clientY - rect.top;
 
         if (resizeState.current) {
-            const { corner, boxId, startX, startY, originalPx, originalBox } = resizeState.current;
+            const { corner, boxId, startX, startY, originalBox } = resizeState.current;
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
 
+            let { startTime, endTime, startFreq, endFreq } = originalBox;
+
+            // Calculate new pixel positions based on drag
+            const originalPx = toPixels(originalBox);
             let { left, top, width, height } = originalPx;
 
             if (corner === 'tl') { left += dx; top += dy; width -= dx; height -= dy; }
@@ -106,13 +125,24 @@ const BoundingBoxLayer = ({
             width = Math.max(20, width);
             height = Math.max(20, height);
 
-            const startTime = pxToTime(left);
-            const endTime = pxToTime(left + width);
+            // Convert pixel positions back to time/frequency
+            const newStartTime = pxToTime(left);
+            const newEndTime = pxToTime(left + width);
+            const newEndFreq = pxToFreq(top);
+            const newStartFreq = pxToFreq(top + height);
 
-            setDrawingBox?.({ startTime, endTime, top, height, code: originalBox.code });
+            // Update only the affected values based on corner
+            if (corner === 'tl' || corner === 'tr' || corner === 'bl' || corner === 'br') {
+                if (corner === 'tl' || corner === 'bl') startTime = newStartTime;
+                if (corner === 'tr' || corner === 'br') endTime = newEndTime;
+                if (corner === 'tl' || corner === 'tr') endFreq = newEndFreq;
+                if (corner === 'bl' || corner === 'br') startFreq = newStartFreq;
+            }
+
+            setDrawingBox?.({ startTime, endTime, startFreq, endFreq, code: originalBox.code });
             
             setBoxes((prev) => prev.map(b => 
-                b.id === boxId ? { ...originalBox, startTime, endTime, top, height } : b
+                b.id === boxId ? { ...originalBox, startTime, endTime, startFreq, endFreq } : b
             ));
             return;
         }
@@ -126,11 +156,16 @@ const BoundingBoxLayer = ({
         const top    = Math.min(activeBox.startY, y);
         const height = Math.abs(y - activeBox.startY);
         
+        const startTime = pxToTime(left);
+        const endTime = pxToTime(left + width);
+        const endFreq = pxToFreq(top);
+        const startFreq = pxToFreq(top + height);
+        
         setDrawingBox?.({ 
-            startTime: pxToTime(left), 
-            endTime: pxToTime(left + width), 
-            top, 
-            height, 
+            startTime, 
+            endTime, 
+            startFreq,
+            endFreq,
             code 
         });
     };
@@ -155,12 +190,17 @@ const BoundingBoxLayer = ({
             const left = Math.min(activeBox.startX, finalX);
             const top  = Math.min(activeBox.startY, finalY);
 
+            const startTime = pxToTime(left);
+            const endTime = pxToTime(left + width);
+            const endFreq = pxToFreq(top);
+            const startFreq = pxToFreq(top + height);
+
             setBoxes((prev) => [...prev, {
                 id: Date.now(),
-                startTime: pxToTime(left),
-                endTime: pxToTime(left + width),
-                top,
-                height,
+                startTime,
+                endTime,
+                startFreq,
+                endFreq,
                 code,
             }]);
         }

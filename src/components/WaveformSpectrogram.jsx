@@ -215,6 +215,9 @@ function WaveformSpectrogram({
                                 visibleTime={visibleTime}
                                 theme={theme}
                                 currTool={currTool}
+                                lowCutoff={lowCutoff}
+                                highCutoff={highCutoff}
+                                yScale={yScale}
                             />
                         </div>
                     </div>
