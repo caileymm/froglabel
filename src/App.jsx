@@ -138,6 +138,7 @@ function App() {
               duration={duration}
               setVisibleTime={setVisibleTime}
               theme={theme}
+              setDrawingBox={setDrawingBox}
             />
             <BoundingBoxControls
               code={code}
