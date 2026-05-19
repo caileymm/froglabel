@@ -32,6 +32,13 @@ const BoundingBoxLayer = ({
         return () => ro.disconnect();
     }, []);
 
+    // Clear drawing/resizing state when view changes
+    useEffect(() => {
+        setActiveBox(null);
+        setIsDrawing(false);
+        resizeState.current = null;
+    }, [visibleTime]);
+
     const effectiveWidth = canvasWidth > 0 ? canvasWidth : localWidth > 0 ? localWidth : 1;
     const viewDuration = visibleTime.end - visibleTime.start;
 
