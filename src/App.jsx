@@ -67,8 +67,8 @@ function App() {
     if (!box) return null;
     const startTime = box.startTime;
     const endTime = box.endTime;
-    const startFreq = yToFreq(box.top + box.height, lowCutoff, highCutoff, yScale);
-    const endFreq = yToFreq(box.top, lowCutoff, highCutoff, yScale);
+    const startFreq = box.startFreq;
+    const endFreq = box.endFreq;
     return {
       ...box,
       name:      codesDict[box.code] ?? '—',
@@ -77,9 +77,9 @@ function App() {
       duration:  (endTime - startTime).toFixed(3),
       startFreq: Math.round(startFreq),
       endFreq:   Math.round(endFreq),
-      bandwidth: Math.round(endFreq - startFreq),
+      bandwidth: Math.round(startFreq - endFreq),
     };
-  }, [codesDict, lowCutoff, highCutoff, yScale]);
+  }, [codesDict]);
 
   const rows = useMemo(() => boxes.map(boxToRow), [boxes, boxToRow]);
   const selectedRow = rows[currSelectedIndex] ?? null;
