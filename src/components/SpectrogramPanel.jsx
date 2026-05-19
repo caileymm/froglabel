@@ -64,7 +64,7 @@ function SpectrogramPanel({ theme }) {
             <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-sm font-display px-2 rounded-md w-6 flex items-center justify-center'>3</div>
 
             <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
-                FFT
+                FFT Sample Rate
                 <div className='flex gap-1'>
                     <button
                         onClick={() => setFFTSamples(512)}
@@ -97,6 +97,52 @@ function SpectrogramPanel({ theme }) {
                         onMouseLeave={(e) => !(FFTSamples==4096)&& (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-1.5 py-2 text-xs rounded-md font-display cursor-pointer'>
                         4096
+                    </button>
+                </div>
+            </div>
+
+            <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
+                Y Scale 
+                <div className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
+                    <button
+                        onClick={() => setYScale('mel')}
+                        style={{ backgroundColor: (FFTSamples==512) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(FFTSamples==512) && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(FFTSamples==512) && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
+                        MEL
+                    </button>
+                    <button
+                        onClick={() => setYScale('linear')}
+                        style={{ backgroundColor: (FFTSamples==1024) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(FFTSamples==1024) && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(FFTSamples==1024) && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
+                        LINEAR
+                    </button>
+                    <button
+                        onClick={() => setYScale('logarithmic')}
+                        style={{ backgroundColor: (FFTSamples==2048) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(FFTSamples==2048)&& (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(FFTSamples==2048) && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
+                        LOG
+                    </button>
+                    <button
+                        onClick={() => setYScale('bark')}
+                        style={{ backgroundColor: (FFTSamples==4096) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(FFTSamples==4096) && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(FFTSamples==4096)&& (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
+                        BARK
+                    </button>
+                    <button
+                        onClick={() => setYScale('erb')}
+                        style={{ backgroundColor: (FFTSamples==4096) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(FFTSamples==4096) && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(FFTSamples==4096)&& (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
+                        ERB
                     </button>
                 </div>
             </div>
