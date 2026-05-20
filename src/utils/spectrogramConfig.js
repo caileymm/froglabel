@@ -1,5 +1,5 @@
 export const WAVEFORM_HEIGHT = 50;
-export const SPECTROGRAM_HEIGHT = 425;
+export const SPECTROGRAM_HEIGHT = 490;
 export const SCALE = 'mel';
 export const FREQUENCY_MIN = 0;
 export const FREQUENCY_MAX = 20000;

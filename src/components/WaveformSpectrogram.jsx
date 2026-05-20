@@ -149,7 +149,7 @@ function WaveformSpectrogram({
     };
     
     return (
-        <div style={{ backgroundColor: theme.panels }} className="p-6 rounded-xl my-2 overflow-hidden">
+        <div style={{ backgroundColor: theme.panels }} className="flex-1 min-h-0 p-6 pb-2 rounded-xl my-2 overflow-auto">
             <div className="flex">
 
                 {/* Frequency Labels */}
