@@ -7,12 +7,15 @@ import moonBlack from '../assets/moon_black.png';
 import moonWhite from '../assets/moon_white.png';
 import { usePanels } from './PanelContext';
 
-function Tools({ currTool, setCurrTool, theme, frogTheme }) {
+function Tools({ theme, frogTheme }) {
     const [isTPressed, setIsTPressed] = useState(false);
-    const { showLeftPanel, setShowLeftPanel, rightPanel, setRightPanel, showDataset, setShowDataset} = usePanels();
+    const { showLeftPanel, setShowLeftPanel, rightPanel, setRightPanel, showDataset, setShowDataset, currTool, setCurrTool} = usePanels();
+    const currToolRef = useRef(currTool);
+    useEffect(() => { currToolRef.current = currTool; }, [currTool]);
 
     const handleChangeToTool1 = () => {
         setCurrTool(0); // Default cursor
+        setShowLeftPanel(prev => !prev);
     };
 
     const handleChangeToTool2 = () => {
@@ -29,23 +32,24 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
         setShowDataset(prev => !prev); // Toggle DatasetPanel
     };
 
-    const handleChangeTool = useCallback(() => {
-        // Cycle through tools: 0 → 1 → 3 → 0
-        let nextTool;
-        if (currTool === 0) nextTool = 1;
-        else if (currTool === 1) nextTool = 3;
-        else nextTool = 0;
+const handleChangeTool = useCallback(() => {
+    const curr = currToolRef.current;
+    let nextTool;
+    if (curr === null) nextTool = 0;
+    else if (curr === 0) nextTool = 1;
+    else if (curr === 1) nextTool = 3;
+    else nextTool = null;
 
-        // Close current tool's panel if applicable
-        if (currTool === 1) setRightPanel(null);
-        else if (currTool === 3) setRightPanel(null);
+    if (curr === 0) setShowLeftPanel(null);
+    else if (curr === 1) setRightPanel(null);
+    else if (curr === 3) setRightPanel(null);
 
-        // Open next tool's panel if applicable
-        if (nextTool === 1) setRightPanel(prev => prev === 2 ? null : 2);
-        else if (nextTool === 3) setRightPanel(prev => prev === 3 ? null : 3);
+    if (nextTool === 0) setShowLeftPanel(1);
+    else if (nextTool === 1) setRightPanel(2);
+    else if (nextTool === 3) setRightPanel(3);
 
-        setCurrTool(nextTool);
-    }, [currTool]);
+    setCurrTool(nextTool);
+}, []);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -55,6 +59,10 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
                 setIsTPressed(true);
                 handleChangeTool();
             }
+            if (e.key === '1') handleChangeToTool1();
+            if (e.key === '2') handleChangeToTool2();
+            if (e.key === '3') handleChangeToTool3();
+            if (e.key === '4') handleChangeToTool4();
         };
         const handleKeyUp = (e) => {
             if (e.key.toUpperCase() === 'T') setIsTPressed(false);
@@ -66,6 +74,13 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
             window.removeEventListener('keyup', handleKeyUp);
         };
     }, [handleChangeTool]);
+
+    
+    useEffect(() => {
+    if (rightPanel === null && !showLeftPanel && currTool !== null) {
+        setCurrTool(null);
+    }
+}, [rightPanel, showLeftPanel]);
 
     return (
         <div style={{ backgroundColor: theme.panels }} className='py-2 rounded-xl flex items-center justify-center gap-2 w-70 mx-auto'>
@@ -80,23 +95,23 @@ function Tools({ currTool, setCurrTool, theme, frogTheme }) {
             </button>
             <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1'>
                 <button onClick={handleChangeToTool1}
-                    style={{ backgroundColor: currTool === 0 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                    onMouseEnter={(e) => currTool !== 0 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                    onMouseLeave={(e) => currTool !== 0 && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                    style={{ backgroundColor: showLeftPanel ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                    onMouseEnter={(e) => !showLeftPanel && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                    onMouseLeave={(e) => !showLeftPanel && (e.currentTarget.style.backgroundColor = theme.buttons)}
                     className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
                     <img src={frogTheme ? defaultBlack : defaultWhite} className='w-4 h-4' />
                 </button>
                 <button onClick={handleChangeToTool2}
-                    style={{ backgroundColor: currTool === 1 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                    onMouseEnter={(e) => currTool !== 1 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                    onMouseLeave={(e) => currTool !== 1 && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                    style={{ backgroundColor: rightPanel === 2 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                    onMouseEnter={(e) => rightPanel !== 2 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                    onMouseLeave={(e) => rightPanel !== 2 && (e.currentTarget.style.backgroundColor = theme.buttons)}
                     className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
                     <img src={frogTheme ? crosshairBlack : crosshairWhite} className='w-4 h-4' />
                 </button>
                 <button onClick={handleChangeToTool3}
-                    style={{ backgroundColor: currTool === 3 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                    onMouseEnter={(e) => currTool !== 3 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                    onMouseLeave={(e) => currTool !== 3 && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                    style={{ backgroundColor: rightPanel === 3 ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                    onMouseEnter={(e) => rightPanel !== 3 && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                    onMouseLeave={(e) => rightPanel !== 3 && (e.currentTarget.style.backgroundColor = theme.buttons)}
                     className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
                     <img src={frogTheme ? moonBlack : moonWhite} className='w-4 h-4' />
                 </button>

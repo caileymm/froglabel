@@ -47,7 +47,7 @@ function WaveformSpectrogram({
 
     const generateFreqLabels = (minFreq, maxFreq, numLabels = 10) => {
         return Array.from({ length: numLabels }, (_, i) => {
-            // evenly spaced Y positions from top (0) to bottom (spectroHeight)
+            // evenly spaced Y positions from bottom (0) to top (spectroHeight)
             const y = (i / (numLabels - 1)) * spectroHeight;
             return Math.round(yToFreq(y, Math.max(minFreq, 1), maxFreq, yScale));
         });
@@ -127,6 +127,8 @@ function WaveformSpectrogram({
             wavesurferRef.current = ws;
         });
 
+        console.log(yScale);
+
         return () => {
             cancelled = true;
             ro.disconnect();
@@ -135,11 +137,12 @@ function WaveformSpectrogram({
             }
             wavesurferRef.current = null;
         };
+
         
-    }, [setDuration, selectedAudio, colorScale, FFTSamples, modifyBandPass, windowFunction, overlap]);
+    }, [setDuration, selectedAudio, colorScale, FFTSamples, modifyBandPass, windowFunction, overlap, yScale]);
 
     const cursorMap = (tool) => {
-        if (tool === 0) return 'auto';
+        if (tool === 0 ) return 'auto';
         if (tool === 1) return 'crosshair';
         if (tool === 2) return 'auto';
         if (tool === 3) return `url(${moonCursor}), auto`;

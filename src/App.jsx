@@ -116,20 +116,6 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    const handleKey = (e) => {
-      const tag = e.target.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
-
-      if (e.key === '1') setShowLeftPanel(p => !p);
-      if (e.key === '2') setRightPanel(p => p === 2 ? null : 2);
-      if (e.key === '3') setRightPanel(p => p === 3 ? null : 3);
-      if (e.key === '4') setShowDataset(p => !p);
-    };
-
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [setShowLeftPanel, setRightPanel]);
 
   return (
     <div className='flex flex-col h-screen overflow-hidden' style={{ backgroundColor: theme.background }}>
@@ -186,8 +172,6 @@ function App() {
               currTool={currTool}
             />
             <Tools
-              currTool={currTool}
-              setCurrTool={setCurrTool}
               theme={theme}
               frogTheme={frogTheme}
             />

@@ -5,7 +5,7 @@ import { SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES } from "../utils/spect
 const PanelContext = createContext(null);
 
 export function PanelProvider({ children }) {
-  const [currTool,      setCurrTool] = useState(0);
+  const [currTool,      setCurrTool] = useState(null);
   const [showLeftPanel, setShowLeftPanel] = useState(false);
   const [rightPanel,    setRightPanel] = useState(null);
   const [showDataset,   setShowDataset] = useState(false);
@@ -20,7 +20,7 @@ export function PanelProvider({ children }) {
   const [minFreq,       setMinFreq] = useState(FREQUENCY_MIN);
   const [maxFreq,       setMaxFreq] = useState(FREQUENCY_MAX);
   const [modifyBandPass,setModifyBandPass] = useState(false);
-  const [lowCutoff,     setLowCutoff] = useState(0);
+  const [lowCutoff,     setLowCutoff] = useState(1);
   const [highCutoff,    setHighCutoff] = useState(0); 
   const [sampleRate,    setSampleRate] = useState(null);
 
@@ -64,6 +64,7 @@ export function PanelProvider({ children }) {
       modifyBandPass,setModifyBandPass,
       maxFreq,       setMaxFreq,
       sampleRate,    setSampleRate,
+      yScale,        setYScale,
       handleSpectroMouseDown,
       handleSpectroMouseMove,
       handleSpectroMouseUp,
