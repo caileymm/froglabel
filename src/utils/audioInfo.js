@@ -1,5 +1,9 @@
 export async function getAudioInfo(audioSrc) {
-  const r = await fetch(audioSrc);
+  const headers = {
+    Authorization: `Token ${import.meta.env.VITE_LS_TOKEN}`,
+  };
+  
+  const r = await fetch(audioSrc, { headers });
   const buf = await r.arrayBuffer();
   const bytes = new Uint8Array(buf);
 
