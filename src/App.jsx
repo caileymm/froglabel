@@ -148,6 +148,9 @@ function App() {
       const next = await getNextTask();
       if (!next || !next.data) {
         console.error('No next task or task data received');
+        setCurrentTask(null); // Show "no more tasks" overlay
+        setSelectedAudio(null);
+        setAudioFilename(null);
         return;
       }
       setCurrentTask(next);
