@@ -69,6 +69,22 @@ function WaveformSpectrogram({
         let ws = null;
         let cancelled = false;
 
+        // Fetch audio with auth headers and convert to blob URL
+        const fetchAudioBlob = async () => {
+          try {
+            const response = await fetch(selectedAudio, {
+              headers: {
+                Authorization: `Token ${import.meta.env.VITE_LS_TOKEN}`,
+              },
+            });
+            if (!response.ok) throw new Error(`Failed to fetch audio: ${response.status}`);
+            const blob = await response.blob();
+            return URL.createObjectURL(blob);
+          } catch (error) {
+            console.error('Error fetching audio:', error);
+            return null;
+          }
+        };
 
         getAudioInfo(selectedAudio).then(({ sampleRate, maxFrequency }) => {
             if (cancelled) return;
@@ -93,38 +109,42 @@ function WaveformSpectrogram({
                             noverlap : overlap,
             })
 
-            ws = WaveSurfer.create({
-                container: containerRef.current,
-                height: WAVEFORM_HEIGHT,
-                barHeight: 3,
-                url: selectedAudio,
-                //minPxPerSec: 0,
-                fillParent: true,
-                autoCenter: false,
-                hideScrollbar: true,
-                waveColor: theme.waveform,
-                cursorColor: theme.cursor,
-                progressColor: theme.progress,
-                cursorWidth: 3,
-                sampleRate: sampleRate,
-                dragToSeek: true,
-                plugins: [
-                   spectroPlugin,
-                    TimelinePlugin.create({
-                        style: { fontSize: '12px', color: theme.text, fontFamily: 'Afacad, sans-serif' },
-                        formatTimeCallback: (seconds) => `${seconds.toFixed(1)} s`,
-                    }),
-                ],
-            });
-             setModifyBandPass(false); 
+            fetchAudioBlob().then((blobUrl) => {
+              if (!blobUrl || cancelled) return;
+              
+              ws = WaveSurfer.create({
+                  container: containerRef.current,
+                  height: WAVEFORM_HEIGHT,
+                  barHeight: 3,
+                  url: blobUrl,
+                  //minPxPerSec: 0,
+                  fillParent: true,
+                  autoCenter: false,
+                  hideScrollbar: true,
+                  waveColor: theme.waveform,
+                  cursorColor: theme.cursor,
+                  progressColor: theme.progress,
+                  cursorWidth: 3,
+                  sampleRate: sampleRate,
+                  dragToSeek: true,
+                  plugins: [
+                     spectroPlugin,
+                      TimelinePlugin.create({
+                          style: { fontSize: '12px', color: theme.text, fontFamily: 'Afacad, sans-serif' },
+                          formatTimeCallback: (seconds) => `${seconds.toFixed(1)} s`,
+                      }),
+                  ],
+              });
+               setModifyBandPass(false); 
 
-            ws.on('ready', () => {
-                const totalDur = ws.getDuration();
-                setDuration(totalDur);
-                setVisibleTime({ start: 0, end: totalDur });
-            });
+              ws.on('ready', () => {
+                  const totalDur = ws.getDuration();
+                  setDuration(totalDur);
+                  setVisibleTime({ start: 0, end: totalDur });
+              });
 
-            wavesurferRef.current = ws;
+              wavesurferRef.current = ws;
+            });
         });
 
         console.log(yScale);
@@ -157,7 +177,7 @@ function WaveformSpectrogram({
                     className="relative shrink-0 w-11 items-end pr-1"
                     style={{ marginTop: spectroTop, height: spectroHeight }}
                 >
-                    {localSampleRate && lowCutoff != null && highCutoff != null
+                    {localSampleRate && lowCutoff != null && highCutoff != null && highCutoff > 0
                         ? FREQ_LABELS.map((freq) => (
                             <span
                                 key={freq}
@@ -215,6 +235,9 @@ function WaveformSpectrogram({
                                 visibleTime={visibleTime}
                                 theme={theme}
                                 currTool={currTool}
+                                lowCutoff={lowCutoff}
+                                highCutoff={highCutoff}
+                                yScale={yScale}
                             />
                         </div>
                     </div>

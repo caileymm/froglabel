@@ -4,14 +4,14 @@ import { usePanels } from './PanelContext';
 
 
 
-function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme }) {
+function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme, setDrawingBox }) {
   const [isVPressed, setIsVPressed] = useState(false);
   const [isAPressed, setIsAPressed] = useState(false);
   const [isDPressed, setIsDPressed] = useState(false);
   const [isQPressed, setIsQPressed] = useState(false);
   const [isEPressed, setIsEPressed] = useState(false);
-  const [isWPressed, setIsWPressed] = useState(false);
-  const [isRPressed, setIsRPressed] = useState(false);
+  // const [isWPressed, setIsWPressed] = useState(false);
+  // const [isRPressed, setIsRPressed] = useState(false);
   const [isCPressed, setIsCPressed] = useState(false);
   const [isPlaying, setPlaying] = useState(false);
   const [wsZoom, setWsZoom] = useState(0);
@@ -32,7 +32,12 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme 
   const updateVisibleTime = useCallback((currentZoom) => {
     const ws = wavesurferRef.current;
     const container = getWsScrollContainer();
-    if (!container || !currentZoom) return;
+    if (!container || currentZoom === null || currentZoom === undefined) return;
+    if (currentZoom === 0) {
+      // When zoom is 0, show full duration
+      setVisibleTime({ start: 0, end: duration });
+      return;
+    }
     const start = container.scrollLeft / currentZoom;
     let end = (container.scrollLeft + container.clientWidth) / currentZoom;
     if (end > duration) end = duration;
@@ -57,6 +62,7 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme 
     requestAnimationFrame(() => updateVisibleTime(newZoom));
   }, [wsZoom, duration, updateVisibleTime]);
 
+  /*
   const handleFreqZoomIn = useCallback(()  => {
     const center = (lowCutoff + highCutoff) / 2;
     const newRange = (highCutoff - lowCutoff) / 1.5;
@@ -70,7 +76,7 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme 
       setLowCutoff(Math.max(0, center - newRange / 2));
       setHighCutoff(Math.min(maxFreq, center + newRange / 2));
   }, [lowCutoff, highCutoff, maxFreq]);
-
+  */
 
   const handlePanLeft = useCallback(() => {
     const container = getWsScrollContainer();
@@ -94,8 +100,9 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme 
     const newZoom = 0;
     ws.zoom(newZoom);
     setWsZoom(newZoom);
+    setDrawingBox?.(null);
     requestAnimationFrame(() => updateVisibleTime(newZoom))
-  }, [updateVisibleTime]);
+  }, [updateVisibleTime, setDrawingBox]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {

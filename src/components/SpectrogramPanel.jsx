@@ -65,7 +65,7 @@ function SpectrogramPanel({ theme }) {
             <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-sm font-display px-2 rounded-md w-6 flex items-center justify-center'>3</div>
 
             <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
-                FFT Sample Rate
+                <span style={{ color: theme.text }}>FFT Sample Rate</span>
                 <div className='flex gap-1'>
                     <button
                         onClick={() => setFFTSamples(512)}
@@ -103,15 +103,15 @@ function SpectrogramPanel({ theme }) {
             </div>
 
             <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
-                Y Scale 
-                <div className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
+                <span style={{ color: theme.text }}>Y Scale</span>
+                <div className='flex flex-col gap-1'>
                     <button
                         onClick={() => handleYScaleChange('mel')}
                         style={{ backgroundColor: (yScale === 'mel') ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
                         onMouseEnter={(e) => !(yScale === 'mel') && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
                         onMouseLeave={(e) => !(yScale === 'mel') && (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
-                        MEL
+                        Mel
                     </button>
                     <button
                         onClick={() => handleYScaleChange('linear')}
@@ -119,7 +119,7 @@ function SpectrogramPanel({ theme }) {
                         onMouseEnter={(e) => !(yScale === 'linear') && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
                         onMouseLeave={(e) => !(yScale === 'linear') && (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
-                        LINEAR
+                        Linear
                     </button>
                     <button
                         onClick={() => handleYScaleChange('logarithmic')}
@@ -127,7 +127,7 @@ function SpectrogramPanel({ theme }) {
                         onMouseEnter={(e) => !(yScale === 'logarithmic')&& (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
                         onMouseLeave={(e) => !(yScale === 'logarithmic') && (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
-                        LOG
+                        Log
                     </button>
                     <button
                         onClick={() => handleYScaleChange('bark')}
@@ -135,7 +135,7 @@ function SpectrogramPanel({ theme }) {
                         onMouseEnter={(e) => !(yScale === 'bark') && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
                         onMouseLeave={(e) => !(yScale ==='bark')&& (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
-                        BARK
+                        Bark
                     </button>
                     <button
                         onClick={() => handleYScaleChange('erb')}
@@ -143,7 +143,7 @@ function SpectrogramPanel({ theme }) {
                         onMouseEnter={(e) => !(yScale === 'erb') && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
                         onMouseLeave={(e) => !(yScale === 'erb')&& (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
-                        ERB
+                        Erb
                     </button>
                 </div>
             </div>
@@ -152,7 +152,7 @@ function SpectrogramPanel({ theme }) {
                 style={{ backgroundColor: theme.group, color: theme.text }}
                 className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'
             >
-                Window Function
+                <span style={{ color: theme.text }}>Window Function</span>
 
                 <div className='flex flex-col gap-1'>
                     <button
@@ -357,8 +357,8 @@ function SpectrogramPanel({ theme }) {
                 {/* Overlap */}
                 <div className='flex flex-col gap-1'>
                     <div className='flex justify-between items-center'>
-                        <span className='text-sm'>Overlap</span>
-                        <span className='text-sm'>
+                        <span className='text-sm' style={{ color: theme.text }}>Overlap</span>
+                        <span className='text-sm' style={{ color: theme.text }}>
                             {overlap} %
                         </span>
                     </div>
@@ -371,6 +371,7 @@ function SpectrogramPanel({ theme }) {
                         value={overlap} 
                         onChange={e => setOverlap( e.target.value)}
                         className='w-full cursor-pointer'
+                        style={{ accentColor: theme.buttonsPressed }}
                     />
             </div>
             </div>
@@ -384,8 +385,8 @@ function SpectrogramPanel({ theme }) {
                 {/* Brightness */}
                 <div className='flex flex-col gap-1'>
                     <div className='flex justify-between items-center'>
-                        <span className='text-sm'>Brightness</span>
-                        <span className='text-sm'>
+                        <span className='text-sm' style={{ color: theme.text }}>Brightness</span>
+                        <span className='text-sm' style={{ color: theme.text }}>
                             {typeof brightness === 'number'
                                 ? brightness.toFixed(2)
                                 : brightness}
@@ -400,14 +401,15 @@ function SpectrogramPanel({ theme }) {
                         value={brightness}
                         onChange={e => setBrightness(parseFloat(e.target.value))}
                         className='w-full cursor-pointer'
+                        style={{ accentColor: theme.buttonsPressed }}
                     />
                 </div>
 
                 {/* Contrast */}
                 <div className='flex flex-col gap-1'>
                     <div className='flex justify-between items-center'>
-                        <span className='text-sm'>Contrast</span>
-                        <span className='text-sm'>
+                        <span className='text-sm' style={{ color: theme.text }}>Contrast</span>
+                        <span className='text-sm' style={{ color: theme.text }}>
                             {typeof contrast === 'number'
                                 ? contrast.toFixed(2)
                                 : contrast}
@@ -422,6 +424,7 @@ function SpectrogramPanel({ theme }) {
                         value={contrast}
                         onChange={e => setContrast(parseFloat(e.target.value))}
                         className='w-full cursor-pointer'
+                        style={{ accentColor: theme.buttonsPressed }}
                     />
 
                 </div>
@@ -448,13 +451,13 @@ function SpectrogramPanel({ theme }) {
                 style={{ backgroundColor: theme.group, color: theme.text }}
                 className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-3'
             >
-                <span className={headerClass}>Band-Pass Filter</span>
+                <span className={headerClass} style={{ color: theme.text }}>Band-Pass Filter</span>
 
                 {/* Low Cutoff */}
                 <div className='flex flex-col gap-1'>
                     <div className='flex justify-between items-center'>
-                        <span className='text-sm'>Low Cutoff</span>
-                        <span className='text-sm'>{pendingLow} Hz</span>
+                        <span className='text-sm' style={{ color: theme.text }}>Low Cutoff</span>
+                        <span className='text-sm' style={{ color: theme.text }}>{pendingLow} Hz</span>
                     </div>
                     <input
                         type='range'
@@ -464,14 +467,15 @@ function SpectrogramPanel({ theme }) {
                         value={pendingLow}
                         onChange={(e) => setPendingLow(Number(e.target.value))}
                         className='w-full cursor-pointer'
+                        style={{ accentColor: theme.buttonsPressed }}
                     />
                 </div>
 
                 {/* High Cutoff */}
                 <div className='flex flex-col gap-1'>
                     <div className='flex justify-between items-center'>
-                        <span className='text-sm'>High Cutoff</span>
-                        <span className='text-sm'>{pendingHigh} Hz</span>
+                        <span className='text-sm' style={{ color: theme.text }}>High Cutoff</span>
+                        <span className='text-sm' style={{ color: theme.text }}>{pendingHigh} Hz</span>
                     </div>
                     <input
                         type='range'
@@ -481,6 +485,7 @@ function SpectrogramPanel({ theme }) {
                         value={pendingHigh}
                         onChange={(e) => setPendingHigh(Number(e.target.value))}
                         className='w-full cursor-pointer'
+                        style={{ accentColor: theme.buttonsPressed }}
                     />
                 </div>
                 <div className="flex gap-2 mt-1">
@@ -506,7 +511,7 @@ function SpectrogramPanel({ theme }) {
             </div>
 
             <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
-                Color Scale & dBFS
+                <span style={{ color: theme.text }}>Color Scale & dBFS</span>
                 <div className='flex flex-col gap-2'>
                     <div className='flex flex-col gap-1'>
                         <span className={headerClass} style={{ color: theme.text }}>Color Scale</span>

@@ -50,3 +50,5 @@ coverage/
 *.mp4
 *.ogg
 *.flacdist
+
+.env

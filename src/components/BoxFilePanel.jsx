@@ -1,16 +1,7 @@
-import greenAudio from '../assets/green_tree.mp3';
-import peronsAudio from '../assets/perons_tree.mp3';
-import redEyedAudio from '../assets/red_eyed_tree.mp3';
 import { getAudioInfo } from '../utils/audioInfo';
 import { useEffect, useState } from 'react';
 
-const audioFiles = [
-    { filename: 'green_tree.mp3', audio: greenAudio },
-    { filename: 'perons_tree.mp3', audio: peronsAudio },
-    { filename: 'red_eyed_tree.mp3', audio: redEyedAudio },
-];
-
-function BoxFilePanel({ selectedRow, drawingRow, selectedAudio, setSelectedAudio, theme }) {
+function BoxFilePanel({ selectedRow, drawingRow, selectedAudio, audioFilename, theme }) {
     const box = drawingRow ?? selectedRow;
 
     const label     = box?.code      ?? '—';
@@ -61,19 +52,8 @@ function BoxFilePanel({ selectedRow, drawingRow, selectedAudio, setSelectedAudio
             <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
                 File Details
                 <div className='flex flex-col gap-1'>
-                    <span style={{ color: theme.text }} className='font-display text-sm'>Select Audio</span>
-                    {audioFiles.map(({ filename, audio }) => (
-                        <div
-                            key={filename}
-                            onClick={() => setSelectedAudio(audio)}
-                            className='flex flex-row items-center gap-2 cursor-pointer'
-                        >
-                            <div style={{ borderColor: theme.keyButtons }} className='w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0'>
-                                {selectedAudio === audio && <div style={{ backgroundColor: theme.keyButtons }} className='w-2 h-2 rounded-full' />}
-                            </div>
-                            <span style={{ backgroundColor: theme.cream, color: theme.textInputText }} className='rounded-sm px-2 py-0.5 font-display text-sm inline-block self-start'>{filename}</span>
-                        </div>
-                    ))}
+                    <span style={{ color: theme.text }} className='font-display text-sm'>Filename</span>
+                    <span style={{ backgroundColor: theme.cream, color: theme.textInputText }} className='rounded-sm px-2 py-0.5 font-display text-sm inline-block self-start'>{audioFilename ?? '—'}</span>
                     <div className='flex flex-col'>
                         <span style={{ color: theme.text }} className='font-display text-sm'>Sample Rate</span>
                         <div className='flex flex-row items-center gap-1'>

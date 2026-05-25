@@ -10,17 +10,16 @@ import DatasetPanel from './components/DatasetPanel'
 import BoxFilePanel from './components/BoxFilePanel'
 import SpectrogramPanel from './components/SpectrogramPanel'
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
-import { yToFreq } from './utils/spectrogramScale'
 import { defaultColors, frogThemeColors } from './utils/theme'
-import greenAudio from './assets/green_tree.mp3';
-import peronsAudio from './assets/perons_tree.mp3';
-import redEyedAudio from './assets/red_eyed_tree.mp3';
+import { getNextTask, submitAnnotation } from './api/labelStudio';
 
 function App() {
+  const [currentTask, setCurrentTask] = useState(null);
   const [frogTheme, setFrogTheme] = useState(false)
   const theme = frogTheme ? frogThemeColors : defaultColors;
 
-  const [selectedAudio, setSelectedAudio] = useState(greenAudio)
+  const [selectedAudio, setSelectedAudio] = useState(null)
+  const [audioFilename, setAudioFilename] = useState(null)
   const {sampleRate, setSampleRate} = usePanels();
   const {currTool, setCurrTool} = usePanels();
   const {lowCutoff, highCutoff} = usePanels();
@@ -67,8 +66,8 @@ function App() {
     if (!box) return null;
     const startTime = box.startTime;
     const endTime = box.endTime;
-    const startFreq = yToFreq(box.top + box.height, lowCutoff, highCutoff, yScale);
-    const endFreq = yToFreq(box.top, lowCutoff, highCutoff, yScale);
+    const startFreq = box.startFreq;
+    const endFreq = box.endFreq;
     return {
       ...box,
       name:      codesDict[box.code] ?? '—',
@@ -77,9 +76,9 @@ function App() {
       duration:  (endTime - startTime).toFixed(3),
       startFreq: Math.round(startFreq),
       endFreq:   Math.round(endFreq),
-      bandwidth: Math.round(endFreq - startFreq),
+      bandwidth: Math.round(startFreq - endFreq),
     };
-  }, [codesDict, lowCutoff, highCutoff, yScale]);
+  }, [codesDict]);
 
   const rows = useMemo(() => boxes.map(boxToRow), [boxes, boxToRow]);
   const selectedRow = rows[currSelectedIndex] ?? null;
@@ -116,11 +115,71 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    getNextTask()
+      .then((task) => {
+        if (!task || !task.data) {
+          console.error('No task or task data received');
+          return;
+        }
+        setCurrentTask(task);
+        
+        // Get the audio file from task data
+        // Label Studio stores the audio path in the first data property
+        const audioPath = Object.values(task.data)[0];
+        if (audioPath) {
+          const fullAudioUrl = `${import.meta.env.VITE_LS_URL}${audioPath}`;
+          const filename = audioPath.split('/').pop(); // Extract filename from path
+          setSelectedAudio(fullAudioUrl);
+          setAudioFilename(filename);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching task:', error);
+      });
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!currentTask) return;
+    try {
+      await submitAnnotation(currentTask.id, boxes);
+      setBoxes([]); // clear boxes
+      // load next task
+      const next = await getNextTask();
+      if (!next || !next.data) {
+        console.error('No next task or task data received');
+        setCurrentTask(null); // Show "no more tasks" overlay
+        setSelectedAudio(null);
+        setAudioFilename(null);
+        return;
+      }
+      setCurrentTask(next);
+      const audioPath = Object.values(next.data)[0];
+      if (audioPath) {
+        const fullAudioUrl = `${import.meta.env.VITE_LS_URL}${audioPath}`;
+        const filename = audioPath.split('/').pop();
+        setSelectedAudio(fullAudioUrl);
+        setAudioFilename(filename);
+      }
+    } catch (error) {
+      console.error('Error submitting annotation:', error);
+    }
+  };
 
   return (
     <div className='flex flex-col h-screen overflow-hidden' style={{ backgroundColor: theme.background }}>
-      <Header frogTheme={frogTheme} setFrogTheme={setFrogTheme} theme={theme} />
+      <Header frogTheme={frogTheme} setFrogTheme={setFrogTheme} theme={theme} onSubmit={handleSubmit} />
 
+      {!currentTask && (
+        <div className='flex-1 flex items-center justify-center'>
+          <div className='text-center'>
+            <p style={{ color: theme.text }} className='font-display text-2xl mb-4'>No Tasks Available</p>
+            <p style={{ color: theme.text }} className='font-display text-sm'>All tasks have been completed or there are no tasks to annotate at this time.</p>
+          </div>
+        </div>
+      )}
+
+      {currentTask && (
       <div className='flex gap-2 px-2 py-2 flex-1 min-h-0 overflow-hidden items-stretch'>
 
         {showLeftPanel && (
@@ -138,6 +197,7 @@ function App() {
               duration={duration}
               setVisibleTime={setVisibleTime}
               theme={theme}
+              setDrawingBox={setDrawingBox}
             />
             <BoundingBoxControls
               code={code}
@@ -204,6 +264,7 @@ function App() {
                 drawingRow={drawingRow}
                 selectedAudio={selectedAudio}
                 setSelectedAudio={setSelectedAudio}
+                audioFilename={audioFilename}
                 theme={theme}
               />
             )}
@@ -212,6 +273,8 @@ function App() {
         )}
 
       </div>
+      )}
+
     </div>
   );
 }
