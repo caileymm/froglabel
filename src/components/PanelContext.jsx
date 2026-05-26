@@ -23,6 +23,7 @@ export function PanelProvider({ children }) {
   const [lowCutoff,     setLowCutoff] = useState(1);
   const [highCutoff,    setHighCutoff] = useState(0); 
   const [sampleRate,    setSampleRate] = useState(null);
+  
 
 
   const isDragging = useRef(false);

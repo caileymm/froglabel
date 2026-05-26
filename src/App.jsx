@@ -11,7 +11,10 @@ import BoxFilePanel from './components/BoxFilePanel'
 import SpectrogramPanel from './components/SpectrogramPanel'
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { defaultColors, frogThemeColors } from './utils/theme'
+
+// NEW EDITIONS
 import { getNextTask, submitAnnotation } from './api/labelStudio';
+import { boxesToLsResults, lsResultsToBoxes } from './serializer/labelStudioCeResults';
 
 function App() {
   const [currentTask, setCurrentTask] = useState(null);
@@ -42,6 +45,7 @@ function App() {
 
   const [currSelectedBoxId, setCurrSelectedBoxId] = useState(null);
   const currSelectedIndex = boxes.findIndex(b => b.id === currSelectedBoxId);
+  const [annotationId, setAnnotationId] = useState(null);
 
   const [zoomX, setZoomX] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -96,6 +100,33 @@ function App() {
     document.body.style.cursor = 'ns-resize';
   };
 
+
+  // ADD this function before the useEffect block
+const applyTask = useCallback((task) => {
+  if (!task?.data) {
+    setCurrentTask(null);
+    setSelectedAudio(null);
+    setAudioFilename(null);
+    setAnnotationId(null);
+    return;
+  }
+  setCurrentTask(task);
+  const audioPath = Object.values(task.data)[0];
+  if (audioPath) {
+    setSelectedAudio(`${import.meta.env.VITE_LS_URL}${audioPath}`);
+    setAudioFilename(audioPath.split('/').pop());
+  }
+  // Load existing annotation if present
+  const existingAnnotation = task.annotations?.[0];
+  if (existingAnnotation) {
+    setAnnotationId(existingAnnotation.id);
+    setBoxes(lsResultsToBoxes(existingAnnotation.result ?? []));
+  } else {
+    setAnnotationId(null);
+    setBoxes([]);
+  }
+}, []);
+
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isDragging.current) return;
@@ -116,55 +147,21 @@ function App() {
   }, []);
 
   useEffect(() => {
-    getNextTask()
-      .then((task) => {
-        if (!task || !task.data) {
-          console.error('No task or task data received');
-          return;
-        }
-        setCurrentTask(task);
-        
-        // Get the audio file from task data
-        // Label Studio stores the audio path in the first data property
-        const audioPath = Object.values(task.data)[0];
-        if (audioPath) {
-          const fullAudioUrl = `${import.meta.env.VITE_LS_URL}${audioPath}`;
-          const filename = audioPath.split('/').pop(); // Extract filename from path
-          setSelectedAudio(fullAudioUrl);
-          setAudioFilename(filename);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching task:', error);
-      });
-  }, []);
+  getNextTask().then(applyTask).catch((e) => console.error('Error fetching task:', e));
+  }, [applyTask]);
 
   const handleSubmit = async () => {
-    if (!currentTask) return;
-    try {
-      await submitAnnotation(currentTask.id, boxes);
-      setBoxes([]); // clear boxes
-      // load next task
-      const next = await getNextTask();
-      if (!next || !next.data) {
-        console.error('No next task or task data received');
-        setCurrentTask(null); // Show "no more tasks" overlay
-        setSelectedAudio(null);
-        setAudioFilename(null);
-        return;
-      }
-      setCurrentTask(next);
-      const audioPath = Object.values(next.data)[0];
-      if (audioPath) {
-        const fullAudioUrl = `${import.meta.env.VITE_LS_URL}${audioPath}`;
-        const filename = audioPath.split('/').pop();
-        setSelectedAudio(fullAudioUrl);
-        setAudioFilename(filename);
-      }
-    } catch (error) {
-      console.error('Error submitting annotation:', error);
-    }
-  };
+  if (!currentTask) return;
+  try {
+    const results = boxesToLsResults(boxes, duration);
+    await submitAnnotation(currentTask.id, annotationId, results);
+    const next = await getNextTask();
+    applyTask(next);
+  } catch (error) {
+    console.error('Error submitting annotation:', error);
+  }
+};
+
 
   return (
     <div className='flex flex-col h-screen overflow-hidden' style={{ backgroundColor: theme.background }}>
