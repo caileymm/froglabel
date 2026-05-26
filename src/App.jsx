@@ -15,6 +15,8 @@ import { defaultColors, frogThemeColors } from './utils/theme'
 import greenAudio from './assets/green_tree.mp3';
 import peronsAudio from './assets/perons_tree.mp3';
 import redEyedAudio from './assets/red_eyed_tree.mp3';
+import { WAVEFORM_HEIGHT, SPECTROGRAM_HEIGHT, SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES } from "./utils/spectrogramConfig";
+
 
 function App() {
   const [frogTheme, setFrogTheme] = useState(false)
@@ -151,7 +153,7 @@ function App() {
             />
           </div>
 
-          <div className='flex-1 min-h-0 overflow-hidden flex flex-col'>
+          <div className='flex-1 min-h-0 overflow-hidden flex flex-col' style={{ height: WAVEFORM_HEIGHT + SPECTROGRAM_HEIGHT }}>
             <WaveformSpectrogram
               selectedAudio={selectedAudio}
               code={code}

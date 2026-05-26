@@ -27,7 +27,7 @@ function WaveformSpectrogram({
     currTool
 }) {
     const [localSampleRate, setLocalSampleRate] = useState(null);
-    const SPECTROGRAM_HEIGHT = 425;
+    const SPECTROGRAM_HEIGHT = 520;
     
 
     const containerRef = useRef(null);
@@ -149,8 +149,8 @@ function WaveformSpectrogram({
 
 
     return (
-        <div style={{ backgroundColor: theme.panels }} className="p-6 rounded-xl my-2 overflow-hidden">
-            <div className="flex">
+        <div style={{ backgroundColor: theme.panels }} className="p-2 rounded-xl my-1 overflow-hidden" >
+            <div className="flex" >
 
                 {/* Frequency Labels */}
                 <div
