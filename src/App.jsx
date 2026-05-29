@@ -23,6 +23,8 @@ function App() {
   const [selectedAudio, setSelectedAudio] = useState(greenAudio)
   const {sampleRate, setSampleRate} = usePanels();
   const {currTool, setCurrTool} = usePanels();
+  const {lowCutoff, highCutoff} = usePanels();
+  const {yScale} = usePanels();
 
   const [boxes, setBoxes] = useState([]);
   const [code, setCode] = useState('');
@@ -65,8 +67,8 @@ function App() {
     if (!box) return null;
     const startTime = box.startTime;
     const endTime = box.endTime;
-    const startFreq = yToFreq(box.top + box.height, sampleRate);
-    const endFreq = yToFreq(box.top, sampleRate);
+    const startFreq = box.startFreq;
+    const endFreq = box.endFreq;
     return {
       ...box,
       name:      codesDict[box.code] ?? '—',
@@ -75,9 +77,9 @@ function App() {
       duration:  (endTime - startTime).toFixed(3),
       startFreq: Math.round(startFreq),
       endFreq:   Math.round(endFreq),
-      bandwidth: Math.round(endFreq - startFreq),
+      bandwidth: Math.round(startFreq - endFreq),
     };
-  }, [codesDict, sampleRate]);
+  }, [codesDict]);
 
   const rows = useMemo(() => boxes.map(boxToRow), [boxes, boxToRow]);
   const selectedRow = rows[currSelectedIndex] ?? null;
@@ -114,6 +116,21 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleKey = (e) => {
+      const tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+
+      if (e.key === '1') setShowLeftPanel(p => !p);
+      if (e.key === '2') setRightPanel(p => p === 2 ? null : 2);
+      if (e.key === '3') setRightPanel(p => p === 3 ? null : 3);
+      if (e.key === '4') setShowDataset(p => !p);
+    };
+
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [setShowLeftPanel, setRightPanel]);
+
   return (
     <div className='flex flex-col h-screen overflow-hidden' style={{ backgroundColor: theme.background }}>
       <Header frogTheme={frogTheme} setFrogTheme={setFrogTheme} theme={theme} />
@@ -135,6 +152,7 @@ function App() {
               duration={duration}
               setVisibleTime={setVisibleTime}
               theme={theme}
+              setDrawingBox={setDrawingBox}
             />
             <BoundingBoxControls
               code={code}
@@ -183,11 +201,13 @@ function App() {
             >
               <div className='h-2 cursor-ns-resize' onMouseDown={handleDragStart} />
               <div className='px-2 pb-2'>
+                {showDataset && (
                 <DatasetPanel
                   rows={rows}
                   onDeleteRow={(i) => setBoxes(prev => prev.filter((_, idx) => idx !== i))}
                   theme={theme}
                 />
+                )}
               </div>
             </div>
           )}
