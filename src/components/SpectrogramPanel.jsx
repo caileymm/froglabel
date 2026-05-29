@@ -17,6 +17,7 @@ function SpectrogramPanel({ theme }) {
     const {modifyBandPass,setModifyBandPass} = usePanels();
     const {lowCutoff, setLowCutoff} = usePanels();
     const {highCutoff, setHighCutoff} = usePanels();
+    const {yScale, setYScale} = usePanels();
     const [pendingLow, setPendingLow] = useState(lowCutoff);
     const [pendingHigh, setPendingHigh] = useState(highCutoff);
 
@@ -101,46 +102,46 @@ function SpectrogramPanel({ theme }) {
 
             <div style={{ backgroundColor: theme.group, color: theme.text }} className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
                 Y Scale 
-                <div className='flex flex-col flex-1 rounded-lg font-display text-md p-2 gap-1'>
+                <div className='flex flex-col gap-1'>
                     <button
                         onClick={() => setYScale('mel')}
-                        style={{ backgroundColor: (FFTSamples==512) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                        onMouseEnter={(e) => !(FFTSamples==512) && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                        onMouseLeave={(e) => !(FFTSamples==512) && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        style={{ backgroundColor: (yScale==='mel') ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(yScale==='mel') && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(yScale==='mel') && (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
-                        MEL
+                        Mel
                     </button>
                     <button
                         onClick={() => setYScale('linear')}
-                        style={{ backgroundColor: (FFTSamples==1024) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                        onMouseEnter={(e) => !(FFTSamples==1024) && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                        onMouseLeave={(e) => !(FFTSamples==1024) && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        style={{ backgroundColor: (yScale==='linear') ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(yScale==='linear') && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(yScale==='linear') && (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
-                        LINEAR
+                        Linear
                     </button>
                     <button
                         onClick={() => setYScale('logarithmic')}
-                        style={{ backgroundColor: (FFTSamples==2048) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                        onMouseEnter={(e) => !(FFTSamples==2048)&& (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                        onMouseLeave={(e) => !(FFTSamples==2048) && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        style={{ backgroundColor: (yScale==='logarithmic') ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(yScale==='logarithmic')&& (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(yScale==='logarithmic') && (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
-                        LOG
+                        Log
                     </button>
                     <button
                         onClick={() => setYScale('bark')}
-                        style={{ backgroundColor: (FFTSamples==4096) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                        onMouseEnter={(e) => !(FFTSamples==4096) && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                        onMouseLeave={(e) => !(FFTSamples==4096)&& (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        style={{ backgroundColor: (yScale==='bark') ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(yScale==='bark') && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(yScale==='bark')&& (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
-                        BARK
+                        Bark
                     </button>
                     <button
                         onClick={() => setYScale('erb')}
-                        style={{ backgroundColor: (FFTSamples==4096) ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                        onMouseEnter={(e) => !(FFTSamples==4096) && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                        onMouseLeave={(e) => !(FFTSamples==4096)&& (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        style={{ backgroundColor: (yScale==='erb') ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                        onMouseEnter={(e) => !(yScale==='erb') && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseLeave={(e) => !(yScale==='erb')&& (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
-                        ERB
+                        Erb
                     </button>
                 </div>
             </div>
