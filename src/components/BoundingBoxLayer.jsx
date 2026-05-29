@@ -62,7 +62,9 @@ const BoundingBoxLayer = ({
 
     // Frequency -> Pixels (Y-axis)
     const freqToPx = (freq) => {
-        return freqToY(freq, lowCutoff, highCutoff, yScale);
+        // Clamp frequency to visible range to prevent boxes from going above/below spectrogram
+        const clampedFreq = Math.max(lowCutoff, Math.min(highCutoff, freq));
+        return freqToY(clampedFreq, lowCutoff, highCutoff, yScale);
     };
 
     // Pixels -> Frequency (Y-axis)

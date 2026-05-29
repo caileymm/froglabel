@@ -27,6 +27,7 @@ function WaveformSpectrogram({
     currTool
 }) {
     const [localSampleRate, setLocalSampleRate] = useState(null);
+    const [spectroReady, setSpectroReady] = useState(false);
     const containerRef = useRef(null);
     const [spectroTop] = useState(WAVEFORM_HEIGHT);
     const [spectroHeight] = useState(SPECTROGRAM_HEIGHT);
@@ -66,8 +67,9 @@ function WaveformSpectrogram({
         });
         ro.observe(containerRef.current);
 
-        let ws = null;
         let cancelled = false;
+        let ws = null;
+        setSpectroReady(false);
 
 
         getAudioInfo(selectedAudio).then(({ sampleRate, maxFrequency }) => {
@@ -90,7 +92,6 @@ function WaveformSpectrogram({
                             colorMap : colorScale,
                             noverlap : overlap,
                             windowFunc: windowFunction,
-                            noverlap : overlap,
             })
 
             ws = WaveSurfer.create({
@@ -122,6 +123,7 @@ function WaveformSpectrogram({
                 const totalDur = ws.getDuration();
                 setDuration(totalDur);
                 setVisibleTime({ start: 0, end: totalDur });
+                setSpectroReady(true);
             });
 
             wavesurferRef.current = ws;
@@ -134,6 +136,7 @@ function WaveformSpectrogram({
                 wavesurferRef.current.destroy();
             }
             wavesurferRef.current = null;
+            setSpectroReady(false);
         };
         
     }, [setDuration, selectedAudio, colorScale, FFTSamples, modifyBandPass, windowFunction, overlap]);
@@ -201,21 +204,23 @@ function WaveformSpectrogram({
                         />
 
                         <div className="w-full h-full relative" style={{ pointerEvents: currTool === 0 ? 'none' : 'auto', cursor: cursorMap(currTool) }}>
-                            <BoundingBoxLayer
-                                code={code}
-                                boxes={boxes}
-                                setBoxes={setBoxes}
-                                currSelectedBoxId={currSelectedBoxId}
-                                setCurrSelectedBoxId={setCurrSelectedBoxId}
-                                setDrawingBox={setDrawingBox}
-                                canvasWidth={viewWidth}
-                                visibleTime={visibleTime}
-                                theme={theme}
-                                currTool={currTool}
-                                lowCutoff={lowCutoff}
-                                highCutoff={highCutoff}
-                                yScale={yScale}
-                            />
+                            {spectroReady && (
+                                <BoundingBoxLayer
+                                    code={code}
+                                    boxes={boxes}
+                                    setBoxes={setBoxes}
+                                    currSelectedBoxId={currSelectedBoxId}
+                                    setCurrSelectedBoxId={setCurrSelectedBoxId}
+                                    setDrawingBox={setDrawingBox}
+                                    canvasWidth={viewWidth}
+                                    visibleTime={visibleTime}
+                                    theme={theme}
+                                    currTool={currTool}
+                                    lowCutoff={lowCutoff}
+                                    highCutoff={highCutoff}
+                                    yScale={yScale}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
