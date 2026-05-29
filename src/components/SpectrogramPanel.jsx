@@ -18,7 +18,7 @@ function SpectrogramPanel({ theme }) {
     const {modifyBandPass,setModifyBandPass} = usePanels();
     const {lowCutoff, setLowCutoff} = usePanels();
     const {highCutoff, setHighCutoff} = usePanels();
-    const [pendingLow, setPendingLow] = useState(1);
+    const [pendingLow, setPendingLow] = useState(lowCutoff);
     const [pendingHigh, setPendingHigh] = useState(highCutoff);
 
 
@@ -124,7 +124,7 @@ function SpectrogramPanel({ theme }) {
                     <button
                         onClick={() => handleYScaleChange('logarithmic')}
                         style={{ backgroundColor: (yScale === 'logarithmic') ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                        onMouseEnter={(e) => !(yScale === 'logarithmic')&& (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                        onMouseEnter={(e) => !(yScale === 'logarithmic') && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
                         onMouseLeave={(e) => !(yScale === 'logarithmic') && (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
                         Log
@@ -133,7 +133,7 @@ function SpectrogramPanel({ theme }) {
                         onClick={() => handleYScaleChange('bark')}
                         style={{ backgroundColor: (yScale === 'bark') ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
                         onMouseEnter={(e) => !(yScale === 'bark') && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                        onMouseLeave={(e) => !(yScale ==='bark')&& (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        onMouseLeave={(e) => !(yScale === 'bark') && (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
                         Bark
                     </button>
@@ -141,7 +141,7 @@ function SpectrogramPanel({ theme }) {
                         onClick={() => handleYScaleChange('erb')}
                         style={{ backgroundColor: (yScale === 'erb') ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
                         onMouseEnter={(e) => !(yScale === 'erb') && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                        onMouseLeave={(e) => !(yScale === 'erb')&& (e.currentTarget.style.backgroundColor = theme.buttons)}
+                        onMouseLeave={(e) => !(yScale === 'erb') && (e.currentTarget.style.backgroundColor = theme.buttons)}
                         className='px-2 py-2 text-sm rounded-md font-display cursor-pointer text-left'>
                         Erb
                     </button>
@@ -461,7 +461,7 @@ function SpectrogramPanel({ theme }) {
                     </div>
                     <input
                         type='range'
-                        min={1}
+                        min={0}
                         max={maxFreq}
                         step='50'
                         value={pendingLow}
@@ -479,7 +479,7 @@ function SpectrogramPanel({ theme }) {
                     </div>
                     <input
                         type='range'
-                        min={1}
+                        min={0}
                         max={maxFreq}
                         step='50'
                         value={pendingHigh}

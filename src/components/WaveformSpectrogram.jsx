@@ -50,7 +50,7 @@ function WaveformSpectrogram({
         return Array.from({ length: numLabels }, (_, i) => {
             // evenly spaced Y positions from bottom (0) to top (spectroHeight)
             const y = (i / (numLabels - 1)) * spectroHeight;
-            return Math.round(yToFreq(y, Math.max(minFreq, 1), maxFreq, yScale));
+            return Math.round(yToFreq(y, minFreq, maxFreq, yScale));
         });
     };
 
@@ -96,7 +96,7 @@ function WaveformSpectrogram({
             if (highCutoff==0) setHighCutoff(maxFrequency);
 
             const spectroPlugin = Spectrogram.create({
-                            labels: false,
+                            labels: true,
                             height: SPECTROGRAM_HEIGHT,
                             splitChannels: false,
                             scale: yScale,
@@ -182,7 +182,7 @@ function WaveformSpectrogram({
                                 key={freq}
                                 className="absolute right-1 text-right text-[12px] font-display leading-none"
                                 style={{
-                                    top: Math.min(freqToY(freq, Math.max(lowCutoff, 1), highCutoff, yScale), spectroHeight - 1),
+                                    top: Math.min(freqToY(freq, lowCutoff, highCutoff, yScale), spectroHeight - 1),
                                     transform: 'translateY(-50%)',
                                     color: 'white',
                                 }}
