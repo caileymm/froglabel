@@ -5,7 +5,7 @@ import { SCALE, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES } from "../utils/spect
 const PanelContext = createContext(null);
 
 export function PanelProvider({ children }) {
-  const [currTool,      setCurrTool] = useState(0);
+  const [currTool,      setCurrTool] = useState(1);
   const [showLeftPanel, setShowLeftPanel] = useState(false);
   const [rightPanel,    setRightPanel] = useState(null);
   const [showDataset,   setShowDataset] = useState(false);
@@ -20,7 +20,7 @@ export function PanelProvider({ children }) {
   const [minFreq,       setMinFreq] = useState(FREQUENCY_MIN);
   const [maxFreq,       setMaxFreq] = useState(FREQUENCY_MAX);
   const [modifyBandPass,setModifyBandPass] = useState(false);
-  const [lowCutoff,     setLowCutoff] = useState(0);
+  const [lowCutoff,     setLowCutoff] = useState(1);
   const [highCutoff,    setHighCutoff] = useState(0); 
   const [sampleRate,    setSampleRate] = useState(null);
 
@@ -29,14 +29,14 @@ export function PanelProvider({ children }) {
   const lastPos = useRef({ x: 0, y: 0 });
 
   const handleSpectroMouseDown = (e) => {
-    if (rightPanel != 3 || currTool == 1) return;
+    if (rightPanel != 3 || currTool == 2) return;
     isDragging.current = true;
     lastPos.current = { x: e.clientX, y: e.clientY };
     e.stopPropagation();
    };
 
   const handleSpectroMouseMove = (e) => {
-    if (!isDragging.current || currTool == 1) return;
+    if (!isDragging.current || currTool == 2) return;
     const dx = e.clientX - lastPos.current.x;
     const dy = e.clientY - lastPos.current.y;
     lastPos.current = { x: e.clientX, y: e.clientY };
@@ -66,6 +66,7 @@ export function PanelProvider({ children }) {
       highCutoff,    setHighCutoff,
       modifyBandPass,setModifyBandPass,
       sampleRate,    setSampleRate,
+      yScale,        setYScale,
       handleSpectroMouseDown,
       handleSpectroMouseMove,
       handleSpectroMouseUp,

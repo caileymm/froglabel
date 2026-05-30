@@ -5,6 +5,7 @@ import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js';
 import { WAVEFORM_HEIGHT, SCALE, SPECTROGRAM_HEIGHT, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES } from "../utils/spectrogramConfig";
 import { freqToY, yToFreq } from '../utils/spectrogramScale';
+import { fetchAuthenticatedAudio } from '../api/labelStudio';
 import { getAudioInfo } from '../utils/audioInfo';
 import { usePanels } from './PanelContext';
 import moonCursor from '../assets/moon_cursor.png';
@@ -48,7 +49,7 @@ function WaveformSpectrogram({
 
     const generateFreqLabels = (minFreq, maxFreq, numLabels = 10) => {
         return Array.from({ length: numLabels }, (_, i) => {
-            // evenly spaced Y positions from top (0) to bottom (spectroHeight)
+            // evenly spaced Y positions from bottom (0) to top (spectroHeight)
             const y = (i / (numLabels - 1)) * spectroHeight;
             return Math.round(yToFreq(y, minFreq, maxFreq, yScale));
         });
@@ -60,7 +61,7 @@ function WaveformSpectrogram({
     );
 
     useEffect(() => {
-        if (!containerRef.current) return;
+        if (!containerRef.current || !selectedAudio) return;
 
         const ro = new ResizeObserver(([entry]) => {
             setViewWidth(entry.contentRect.width);
@@ -69,8 +70,8 @@ function WaveformSpectrogram({
 
         let cancelled = false;
         let ws = null;
+        let blobUrl = null;
         setSpectroReady(false);
-
 
         getAudioInfo(selectedAudio).then(({ sampleRate, maxFrequency }) => {
             if (cancelled) return;
@@ -94,62 +95,71 @@ function WaveformSpectrogram({
                             windowFunc: windowFunction,
             })
 
-            ws = WaveSurfer.create({
-                container: containerRef.current,
-                height: WAVEFORM_HEIGHT,
-                barHeight: 3,
-                url: selectedAudio,
-                //minPxPerSec: 0,
-                fillParent: true,
-                autoCenter: false,
-                hideScrollbar: true,
-                waveColor: theme.waveform,
-                cursorColor: theme.cursor,
-                progressColor: theme.progress,
-                cursorWidth: 3,
-                sampleRate: sampleRate,
-                dragToSeek: true,
-                plugins: [
-                   spectroPlugin,
-                    TimelinePlugin.create({
-                        style: { fontSize: '12px', color: theme.text, fontFamily: 'Afacad, sans-serif' },
-                        formatTimeCallback: (seconds) => `${seconds.toFixed(1)} s`,
-                    }),
-                ],
-            });
-             setModifyBandPass(false); 
+            fetchAuthenticatedAudio(selectedAudio).then((url) => {
+              blobUrl = url;
+              if (!blobUrl || cancelled) return;
+              
+              ws = WaveSurfer.create({
+                  container: containerRef.current,
+                  height: WAVEFORM_HEIGHT,
+                  barHeight: 3,
+                  url: blobUrl,
+                  //minPxPerSec: 0,
+                  fillParent: true,
+                  autoCenter: false,
+                  hideScrollbar: true,
+                  waveColor: theme.waveform,
+                  cursorColor: theme.cursor,
+                  progressColor: theme.progress,
+                  cursorWidth: 3,
+                  sampleRate: sampleRate,
+                  dragToSeek: true,
+                  plugins: [
+                     spectroPlugin,
+                      TimelinePlugin.create({
+                          style: { fontSize: '12px', color: theme.text, fontFamily: 'Afacad, sans-serif' },
+                          formatTimeCallback: (seconds) => `${seconds.toFixed(1)} s`,
+                      }),
+                  ],
+              });
+               setModifyBandPass(false); 
 
-            ws.on('ready', () => {
-                const totalDur = ws.getDuration();
-                setDuration(totalDur);
-                setVisibleTime({ start: 0, end: totalDur });
-                setSpectroReady(true);
-            });
+              ws.on('ready', () => {
+                  const totalDur = ws.getDuration();
+                  setDuration(totalDur);
+                  setVisibleTime({ start: 0, end: totalDur });
+                  setSpectroReady(true);
+              });
 
-            wavesurferRef.current = ws;
+              wavesurferRef.current = ws;
+            }).catch((error) => {
+              console.error('Error fetching audio:', error);
+            });
+        }).catch((error) => {
+            console.error('Error reading audio info:', error);
         });
 
         return () => {
             cancelled = true;
             ro.disconnect();
+            if (blobUrl) URL.revokeObjectURL(blobUrl);
             if (wavesurferRef.current) {
                 wavesurferRef.current.destroy();
             }
             wavesurferRef.current = null;
             setSpectroReady(false);
         };
-        
     }, [setDuration, selectedAudio, colorScale, FFTSamples, modifyBandPass, windowFunction, overlap, yScale, lowCutoff, highCutoff]);
 
     const cursorMap = (tool) => {
-        if (tool === 0) return 'auto';
-        if (tool === 1) return 'crosshair';
-        if (tool === 2) return 'auto';
+        if (tool === 1) return 'auto';
+        if (tool === 2) return 'crosshair';
         if (tool === 3) return `url(${moonCursor}), auto`;
+        return 'auto';
     };
     
     return (
-        <div style={{ backgroundColor: theme.panels }} className="p-6 rounded-xl my-2 overflow-hidden">
+        <div style={{ backgroundColor: theme.panels }} className="flex-1 min-h-0 p-6 pb-2 rounded-xl my-2 overflow-auto">
             <div className="flex">
 
                 {/* Frequency Labels */}
@@ -157,7 +167,7 @@ function WaveformSpectrogram({
                     className="relative shrink-0 w-11 items-end pr-1"
                     style={{ marginTop: spectroTop, height: spectroHeight }}
                 >
-                    {localSampleRate && lowCutoff != null && highCutoff != null
+                    {localSampleRate && lowCutoff != null && highCutoff != null && highCutoff > 0
                         ? FREQ_LABELS.map((freq) => (
                             <span
                                 key={freq}
@@ -184,13 +194,13 @@ function WaveformSpectrogram({
                       style={{ 
                         top: spectroTop, 
                         height: spectroHeight, 
-                        pointerEvents: currTool === 0 ? 'none' : 'auto',
+                        pointerEvents: currTool === 1 ? 'none' : 'auto',
                         cursor: 'inherit'
                     }}
-                      onMouseDown={currTool === 0 ? undefined : handleSpectroMouseDown}
-                      onMouseMove={currTool === 0 ? undefined : handleSpectroMouseMove}
-                      onMouseUp={currTool === 0 ? undefined : handleSpectroMouseUp}
-                      onMouseLeave={currTool === 0 ? undefined : handleSpectroMouseUp}
+                      onMouseDown={currTool === 1 ? undefined : handleSpectroMouseDown}
+                      onMouseMove={currTool === 1 ? undefined : handleSpectroMouseMove}
+                      onMouseUp={currTool === 1 ? undefined : handleSpectroMouseUp}
+                      onMouseLeave={currTool === 1 ? undefined : handleSpectroMouseUp}
                     >
                         {/* Brightness / Contrast filter */}
                         <div
@@ -203,7 +213,7 @@ function WaveformSpectrogram({
                             }}
                         />
 
-                        <div className="w-full h-full relative" style={{ pointerEvents: currTool === 0 ? 'none' : 'auto', cursor: cursorMap(currTool) }}>
+                        <div className="w-full h-full relative" style={{ pointerEvents: currTool === 1 ? 'none' : 'auto', cursor: cursorMap(currTool) }}>
                             {spectroReady && (
                                 <BoundingBoxLayer
                                     code={code}

@@ -1,25 +1,59 @@
 import frogIdLogo from '.././assets/frog_id_logo.png'
 import frog from '.././assets/frog.png'
+import ThemeButton from './ThemeButton'
 
-function Header({ frogTheme, setFrogTheme, theme }) {
+function Header({ theme, setFrogTheme, onSubmit, onLogout, showActions = true }) {
     return (
-        <div style={{ backgroundColor: theme.header }} className='w-full h-15 flex items-center justify-between p-5'>
-            <div className='w-[100px] flex items-center'>
-                <a href='https://www.frogid.net.au' target='_blank' rel='noreferrer'>
-                    <img src={frogIdLogo} alt='frogid logo' className='w-[35px] h-[40px]' />
+        <div
+            style={{ backgroundColor: theme.header }}
+            className="w-full flex items-center px-3 py-2 gap-4 shrink-0"
+        >
+            <div className="flex flex-1 items-center gap-3 min-w-0">
+                <a href="https://www.frogid.net.au" target="_blank" rel="noreferrer" className="shrink-0">
+                    <img src={frogIdLogo} alt="frogid logo" className="w-[35px] h-[40px]" />
                 </a>
-            </div>
-            <p style={{ color: theme.group }} className='font-display text-center text-3xl'>FrogLabel</p>
-            <div className='w-[100px] flex justify-end'>
-                <button onClick={() => setFrogTheme(prev => !prev)}>
-                    <img
-                        src={frog}
-                        className='w-[40px] h-[40px] rounded-md bg-[#FFDE9E] cursor-pointer'
-                    />
+                <button
+                    type="button"
+                    onClick={() => setFrogTheme((prev) => !prev)}
+                    title="Toggle frog theme"
+                    className="shrink-0 p-1 rounded-4xl cursor-pointer hover:opacity-90 transition-opacity"
+                    style={{ backgroundColor: theme.themeToggle }}
+                >
+                    <img src={frog} alt="Toggle theme" className="w-8 h-8 block" />
                 </button>
             </div>
+
+            <p
+                style={{ color: theme.group }}
+                className="font-display text-3xl shrink-0 text-center"
+            >
+                FrogLabel
+            </p>
+
+            <div className="flex flex-1 items-center justify-end gap-2 min-w-0">
+                {showActions && (
+                    <>
+                        <ThemeButton
+                            theme={theme}
+                            onClick={onSubmit}
+                            className="px-3 py-1.5 text-sm rounded-md font-display cursor-pointer shrink-0"
+                        >
+                            Submit Task
+                        </ThemeButton>
+                        {onLogout && (
+                            <ThemeButton
+                                theme={theme}
+                                onClick={onLogout}
+                                className="px-3 py-1.5 text-sm rounded-md font-display cursor-pointer shrink-0"
+                            >
+                                Log Out
+                            </ThemeButton>
+                        )}
+                    </>
+                )}
+            </div>
         </div>
-    )
+    );
 }
 
-export default Header
+export default Header;

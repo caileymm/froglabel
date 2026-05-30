@@ -1,6 +1,7 @@
+import { fetchAuthenticatedAudioBuffer } from '../api/labelStudio';
+
 export async function getAudioInfo(audioSrc) {
-  const r = await fetch(audioSrc);
-  const buf = await r.arrayBuffer();
+  const buf = await fetchAuthenticatedAudioBuffer(audioSrc);
   const bytes = new Uint8Array(buf);
 
   let sampleRate = null, channels = null, bitrate = null, version = null,  maxFrequency = null;

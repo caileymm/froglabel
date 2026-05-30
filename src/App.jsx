@@ -10,23 +10,31 @@ import DatasetPanel from './components/DatasetPanel'
 import BoxFilePanel from './components/BoxFilePanel'
 import SpectrogramPanel from './components/SpectrogramPanel'
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
-import { yToFreq } from './utils/spectrogramScale'
-import { defaultColors, frogThemeColors } from './utils/theme'
-import greenAudio from './assets/green_tree.mp3';
-import peronsAudio from './assets/perons_tree.mp3';
-import redEyedAudio from './assets/red_eyed_tree.mp3';
+import { useAnnotationSession } from './hooks/useAnnotationSession';
+import { useSessionConfig } from './hooks/useSessionConfig';
+import { useTheme } from './hooks/useTheme';
+import LoginScreen from './components/LoginScreen';
 
 function App() {
-  const [frogTheme, setFrogTheme] = useState(false)
-  const theme = frogTheme ? frogThemeColors : defaultColors;
+  const { config, isAuthenticated, login, logout, defaultFormValues } = useSessionConfig();
 
-  const [selectedAudio, setSelectedAudio] = useState(greenAudio)
+  if (!isAuthenticated) {
+    return <LoginScreen defaultFormValues={defaultFormValues} onLogin={login} />;
+  }
+
+  return <AppContent config={config} onLogout={logout} />;
+}
+
+function AppContent({ config, onLogout }) {
+  const { theme, frogTheme, setFrogTheme } = useTheme();
+
+  const { currentTask, selectedAudio, boxes, setBoxes, submitAnnotation } = useAnnotationSession(config);
+  const audioFilename = selectedAudio ? selectedAudio.split('/').pop()?.split('?')[0] : null;
   const {sampleRate, setSampleRate} = usePanels();
   const {currTool, setCurrTool} = usePanels();
   const {lowCutoff, highCutoff} = usePanels();
   const {yScale} = usePanels();
 
-  const [boxes, setBoxes] = useState([]);
   const [code, setCode] = useState('');
   const [codesDict, setCodesDict] = useState({
     'GRE': 'Green Tree Frog',
@@ -116,25 +124,25 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    const handleKey = (e) => {
-      const tag = e.target.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
-
-      if (e.key === '1') setShowLeftPanel(p => !p);
-      if (e.key === '2') setRightPanel(p => p === 2 ? null : 2);
-      if (e.key === '3') setRightPanel(p => p === 3 ? null : 3);
-      if (e.key === '4') setShowDataset(p => !p);
-    };
-
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [setShowLeftPanel, setRightPanel]);
-
   return (
     <div className='flex flex-col h-screen overflow-hidden' style={{ backgroundColor: theme.background }}>
-      <Header frogTheme={frogTheme} setFrogTheme={setFrogTheme} theme={theme} />
+      <Header
+        theme={theme}
+        setFrogTheme={setFrogTheme}
+        onSubmit={submitAnnotation}
+        onLogout={onLogout}
+      />
 
+      {!currentTask && (
+        <div className='flex-1 flex items-center justify-center'>
+          <div className='text-center'>
+            <p style={{ color: theme.text }} className='font-display text-2xl mb-4'>No Tasks Available</p>
+            <p style={{ color: theme.text }} className='font-display text-sm'>All tasks have been completed or there are no tasks to annotate at this time.</p>
+          </div>
+        </div>
+      )}
+
+      {currentTask && (
       <div className='flex gap-2 px-2 py-2 flex-1 min-h-0 overflow-hidden items-stretch'>
 
         {showLeftPanel && (
@@ -187,8 +195,6 @@ function App() {
               currTool={currTool}
             />
             <Tools
-              currTool={currTool}
-              setCurrTool={setCurrTool}
               theme={theme}
               frogTheme={frogTheme}
             />
@@ -220,7 +226,7 @@ function App() {
                 selectedRow={selectedRow}
                 drawingRow={drawingRow}
                 selectedAudio={selectedAudio}
-                setSelectedAudio={setSelectedAudio}
+                audioFilename={audioFilename}
                 theme={theme}
               />
             )}
@@ -229,6 +235,8 @@ function App() {
         )}
 
       </div>
+      )}
+
     </div>
   );
 }

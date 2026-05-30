@@ -61,7 +61,7 @@ function CodesPanel({ codesDict, setCodesDict, theme }) {
                         style={{ 
                             backgroundColor: theme.textInput, 
                             color: theme.textInputText,
-                            '--placeholder-color': theme.placeholderText 
+                            '--placeholder-color': theme.placeholderText
                         }}
                         className={`w-15 px-2 py-1.5 text-sm rounded-md font-display uppercase placeholder:normal-case
                         ${isCodeError ? 'border-2 border-[#FFAAAA]' : 'border-none'}`}
