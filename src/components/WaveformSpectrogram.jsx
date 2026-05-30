@@ -5,6 +5,7 @@ import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js';
 import { WAVEFORM_HEIGHT, SCALE, SPECTROGRAM_HEIGHT, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES } from "../utils/spectrogramConfig";
 import { freqToY, yToFreq } from '../utils/spectrogramScale';
+import { fetchAuthenticatedAudio } from '../api/labelStudio';
 import { getAudioInfo } from '../utils/audioInfo';
 import { usePanels } from './PanelContext';
 import moonCursor from '../assets/moon_cursor.png';
@@ -60,7 +61,7 @@ function WaveformSpectrogram({
     );
 
     useEffect(() => {
-        if (!containerRef.current) return;
+        if (!containerRef.current || !selectedAudio) return;
 
         const ro = new ResizeObserver(([entry]) => {
             setViewWidth(entry.contentRect.width);
@@ -69,24 +70,8 @@ function WaveformSpectrogram({
 
         let cancelled = false;
         let ws = null;
+        let blobUrl = null;
         setSpectroReady(false);
-
-        // Fetch audio with auth headers and convert to blob URL
-        const fetchAudioBlob = async () => {
-          try {
-            const response = await fetch(selectedAudio, {
-              headers: {
-                Authorization: `Token ${import.meta.env.VITE_LS_TOKEN}`,
-              },
-            });
-            if (!response.ok) throw new Error(`Failed to fetch audio: ${response.status}`);
-            const blob = await response.blob();
-            return URL.createObjectURL(blob);
-          } catch (error) {
-            console.error('Error fetching audio:', error);
-            return null;
-          }
-        };
 
         getAudioInfo(selectedAudio).then(({ sampleRate, maxFrequency }) => {
             if (cancelled) return;
@@ -110,7 +95,8 @@ function WaveformSpectrogram({
                             windowFunc: windowFunction,
             })
 
-            fetchAudioBlob().then((blobUrl) => {
+            fetchAuthenticatedAudio(selectedAudio).then((url) => {
+              blobUrl = url;
               if (!blobUrl || cancelled) return;
               
               ws = WaveSurfer.create({
@@ -146,12 +132,17 @@ function WaveformSpectrogram({
               });
 
               wavesurferRef.current = ws;
+            }).catch((error) => {
+              console.error('Error fetching audio:', error);
             });
+        }).catch((error) => {
+            console.error('Error reading audio info:', error);
         });
 
         return () => {
             cancelled = true;
             ro.disconnect();
+            if (blobUrl) URL.revokeObjectURL(blobUrl);
             if (wavesurferRef.current) {
                 wavesurferRef.current.destroy();
             }
@@ -161,10 +152,10 @@ function WaveformSpectrogram({
     }, [setDuration, selectedAudio, colorScale, FFTSamples, modifyBandPass, windowFunction, overlap, yScale, lowCutoff, highCutoff]);
 
     const cursorMap = (tool) => {
-        if (tool === 0 ) return 'auto';
-        if (tool === 1) return 'crosshair';
-        if (tool === 2) return 'auto';
+        if (tool === 1) return 'auto';
+        if (tool === 2) return 'crosshair';
         if (tool === 3) return `url(${moonCursor}), auto`;
+        return 'auto';
     };
     
     return (
@@ -203,13 +194,13 @@ function WaveformSpectrogram({
                       style={{ 
                         top: spectroTop, 
                         height: spectroHeight, 
-                        pointerEvents: currTool === 0 ? 'none' : 'auto',
+                        pointerEvents: currTool === 1 ? 'none' : 'auto',
                         cursor: 'inherit'
                     }}
-                      onMouseDown={currTool === 0 ? undefined : handleSpectroMouseDown}
-                      onMouseMove={currTool === 0 ? undefined : handleSpectroMouseMove}
-                      onMouseUp={currTool === 0 ? undefined : handleSpectroMouseUp}
-                      onMouseLeave={currTool === 0 ? undefined : handleSpectroMouseUp}
+                      onMouseDown={currTool === 1 ? undefined : handleSpectroMouseDown}
+                      onMouseMove={currTool === 1 ? undefined : handleSpectroMouseMove}
+                      onMouseUp={currTool === 1 ? undefined : handleSpectroMouseUp}
+                      onMouseLeave={currTool === 1 ? undefined : handleSpectroMouseUp}
                     >
                         {/* Brightness / Contrast filter */}
                         <div
@@ -222,7 +213,7 @@ function WaveformSpectrogram({
                             }}
                         />
 
-                        <div className="w-full h-full relative" style={{ pointerEvents: currTool === 0 ? 'none' : 'auto', cursor: cursorMap(currTool) }}>
+                        <div className="w-full h-full relative" style={{ pointerEvents: currTool === 1 ? 'none' : 'auto', cursor: cursorMap(currTool) }}>
                             {spectroReady && (
                                 <BoundingBoxLayer
                                     code={code}

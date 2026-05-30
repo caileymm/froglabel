@@ -25,7 +25,7 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
         // Delay blur to allow typing to complete
         setTimeout(() => {
           if (Object.keys(codesDict).includes(value)) {
-            setCurrTool(1);
+            setCurrTool(2);
             setIsError(false);
           } else {
             setCode(''); 

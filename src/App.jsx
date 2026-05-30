@@ -10,22 +10,31 @@ import DatasetPanel from './components/DatasetPanel'
 import BoxFilePanel from './components/BoxFilePanel'
 import SpectrogramPanel from './components/SpectrogramPanel'
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
-import { defaultColors, frogThemeColors } from './utils/theme'
-import { getNextTask, submitAnnotation } from './api/labelStudio';
+import { useAnnotationSession } from './hooks/useAnnotationSession';
+import { useSessionConfig } from './hooks/useSessionConfig';
+import { useTheme } from './hooks/useTheme';
+import LoginScreen from './components/LoginScreen';
 
 function App() {
-  const [currentTask, setCurrentTask] = useState(null);
-  const [frogTheme, setFrogTheme] = useState(false)
-  const theme = frogTheme ? frogThemeColors : defaultColors;
+  const { config, isAuthenticated, login, logout, defaultFormValues } = useSessionConfig();
 
-  const [selectedAudio, setSelectedAudio] = useState(null)
-  const [audioFilename, setAudioFilename] = useState(null)
+  if (!isAuthenticated) {
+    return <LoginScreen defaultFormValues={defaultFormValues} onLogin={login} />;
+  }
+
+  return <AppContent config={config} onLogout={logout} />;
+}
+
+function AppContent({ config, onLogout }) {
+  const { theme, frogTheme, setFrogTheme } = useTheme();
+
+  const { currentTask, selectedAudio, boxes, setBoxes, submitAnnotation } = useAnnotationSession(config);
+  const audioFilename = selectedAudio ? selectedAudio.split('/').pop()?.split('?')[0] : null;
   const {sampleRate, setSampleRate} = usePanels();
   const {currTool, setCurrTool} = usePanels();
   const {lowCutoff, highCutoff} = usePanels();
   const {yScale} = usePanels();
 
-  const [boxes, setBoxes] = useState([]);
   const [code, setCode] = useState('');
   const [codesDict, setCodesDict] = useState({
     'GRE': 'Green Tree Frog',
@@ -115,60 +124,14 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    getNextTask()
-      .then((task) => {
-        if (!task || !task.data) {
-          console.error('No task or task data received');
-          return;
-        }
-        setCurrentTask(task);
-        
-        // Get the audio file from task data
-        // Label Studio stores the audio path in the first data property
-        const audioPath = Object.values(task.data)[0];
-        if (audioPath) {
-          const fullAudioUrl = `${import.meta.env.VITE_LS_URL}${audioPath}`;
-          const filename = audioPath.split('/').pop(); // Extract filename from path
-          setSelectedAudio(fullAudioUrl);
-          setAudioFilename(filename);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching task:', error);
-      });
-  }, []);
-
-  const handleSubmit = async () => {
-    if (!currentTask) return;
-    try {
-      await submitAnnotation(currentTask.id, boxes);
-      setBoxes([]); // clear boxes
-      // load next task
-      const next = await getNextTask();
-      if (!next || !next.data) {
-        console.error('No next task or task data received');
-        setCurrentTask(null); // Show "no more tasks" overlay
-        setSelectedAudio(null);
-        setAudioFilename(null);
-        return;
-      }
-      setCurrentTask(next);
-      const audioPath = Object.values(next.data)[0];
-      if (audioPath) {
-        const fullAudioUrl = `${import.meta.env.VITE_LS_URL}${audioPath}`;
-        const filename = audioPath.split('/').pop();
-        setSelectedAudio(fullAudioUrl);
-        setAudioFilename(filename);
-      }
-    } catch (error) {
-      console.error('Error submitting annotation:', error);
-    }
-  };
-
   return (
     <div className='flex flex-col h-screen overflow-hidden' style={{ backgroundColor: theme.background }}>
-      <Header frogTheme={frogTheme} setFrogTheme={setFrogTheme} theme={theme} onSubmit={handleSubmit} />
+      <Header
+        theme={theme}
+        setFrogTheme={setFrogTheme}
+        onSubmit={submitAnnotation}
+        onLogout={onLogout}
+      />
 
       {!currentTask && (
         <div className='flex-1 flex items-center justify-center'>
@@ -263,7 +226,6 @@ function App() {
                 selectedRow={selectedRow}
                 drawingRow={drawingRow}
                 selectedAudio={selectedAudio}
-                setSelectedAudio={setSelectedAudio}
                 audioFilename={audioFilename}
                 theme={theme}
               />
