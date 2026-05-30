@@ -12,15 +12,16 @@ let taskIndex = 0;
 
 export const demoAdapter = {
     getNextTask() {
-        const task = DEMO_TASKS[taskIndex % DEMO_TASKS.length];
+        if (taskIndex >= DEMO_TASKS.length) {
+            return Promise.resolve(null);
+        }
+        const task = DEMO_TASKS[taskIndex];
         taskIndex += 1;
         return Promise.resolve({ ...task });
     },
-
     submitAnnotation(_taskId, _boxes) {
         return Promise.resolve({ ok: true });
     },
-
     updateAnnotation(_annotationId, _boxes) {
         return Promise.resolve({ ok: true });
     },
