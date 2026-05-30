@@ -5,7 +5,7 @@ Run locally (for developers):
 - Terminal 1: echo 'export PATH="$HOME/Library/Python/3.9/bin:$PATH''' >> ~/.zshrc source ~/.zshrc
 - Terminal 1: label-studio start
 - Terminal 2: npm run dev
-3. View local host links
+2. View local host links
 
 Run in browser (for non-developers):
 1. https://caileymm.github.io/froglabel-studio/
