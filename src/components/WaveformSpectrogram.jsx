@@ -81,7 +81,7 @@ function WaveformSpectrogram({
             if (highCutoff==0) setHighCutoff(maxFrequency);
 
             const spectroPlugin = Spectrogram.create({
-                            labels: true,
+                            labels: false,
                             height: SPECTROGRAM_HEIGHT,
                             splitChannels: false,
                             scale: yScale,

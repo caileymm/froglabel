@@ -127,7 +127,7 @@ function LoginScreen({ defaultFormValues, onLogin }) {
                         style={{ backgroundColor: theme.buttons, color: theme.text }}
                         className="w-full py-2.5 rounded-md font-display text-sm cursor-pointer hover:opacity-90 transition-opacity"
                     >
-                        {demoMode ? 'Start demo' : 'Connect'}
+                        {demoMode ? 'Start Demo' : 'Connect'}
                     </button>
                 </form>
             </div>
