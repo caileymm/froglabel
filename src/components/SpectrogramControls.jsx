@@ -10,14 +10,18 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme,
   const [isDPressed, setIsDPressed] = useState(false);
   const [isQPressed, setIsQPressed] = useState(false);
   const [isEPressed, setIsEPressed] = useState(false);
-  // const [isWPressed, setIsWPressed] = useState(false);
-  // const [isRPressed, setIsRPressed] = useState(false);
   const [isCPressed, setIsCPressed] = useState(false);
+  const [isRPressed, setIsRPressed] = useState(false);
   const [isPlaying, setPlaying] = useState(false);
+  const [speedOpen, setSpeedOpen] = useState(false);
   const [wsZoom, setWsZoom] = useState(0);
+  
+
 
   const { lowCutoff, highCutoff, setLowCutoff, setHighCutoff } = usePanels();
   const { maxFreq } = usePanels();
+  const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
+
 
   const handlePlayAudio = useCallback(() => {
     wavesurferRef.current?.playPause();
@@ -62,21 +66,6 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme,
     requestAnimationFrame(() => updateVisibleTime(newZoom));
   }, [wsZoom, duration, updateVisibleTime]);
 
-  /*
-  const handleFreqZoomIn = useCallback(()  => {
-    const center = (lowCutoff + highCutoff) / 2;
-    const newRange = (highCutoff - lowCutoff) / 1.5;
-    setLowCutoff(Math.max(0, center - newRange / 2));
-    setHighCutoff(Math.min(maxFreq, center + newRange / 2)); 
-  }, [lowCutoff, highCutoff, maxFreq]);
-
-  const handleFreqZoomOut = useCallback(() => {
-      const center = (lowCutoff + highCutoff) / 2;
-      const newRange = (highCutoff - lowCutoff) * 1.5;
-      setLowCutoff(Math.max(0, center - newRange / 2));
-      setHighCutoff(Math.min(maxFreq, center + newRange / 2));
-  }, [lowCutoff, highCutoff, maxFreq]);
-  */
 
   const handlePanLeft = useCallback(() => {
     const container = getWsScrollContainer();
@@ -104,6 +93,20 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme,
     requestAnimationFrame(() => updateVisibleTime(newZoom))
   }, [updateVisibleTime, setDrawingBox]);
 
+  
+  const [speed, setSpeed] = useState(1);
+
+  const handleSpeedChange = (rate) => {
+      setSpeed(rate);
+      wavesurferRef.current?.setPlaybackRate(rate);
+  };
+
+  const handleCycleSpeed = useCallback(() => {
+    const currentIndex = SPEEDS.indexOf(speed);
+    const nextIndex = (currentIndex + 1) % SPEEDS.length;
+    handleSpeedChange(SPEEDS[nextIndex]);
+  }, [speed]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'v') { setIsVPressed(true); handlePlayAudio(); }
@@ -111,9 +114,8 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme,
       if (e.key === 'd') { setIsDPressed(true); handlePanRight(); }
       if (e.key === 'q') { setIsQPressed(true); handleZoomInX(); }
       if (e.key === 'e') { setIsEPressed(true); handleZoomOutX(); }
-      // if (e.key === 'w') { setIsQPressed(true); handleFreqZoomIn(); }
-      // if (e.key === 'r') { setIsEPressed(true); handleFreqZoomOut(); }
       if (e.key === 'c') { setIsCPressed(true); handleResetView(); }
+      if (e.key === 'r') { setIsRPressed(true); handleCycleSpeed(); } 
     };
     const handleKeyUp = (e) => {
       if (e.key === 'v') setIsVPressed(false);
@@ -121,9 +123,8 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme,
       if (e.key === 'd') setIsDPressed(false);
       if (e.key === 'q') setIsQPressed(false);
       if (e.key === 'e') setIsEPressed(false);
-      // if (e.key === 'w') setIsWPressed(false);
-      // if (e.key === 'r') setIsRPressed(false);
       if (e.key === 'c') setIsCPressed(false);
+      if (e.key === 'r') setIsRPressed(false);
     };
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
@@ -131,7 +132,8 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme,
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [handlePlayAudio, handlePanLeft, handlePanRight, handleZoomInX, handleZoomOutX, handleResetView]);
+    }, [handlePlayAudio, handlePanLeft, handlePanRight, handleZoomInX, handleZoomOutX, handleResetView, handleCycleSpeed]);
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -149,7 +151,7 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme,
 
   return (
     <div className='flex items-center justify-center gap-2 flex-wrap'>
-
+      <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1'>
       <button onClick={handlePlayAudio}
         style={{ backgroundColor: isVPressed ? theme.audioButtonPressed : theme.audioButton, color: theme.buttonsText }}
         onMouseEnter={(e) => !isVPressed && (e.currentTarget.style.backgroundColor = theme.audioButtonHover)}
@@ -158,6 +160,36 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme,
         {isPlaying ? 'Pause Audio' : 'Play Audio'}
         <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>V</div>
       </button>
+      
+       <div className='relative'>
+    <button
+        onClick={() => setSpeedOpen(prev => !prev)}
+        style={{ backgroundColor: isRPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+        onMouseEnter={(e) => !isRPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+        onMouseLeave={(e) => !isRPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
+        className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
+        {speed}x
+        <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>R</div>
+    </button>
+    {speedOpen && (
+        <div
+            style={{ backgroundColor: theme.group }}
+            className='absolute top-full mt-1 left-0 rounded-md overflow-hidden z-50 flex flex-col'>
+            {SPEEDS.map(rate => (
+                <button
+                    key={rate}
+                    onClick={() => { handleSpeedChange(rate); setSpeedOpen(false); }}
+                    style={{ backgroundColor: speed === rate ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                    onMouseEnter={(e) => speed !== rate && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                    onMouseLeave={(e) => speed !== rate && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                    className='px-4 py-1.5 text-xs font-display whitespace-nowrap cursor-pointer text-left'>
+                    {rate}x
+                </button>
+            ))}
+        </div>
+    )}
+</div>
+      </div>
 
       <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1'>
         <button onClick={handlePanLeft}
@@ -195,25 +227,6 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme,
           Zoom Out (X)
           <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>E</div>
         </button>
-
-
-        {/* <div style={{ backgroundColor: theme.group }} className='p-1.5 rounded-xl flex items-center gap-1'> */}
-        {/* <button onClick={handleFreqZoomIn}
-          style={{ backgroundColor: isWPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-          onMouseEnter={(e) => !isWPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-          onMouseLeave={(e) => !isWPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
-          className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
-          Zoom In (Y)
-          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>W</div>
-        </button>
-        <button onClick={handleFreqZoomOut}
-          style={{ backgroundColor: isRPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-          onMouseEnter={(e) => !isRPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-          onMouseLeave={(e) => !isRPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
-          className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
-          Zoom Out (Y)
-          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>R</div>
-        </button> */}
 
 
         <button onClick={handleResetView}
