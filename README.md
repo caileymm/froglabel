@@ -3,6 +3,10 @@
 This project is an easy to use front-end design for an already existing open source data annotation tool called [Label-Studio](https://labelstud.io/). Our project makes it easy to label audio data through the implementation of keyboard shortcuts and tools to modify the display and annotation settings on the webpage. The front-end accesses the converted audio file from Label-Studio and converts it into a spectrogram. The spectrogram further allows the annotator to precisely identify the location of certain audio frequencies which can futher be used to absorb important information and run analysis on the required data. Once the annotator is done annotating, the data is sent back to label-studio and saved on the website as usual within the project on Label-Studio.  
 
 ## ACCESSING THE FILES 
+Our project has multiple folders to ease the modification process for future developers. In this repository all of our design files are in the [src](https://github.com/caileymm/froglabel-studio/tree/main/src) folder. This folder holds the components in the [components](https://github.com/caileymm/froglabel-studio/tree/main/src/components) folder that are responsible for the waveform, spectrogram and bounding boxes display. It also holds the files for the tools that a user uses to modify the display of the waveform/annotation descriptions on the screen.
+
+Additionally, we also have the [adapters](https://github.com/caileymm/froglabel-studio/tree/main/src/adapters) folder that allows our front-end to be connected to label-studio backend. This allows for our frontend to communiate with label-studio and annotate projects that a user stores on there.   
+
 
 ## RUNNING THE PROJECT 
   ### Run locally (for developers):
