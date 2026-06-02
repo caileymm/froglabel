@@ -172,22 +172,37 @@ function SpectrogramControls({ zoomX, setZoomX, duration, setVisibleTime, theme,
         <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>R</div>
     </button>
     {speedOpen && (
-        <div
-            style={{ backgroundColor: theme.group }}
-            className='absolute top-full mt-1 left-0 rounded-md overflow-hidden z-50 flex flex-col'>
-            {SPEEDS.map(rate => (
-                <button
-                    key={rate}
-                    onClick={() => { handleSpeedChange(rate); setSpeedOpen(false); }}
-                    style={{ backgroundColor: speed === rate ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-                    onMouseEnter={(e) => speed !== rate && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-                    onMouseLeave={(e) => speed !== rate && (e.currentTarget.style.backgroundColor = theme.buttons)}
-                    className='px-4 py-1.5 text-xs font-display whitespace-nowrap cursor-pointer text-left'>
-                    {rate}x
-                </button>
-            ))}
-        </div>
-    )}
+    <div
+        style={{ backgroundColor: theme.group }}
+        className='absolute top-full mt-1 left-0 rounded-md overflow-hidden z-50 flex flex-col min-w-[80px]'>
+        <input
+            type='number'
+            defaultValue={speed}
+            min={0.1}
+            max={4}
+            step={0.05}
+            onBlur={(e) => { const v = Number(e.target.value); if (v > 0) handleSpeedChange(v); }}
+            onKeyDown={(e) => {
+                e.stopPropagation();
+                if (e.key === 'Enter') { handleSpeedChange(Number(e.target.value)); setSpeedOpen(false); }
+            }}
+            style={{ backgroundColor: theme.textInput, color: theme.textInputText }}
+            className='px-2 py-1.5 text-xs font-display outline-none border-b w-full'
+            autoFocus
+        />
+        {SPEEDS.map(rate => (
+            <button
+                key={rate}
+                onClick={() => { handleSpeedChange(rate); setSpeedOpen(false); }}
+                style={{ backgroundColor: speed === rate ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+                onMouseEnter={(e) => speed !== rate && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+                onMouseLeave={(e) => speed !== rate && (e.currentTarget.style.backgroundColor = theme.buttons)}
+                className='px-4 py-1.5 text-xs font-display whitespace-nowrap cursor-pointer text-left'>
+                {rate}x
+            </button>
+        ))}
+    </div>
+)}
 </div>
       </div>
 

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { usePanels } from './PanelContext';
-import generateViridis from '../color_pallettes/viridis.jsx'
-import generateMagma from '../color_pallettes/magma.jsx';
-import generateInferno from '../color_pallettes/inferno.jsx'
-import generatePlasma from '../color_pallettes/plasma.jsx'
+import generateViridis from '../color_palettes/viridis.jsx'
+import generateMagma from '../color_palettes/magma.jsx';
+import generateInferno from '../color_palettes/inferno.jsx'
+import generatePlasma from '../color_palettes/plasma.jsx'
 
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));

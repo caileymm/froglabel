@@ -1,11 +1,13 @@
 import greenAudio from '../assets/green_tree.mp3';
 import peronsAudio from '../assets/perons_tree.mp3';
 import redEyedAudio from '../assets/red_eyed_tree.mp3';
+import batSoundsAudio from '../assets/batSounds.mp3'
 
 const DEMO_TASKS = [
     { id: 'demo-green', data: { audio: greenAudio }, annotations: [] },
     { id: 'demo-perons', data: { audio: peronsAudio }, annotations: [] },
     { id: 'demo-red-eyed', data: { audio: redEyedAudio }, annotations: [] },
+    { id: 'demo-bats', data: { audio: batSoundsAudio }, annotations: [] }
 ];
 
 let taskIndex = 0;
