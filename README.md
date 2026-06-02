@@ -143,7 +143,8 @@ Additionally, we also have the [adapters](https://github.com/caileymm/froglabel-
    7. <b>Connection to self hosted Label studio project</b> - done via API and the next task is fetched automatically
    8. <b>Additional Demo feature<b> - helps test and further develop project without running label studio in the background
       
-## PROJECT WORKFLOW 
+## PROJECT DEMO 
+  [link to video] - will add video once ready 
 
 ## IMPORTANT LINKS
   - [FINAL PRESENTATION](https://docs.google.com/presentation/d/1TOCNL7Rg-TOa_IB5ZToZK-hIDA3hgP1P7RpdjB0QWuo/edit?usp=sharing)
