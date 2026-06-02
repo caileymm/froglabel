@@ -1,14 +1,16 @@
 import greenAudio from '../assets/green_tree.mp3';
 import peronsAudio from '../assets/perons_tree.mp3';
 import redEyedAudio from '../assets/red_eyed_tree.mp3';
-import batSoundsAudio from '../assets/batSounds.mp3'
-
+import frquencyTestAudio from '../assets/audioFrequencyTestingSounds.mp3'; 
+import test_10k from '../assets/test_10k.mp3'; 
+ 
 const DEMO_TASKS = [
     { id: 'demo-green', data: { audio: greenAudio }, annotations: [] },
     { id: 'demo-perons', data: { audio: peronsAudio }, annotations: [] },
     { id: 'demo-red-eyed', data: { audio: redEyedAudio }, annotations: [] },
-    { id: 'demo-bats', data: { audio: batSoundsAudio }, annotations: [] }
-];
+    { id: 'demo-different-frequency-tests', data: { audio: frquencyTestAudio }, annotations: [] }, 
+    { id: 'demo-10k', data: { audio: test_10k }, annotations: [] }, 
+ ];
 
 let taskIndex = 0;
 
