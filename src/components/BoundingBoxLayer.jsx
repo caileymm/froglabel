@@ -18,7 +18,6 @@ const BoundingBoxLayer = ({
     highCutoff,
     yScale
 }) => {
-    console.log('currTool:', currTool);
     const [activeBox, setActiveBox] = useState(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [localWidth, setLocalWidth] = useState(0);

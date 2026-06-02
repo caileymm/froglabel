@@ -17,7 +17,7 @@ const PANEL_SPECTROGRAM = 3;
 
 function Tools({ theme, frogTheme }) {
     const [isTPressed, setIsTPressed] = useState(false);
-    const { setShowLeftPanel, setRightPanel, setShowDataset, currTool, setCurrTool } = usePanels();
+    const { setShowLeftPanel, setRightPanel, setShowDataset, currTool, setCurrTool, rightPanel, showLeftPanel } = usePanels();
     const currToolRef = useRef(currTool);
     useEffect(() => { currToolRef.current = currTool; }, [currTool]);
 
@@ -43,14 +43,16 @@ function Tools({ theme, frogTheme }) {
         if (tool === TOOL_DEFAULT) {
             setCurrTool(TOOL_DEFAULT);
             setRightPanel(null);
+            handleOpenCodePanel();
         } else if (tool === TOOL_CROSSHAIR) {
             setCurrTool(TOOL_CROSSHAIR);
             setShowLeftPanel(false);
-            setRightPanel(PANEL_BOX_FILE);
+            handleOpenBoxFilePanel();
+            
         } else if (tool === TOOL_SPECTRO) {
             setCurrTool(TOOL_SPECTRO);
             setShowLeftPanel(false);
-            setRightPanel(PANEL_SPECTROGRAM);
+            handleOpenSpectrogramPanel();
         } else {
             setCurrTool(null);
             setRightPanel(null);
@@ -68,6 +70,12 @@ function Tools({ theme, frogTheme }) {
     }, [applyTool]);
 
     useEffect(() => {
+    if (!rightPanel && !showLeftPanel) {
+        setCurrTool(TOOL_DEFAULT);
+    }
+    }, [rightPanel, showLeftPanel]);
+
+    useEffect(() => {
         const handleKeyDown = (e) => {
             const isInputFocused = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName);
             if (isInputFocused) return;
@@ -75,9 +83,9 @@ function Tools({ theme, frogTheme }) {
                 setIsTPressed(true);
                 handleChangeTool();
             }
-            if (e.key === '1') handleOpenCodePanel();
-            if (e.key === '2') handleOpenBoxFilePanel();
-            if (e.key === '3') handleOpenSpectrogramPanel();
+            if (e.key === '1') applyTool(TOOL_DEFAULT);
+            if (e.key === '2') applyTool(TOOL_CROSSHAIR);
+            if (e.key === '3') applyTool(TOOL_SPECTRO);
             if (e.key === '4') handleChangeToTool4();
         };
         const handleKeyUp = (e) => {

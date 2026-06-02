@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 import { usePanels } from './PanelContext';
+import generateViridis from '../color_pallettes/viridis.jsx'
+import generateMagma from '../color_pallettes/magma.jsx';
+import generateInferno from '../color_pallettes/inferno.jsx'
+import generatePlasma from '../color_pallettes/plasma.jsx'
 
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -106,13 +110,20 @@ function SpectrogramPanel({ theme }) {
     useEffect(() => { setPendingLow(lowCutoff); }, [lowCutoff]);
     useEffect(() => { setPendingHigh(highCutoff); }, [highCutoff]);
 
-    const colorScales = [
-        { name: 'roseus', gradient: 'linear-gradient(to right, #dbc642, #f36e1c, #d94f8a, #7a1b6c, #2b0a3d )', dbfs: [-120, -90, -60, -30, 0] },
-        { name: 'igray', gradient: 'linear-gradient(to right, #ffffff, #000000 ', dbfs: [-120, -90, -60, -30, 0] },
-        { name: 'gray', gradient: 'linear-gradient(to right, #000000, #ffffff)', dbfs: [-120, -90, -60, -30, 0] },
-    ];
 
-    const selected = colorScales.find(c => c.name === colorScale) || colorScales[0];
+
+    const colorScales = [
+        { name: 'roseus', gradient: 'linear-gradient(to right, #dbc642, #f36e1c, #d94f8a, #7a1b6c, #2b0a3d )', dbfs: [-120, -90, -60, -30, 0], colorMap: 'roseus' },
+        { name: 'inferno', gradient: 'linear-gradient(to right, #000004, #420a68, #932667, #dd513a, #fca50a, #fcffa4)', dbfs: [-120, -90, -60, -30, 0], colorMap: generateInferno() },
+        { name: 'igray', gradient: 'linear-gradient(to right, #ffffff, #000000 ', dbfs: [-120, -90, -60, -30, 0],  colorMap:'igray' },
+        { name: 'gray', gradient: 'linear-gradient(to right, #000000, #ffffff)', dbfs: [-120, -90, -60, -30, 0],  colorMap: 'gray' },
+        { name: 'viridis', gradient: 'linear-gradient(to right, #440154, #30678d, #35b778, #fde724)', dbfs: [-120, -90, -60, -30, 0], colorMap: generateViridis()},
+        { name: 'magma', gradient: 'linear-gradient(to right, #000004, #51127c, #b73779, #fc8961, #fbfdbf)', dbfs: [-120, -90, -60, -30, 0], colorMap: generateMagma()},
+        { name: 'plasma', gradient: 'linear-gradient(to right, #0d0887, #6a00a8, #b12a90, #e16462, #fca636, #f0f921)', dbfs: [-120, -90, -60, -30, 0], colorMap: generatePlasma() },
+    ]
+
+    const colorName = colorScales.find(c => c.name === colorScale) || colorScales[0];
+    const selected = colorName.colorMap;
     const titleClass = 'font-display text-md';
     const labelClass = 'font-display text-sm';
     const metaClass = 'font-display text-xs';
@@ -311,9 +322,9 @@ function SpectrogramPanel({ theme }) {
 
                     <div className='flex flex-col gap-0.5'>
                         <span className={labelClass} style={{ color: theme.text }}>Level scale (dBFS)</span>
-                        <div className='h-4 rounded-sm w-full' style={{ background: selected.gradient }} />
+                        <div className='h-4 rounded-sm w-full' style={{ background: colorName.gradient }} />
                         <div className='flex flex-row justify-between'>
-                            {selected.dbfs.map(val => (
+                            {colorName.dbfs.map(val => (
                                 <span key={val} className={metaClass} style={{ color: theme.text }}>{val}</span>
                             ))}
                         </div>

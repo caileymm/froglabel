@@ -10,6 +10,12 @@ import { getAudioInfo } from '../utils/audioInfo';
 import { usePanels } from './PanelContext';
 import moonCursor from '../assets/moon_cursor.png';
 
+import generateViridis from '../color_pallettes/viridis.jsx'
+import generateMagma from '../color_pallettes/magma.jsx'
+import generateInferno from "../color_pallettes/inferno.jsx";
+import generatePlasma from '../color_pallettes/plasma.jsx'
+
+
 export const wavesurferRef = { current: null };
 
 function WaveformSpectrogram({
@@ -45,7 +51,22 @@ function WaveformSpectrogram({
     const { lowCutoff, highCutoff, setHighCutoff} = usePanels();
     const { maxFreq, setMaxFreq} = usePanels();
     const { sampleRate, setSampleRate} = usePanels();
+    const viridisMap = generateViridis();
+    const magmaMap = generateMagma();
+    const infernoMap = generateInferno();
+    const plasmaMap = generatePlasma();
+
+    const COLOR_MAPS = {
+    roseus: 'roseus',
+    igray: 'igray',
+    gray: 'gray',
+    viridis: viridisMap,
+    magma: magmaMap,
+    inferno: infernoMap,
+    plasma: plasmaMap,
+    };
     
+
 
     const generateFreqLabels = (minFreq, maxFreq, numLabels = 10) => {
         return Array.from({ length: numLabels }, (_, i) => {
@@ -90,7 +111,7 @@ function WaveformSpectrogram({
                             fftSamples: FFTSamples,
                             labelsBackground: 'rgba(0, 0, 0, 0.1)',
                             useWebWorker: true,
-                            colorMap : colorScale,
+                            colorMap: COLOR_MAPS[colorScale] ?? 'gray',
                             noverlap : overlap,
                             windowFunc: windowFunction,
             })
