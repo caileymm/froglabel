@@ -5,6 +5,7 @@ import WaveSurfer from "wavesurfer.js";
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js';
 import { WAVEFORM_HEIGHT, SCALE, SPECTROGRAM_HEIGHT, FREQUENCY_MIN, FREQUENCY_MAX, FFT_SAMPLES } from "../utils/spectrogramConfig";
 import { freqToY, yToFreq } from '../utils/spectrogramScale';
+import { fetchAuthenticatedAudio } from '../api/labelStudio';
 import { getAudioInfo } from '../utils/audioInfo';
 import { usePanels } from './PanelContext';
 import moonCursor from '../assets/moon_cursor.png';
@@ -27,6 +28,7 @@ function WaveformSpectrogram({
     currTool
 }) {
     const [localSampleRate, setLocalSampleRate] = useState(null);
+    const [spectroReady, setSpectroReady] = useState(false);
     const containerRef = useRef(null);
     const [spectroTop] = useState(WAVEFORM_HEIGHT);
     const [spectroHeight] = useState(SPECTROGRAM_HEIGHT);
@@ -49,7 +51,7 @@ function WaveformSpectrogram({
         return Array.from({ length: numLabels }, (_, i) => {
             // evenly spaced Y positions from bottom (0) to top (spectroHeight)
             const y = (i / (numLabels - 1)) * spectroHeight;
-            return Math.round(yToFreq(y, Math.max(minFreq, 1), maxFreq, yScale));
+            return Math.round(yToFreq(y, minFreq, maxFreq, yScale));
         });
     };
 
@@ -59,32 +61,17 @@ function WaveformSpectrogram({
     );
 
     useEffect(() => {
-        if (!containerRef.current) return;
+        if (!containerRef.current || !selectedAudio) return;
 
         const ro = new ResizeObserver(([entry]) => {
             setViewWidth(entry.contentRect.width);
         });
         ro.observe(containerRef.current);
 
-        let ws = null;
         let cancelled = false;
-
-        // Fetch audio with auth headers and convert to blob URL
-        const fetchAudioBlob = async () => {
-          try {
-            const response = await fetch(selectedAudio, {
-              headers: {
-                Authorization: `Token ${import.meta.env.VITE_LS_TOKEN}`,
-              },
-            });
-            if (!response.ok) throw new Error(`Failed to fetch audio: ${response.status}`);
-            const blob = await response.blob();
-            return URL.createObjectURL(blob);
-          } catch (error) {
-            console.error('Error fetching audio:', error);
-            return null;
-          }
-        };
+        let ws = null;
+        let blobUrl = null;
+        setSpectroReady(false);
 
         getAudioInfo(selectedAudio).then(({ sampleRate, maxFrequency }) => {
             if (cancelled) return;
@@ -106,10 +93,10 @@ function WaveformSpectrogram({
                             colorMap : colorScale,
                             noverlap : overlap,
                             windowFunc: windowFunction,
-                            noverlap : overlap,
             })
 
-            fetchAudioBlob().then((blobUrl) => {
+            fetchAuthenticatedAudio(selectedAudio).then((url) => {
+              blobUrl = url;
               if (!blobUrl || cancelled) return;
               
               ws = WaveSurfer.create({
@@ -141,31 +128,34 @@ function WaveformSpectrogram({
                   const totalDur = ws.getDuration();
                   setDuration(totalDur);
                   setVisibleTime({ start: 0, end: totalDur });
+                  setSpectroReady(true);
               });
 
               wavesurferRef.current = ws;
+            }).catch((error) => {
+              console.error('Error fetching audio:', error);
             });
+        }).catch((error) => {
+            console.error('Error reading audio info:', error);
         });
-
-        console.log(yScale);
 
         return () => {
             cancelled = true;
             ro.disconnect();
+            if (blobUrl) URL.revokeObjectURL(blobUrl);
             if (wavesurferRef.current) {
                 wavesurferRef.current.destroy();
             }
             wavesurferRef.current = null;
+            setSpectroReady(false);
         };
-
-        
-    }, [setDuration, selectedAudio, colorScale, FFTSamples, modifyBandPass, windowFunction, overlap, yScale]);
+    }, [setDuration, selectedAudio, colorScale, FFTSamples, modifyBandPass, windowFunction, overlap, yScale, lowCutoff, highCutoff]);
 
     const cursorMap = (tool) => {
-        if (tool === 0 ) return 'auto';
-        if (tool === 1) return 'crosshair';
-        if (tool === 2) return 'auto';
+        if (tool === 1) return 'auto';
+        if (tool === 2) return 'crosshair';
         if (tool === 3) return `url(${moonCursor}), auto`;
+        return 'auto';
     };
     
     return (
@@ -183,7 +173,7 @@ function WaveformSpectrogram({
                                 key={freq}
                                 className="absolute right-1 text-right text-[12px] font-display leading-none"
                                 style={{
-                                    top: Math.min(freqToY(freq, Math.max(lowCutoff, 1), highCutoff, yScale), spectroHeight - 1),
+                                    top: Math.min(freqToY(freq, lowCutoff, highCutoff, yScale), spectroHeight - 1),
                                     transform: 'translateY(-50%)',
                                     color: 'white',
                                 }}
@@ -204,13 +194,13 @@ function WaveformSpectrogram({
                       style={{ 
                         top: spectroTop, 
                         height: spectroHeight, 
-                        pointerEvents: currTool === 0 ? 'none' : 'auto',
+                        pointerEvents: currTool === 1 ? 'none' : 'auto',
                         cursor: 'inherit'
                     }}
-                      onMouseDown={currTool === 0 ? undefined : handleSpectroMouseDown}
-                      onMouseMove={currTool === 0 ? undefined : handleSpectroMouseMove}
-                      onMouseUp={currTool === 0 ? undefined : handleSpectroMouseUp}
-                      onMouseLeave={currTool === 0 ? undefined : handleSpectroMouseUp}
+                      onMouseDown={currTool === 1 ? undefined : handleSpectroMouseDown}
+                      onMouseMove={currTool === 1 ? undefined : handleSpectroMouseMove}
+                      onMouseUp={currTool === 1 ? undefined : handleSpectroMouseUp}
+                      onMouseLeave={currTool === 1 ? undefined : handleSpectroMouseUp}
                     >
                         {/* Brightness / Contrast filter */}
                         <div
@@ -223,22 +213,24 @@ function WaveformSpectrogram({
                             }}
                         />
 
-                        <div className="w-full h-full relative" style={{ pointerEvents: currTool === 0 ? 'none' : 'auto', cursor: cursorMap(currTool) }}>
-                            <BoundingBoxLayer
-                                code={code}
-                                boxes={boxes}
-                                setBoxes={setBoxes}
-                                currSelectedBoxId={currSelectedBoxId}
-                                setCurrSelectedBoxId={setCurrSelectedBoxId}
-                                setDrawingBox={setDrawingBox}
-                                canvasWidth={viewWidth}
-                                visibleTime={visibleTime}
-                                theme={theme}
-                                currTool={currTool}
-                                lowCutoff={lowCutoff}
-                                highCutoff={highCutoff}
-                                yScale={yScale}
-                            />
+                        <div className="w-full h-full relative" style={{ pointerEvents: currTool === 1 ? 'none' : 'auto', cursor: cursorMap(currTool) }}>
+                            {spectroReady && (
+                                <BoundingBoxLayer
+                                    code={code}
+                                    boxes={boxes}
+                                    setBoxes={setBoxes}
+                                    currSelectedBoxId={currSelectedBoxId}
+                                    setCurrSelectedBoxId={setCurrSelectedBoxId}
+                                    setDrawingBox={setDrawingBox}
+                                    canvasWidth={viewWidth}
+                                    visibleTime={visibleTime}
+                                    theme={theme}
+                                    currTool={currTool}
+                                    lowCutoff={lowCutoff}
+                                    highCutoff={highCutoff}
+                                    yScale={yScale}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

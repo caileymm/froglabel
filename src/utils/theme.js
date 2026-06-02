@@ -7,27 +7,27 @@ export const defaultColors = {
     buttonsHover:          '#5b5b5e',
     buttonsText:          '#ffffff',
     buttonsPressed:      '#5b5b5e',
-    
-    audioButton:         '#3b82f6', 
+    themeToggle:         '#FFDE9E',
+
+    audioButton:         '#3b82f6',
     audioButtonHover:   '#60a5fa',
     audioButtonPressed:  '#60a5fa',
-    
-    keyButtons:          '#f4f4f5', 
-    keyText:             '#09090b', 
-    text:                '#fafafa', 
+
+    keyButtons:          '#f4f4f5',
+    keyText:             '#09090b',
+    text:                '#fafafa',
     cursor:              '#3b82f6',
     progress:            '#ffffff',
-    waveform:            '#52525b', 
+    waveform:            '#52525b',
     cream:               '#18181b',
-    
-    // Bounding Box Styles
+
     box:                 '#82A062',
     boxSelected:         '#FFFFFF',
     boxFill:             'rgba(16, 185, 129, 0.05)',
     boxFillSelected:     'rgba(52, 211, 153, 0.15)',
     boxLabel:            '#ffffff',
     boxLabelBg:          '#82A062',
-    
+
     textInput:           '#18181b',
     textInputText:       '#fafafa',
     placeholderText:     '#52525b',
@@ -42,6 +42,8 @@ export const frogThemeColors = {
     buttonsHover:          '#FFDE9E',
     buttonsText:        '#1E1E1E',
     buttonsPressed:      '#FFDE9E',
+    themeToggle:         '#FFDE9E',
+
     audioButton:         '#CAE4EF',
     audioButtonHover:  '#B4D2EF',
     audioButtonPressed:  '#B4D2EF',
@@ -60,5 +62,5 @@ export const frogThemeColors = {
     boxLabelBg:          '#C8D9A3',
     textInput: '#FFFFFF',
     textInputText: '#1E1E1E',
-     placeholderText:'#1E1E1E',
+    placeholderText:'#1E1E1E',
 };

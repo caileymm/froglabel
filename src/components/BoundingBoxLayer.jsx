@@ -62,7 +62,9 @@ const BoundingBoxLayer = ({
 
     // Frequency -> Pixels (Y-axis)
     const freqToPx = (freq) => {
-        return freqToY(freq, lowCutoff, highCutoff, yScale);
+        // Clamp frequency to visible range to prevent boxes from going above/below spectrogram
+        const clampedFreq = Math.max(lowCutoff, Math.min(highCutoff, freq));
+        return freqToY(clampedFreq, lowCutoff, highCutoff, yScale);
     };
 
     // Pixels -> Frequency (Y-axis)
@@ -79,7 +81,7 @@ const BoundingBoxLayer = ({
     });
 
     const handleMouseDown = (e) => {
-        if (currTool !== 1) return; // only draw with crosshair
+        if (currTool !== 2) return; // only draw with crosshair (tool 2)
         if (!code || code.length < 3) return;
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -231,7 +233,7 @@ const BoundingBoxLayer = ({
         <div
             ref={containerRef}
             className={`absolute inset-0 z-40 select-none }`} // ${code ? 'cursor-crosshair' : 'cursor-default'
-            style={{ cursor: currTool === 1 ? 'crosshair' : currTool === 3 ? `url(${moonCursor}), auto` : 'auto' }}
+            style={{ cursor: currTool === 2 ? 'crosshair' : currTool === 3 ? `url(${moonCursor}), auto` : 'auto' }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -251,7 +253,7 @@ const BoundingBoxLayer = ({
         top: px.top, 
         width: px.width, 
         height: px.height,
-        cursor: currTool === 1 ? 'crosshair' : currTool === 3 ? `url(${moonCursor}), auto` : 'auto',
+        cursor: currTool === 2 ? 'crosshair' : currTool === 3 ? `url(${moonCursor}), auto` : 'auto',
         borderColor: isSelected ? theme.boxSelected : theme.box,
         backgroundColor: isSelected ? theme.boxFillSelected : theme.boxFill
     }}
