@@ -20,5 +20,10 @@ Run in browser (for non-developers):
 
 ## PROJECT WORKFLOW 
 
+## IMPORTANT LINKS
+  - [FINAL PRESENTATION](https://docs.google.com/presentation/d/1TOCNL7Rg-TOa_IB5ZToZK-hIDA3hgP1P7RpdjB0QWuo/edit?usp=sharing)
+  - [FINAL VIDEO](EnterLinkHere)
+
+
 
 
