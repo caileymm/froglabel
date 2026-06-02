@@ -9,3 +9,16 @@ Run locally (for developers):
 
 Run in browser (for non-developers):
 1. https://caileymm.github.io/froglabel-studio/
+
+
+## ABSTRACT 
+
+## ACCESSING THE FILES 
+
+## RUNNING THE PROJECT 
+
+
+## PROJECT WORKFLOW 
+
+
+
