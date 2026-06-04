@@ -4,7 +4,7 @@ import { getSessionConfig, DEFAULT_LS_URL } from '../utils/sessionConfig';
 function apiConfig() {
     const config = getSessionConfig();
     const lsUrl = config?.lsUrl || DEFAULT_LS_URL;
-    const token = config?.token || import.meta.env.VITE_LS_TOKEN || '';
+    const token = config?.token || '';
     const projectId = config?.projectId || import.meta.env.VITE_LS_PROJECT_ID || '';
 
     return {

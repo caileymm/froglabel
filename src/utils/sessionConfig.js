@@ -6,7 +6,7 @@ let activeConfig = null;
 export function getDefaultFormValues() {
     return {
         demoMode: import.meta.env.VITE_DEMO_MODE === 'true',
-        token: import.meta.env.VITE_LS_TOKEN || '',
+        token: '',
         projectId: String(import.meta.env.VITE_LS_PROJECT_ID || ''),
         lsUrl: DEFAULT_LS_URL,
     };

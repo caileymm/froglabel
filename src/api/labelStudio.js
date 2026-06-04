@@ -4,7 +4,7 @@ function getLsConfig() {
   const config = getSessionConfig();
   return {
     lsUrl: config?.lsUrl || DEFAULT_LS_URL,
-    token: config?.token || import.meta.env.VITE_LS_TOKEN || "",
+    token: config?.token || "",
     projectId: config?.projectId || import.meta.env.VITE_LS_PROJECT_ID || "",
   };
 }
