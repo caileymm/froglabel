@@ -20,12 +20,23 @@ function apiConfig() {
 export const labelStudioCeAdapter = {
     async getNextTask() {
         const { base, projectId, headers } = apiConfig();
-        const response = await fetch(`${base}/projects/${projectId}/next/`, { headers });
-        if (response.status === 404 || response.status === 204) return null;
-        if (!response.ok) {
-            throw new Error(`Failed to fetch next task: ${response.status}`);
+        const url = `${base}/projects/${projectId}/next/`;
+        console.log('Fetching next task from:', url);
+        const response = await fetch(url, { headers });
+        console.log('Response status:', response.status);
+        
+        if (response.status === 404 || response.status === 204) {
+            console.log('No more tasks (status:', response.status + ')');
+            return null;
         }
-        return response.json();
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Task fetch failed:', response.status, errorText);
+            throw new Error(`Failed to fetch next task: ${response.status} - ${errorText}`);
+        }
+        const task = await response.json();
+        console.log('Task loaded:', task);
+        return task;
     },
 
     submitAnnotation(taskId, boxes) {

@@ -22,6 +22,7 @@ export function useAnnotationSession(config) {
         try {
             const task = await adapter.getNextTask();
             if (!task || !task.data) {
+                console.warn('No task returned or task has no data:', task);
                 setCurrentTask(null);
                 setSelectedAudio(null);
                 setBoxes([]);
