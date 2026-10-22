@@ -2,7 +2,7 @@ import './App.css'
 import { usePanels } from './components/PanelContext';
 import Header from './components/Header'
 import BoundingBoxControls from './components/BoundingBoxControls'
-import WaveformSpectrogram from './components/WaveformSpectrogram'
+import WaveformSpectrogram, { wavesurferRef } from './components/WaveformSpectrogram'
 import SpectrogramControls from './components/SpectrogramControls'
 import Tools from './components/Tools'
 import CodesPanel from './components/CodesPanel'
@@ -51,8 +51,10 @@ function AppContent({ config, onLogout }) {
 
   const [currSelectedBoxId, setCurrSelectedBoxId] = useState(null);
   const currSelectedIndex = boxes.findIndex(b => b.id === currSelectedBoxId);
+  const selectedBox = boxes.find(box => box.id === currSelectedBoxId) ?? null;
 
   const [zoomX, setZoomX] = useState(1);
+  const [speed, setSpeed] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const { showLeftPanel, setShowLeftPanel, rightPanel, setRightPanel, showDataset, setShowDataset } = usePanels();
@@ -61,13 +63,24 @@ function AppContent({ config, onLogout }) {
   const [containerWidth, setContainerWidth] = useState(0);
   const [drawingBox, setDrawingBox] = useState(null);
 
-  const wavesurferRef = useRef(null);
-
   const togglePlayPause = useCallback(() => {
     const ws = wavesurferRef.current;
     if (!ws) return;
     ws.playPause();
   }, []);
+
+  const handleSpeedChange = useCallback((rate) => {
+    setSpeed(rate);
+    wavesurferRef.current?.setPlaybackRate(rate);
+  }, []);
+
+  const handlePlayBoxAudio = useCallback(() => {
+    const ws = wavesurferRef.current;
+    if (!ws || !selectedBox) return;
+    ws.setPlaybackRate(speed);
+    ws.play(selectedBox.startTime, selectedBox.endTime)
+      .catch(error => console.error('Error playing box audio:', error));
+  }, [selectedBox, speed]);
 
   const [visibleTime, setVisibleTime] = useState({ start: 0, end: duration });
 
@@ -161,6 +174,10 @@ function AppContent({ config, onLogout }) {
               setVisibleTime={setVisibleTime}
               theme={theme}
               setDrawingBox={setDrawingBox}
+              selectedBox={selectedBox}
+              speed={speed}
+              onSpeedChange={handleSpeedChange}
+              onPlayBoxAudio={handlePlayBoxAudio}
             />
             <BoundingBoxControls
               code={code}
@@ -170,6 +187,7 @@ function AppContent({ config, onLogout }) {
               setBoxes={setBoxes}
               currSelectedBoxId={currSelectedBoxId}
               setCurrSelectedBoxId={setCurrSelectedBoxId}
+              onPlayBoxAudio={handlePlayBoxAudio}
               isPlaying={isPlaying}
               togglePlayPause={togglePlayPause}
               setCurrTool={setCurrTool}

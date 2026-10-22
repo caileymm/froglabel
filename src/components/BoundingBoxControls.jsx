@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSelectedBoxId, setCurrSelectedBoxId, setCurrTool, theme }) {
+function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSelectedBoxId, setCurrSelectedBoxId, onPlayBoxAudio, setCurrTool, theme }) {
   const inputRef = useRef(null);
   const [isError, setIsError] = useState(false);
   
@@ -8,7 +8,7 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
   const [isTabPressed, setIsTabPressed] = useState(false);
   const [isShiftVPressed, setIsShiftVPressed] = useState(false);
   const [isShiftDPressed, setIsShiftDPressed] = useState(false);
-  const [isEscPressed, setIsEscPressed] = useState(false);
+  const [isShiftSPressed, setIsShiftSPressed] = useState(false);
 
   const handleSetCode = () => {
       setCode('');
@@ -45,8 +45,6 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
     setCurrSelectedBoxId(boxes[nextIndex].id);
   };
 
-  const handlePlayBoxAudio = () => console.log("Play Box Audio");
-
   const handleDeleteBox = () => {
     if (currSelectedBoxId !== -1) {
       setBoxes((prev) => prev.filter((box) => box.id !== currSelectedBoxId));
@@ -56,9 +54,9 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
 
   const handleDeselectBox = () => setCurrSelectedBoxId(-1);
 
-  const actionsRef = useRef({ handleSetCode, handleSelectBox, handlePlayBoxAudio, handleDeleteBox, handleDeselectBox });
+  const actionsRef = useRef({ handleSetCode, handleSelectBox, handlePlayBoxAudio: onPlayBoxAudio, handleDeleteBox, handleDeselectBox });
   useEffect(() => {
-    actionsRef.current = { handleSetCode, handleSelectBox, handlePlayBoxAudio, handleDeleteBox, handleDeselectBox };
+    actionsRef.current = { handleSetCode, handleSelectBox, handlePlayBoxAudio: onPlayBoxAudio, handleDeleteBox, handleDeselectBox };
   });
 
   useEffect(() => {
@@ -75,14 +73,14 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
       if (e.key === 'Tab') { e.preventDefault(); setIsTabPressed(true); actionsRef.current.handleSelectBox(); }
       if (e.shiftKey && e.key.toUpperCase() === 'V') { e.preventDefault(); setIsShiftVPressed(true); actionsRef.current.handlePlayBoxAudio(); }
       if (e.shiftKey && e.key.toUpperCase() === 'D') { e.preventDefault(); setIsShiftDPressed(true); actionsRef.current.handleDeleteBox(); }
-      if (e.key === 'Escape') { setIsEscPressed(true); actionsRef.current.handleDeselectBox(); }
+      if (e.shiftKey && e.key.toUpperCase() === 'S') { e.preventDefault(); setIsShiftSPressed(true); actionsRef.current.handleDeselectBox(); }
     };
     const handleKeyUp = (e) => {
       if (e.key === ' ') setIsSpacePressed(false);
       if (e.key === 'Tab') setIsTabPressed(false);
       if (e.key === 'Shift' || e.key.toUpperCase() === 'V') setIsShiftVPressed(false);
       if (e.key === 'Shift' || e.key.toUpperCase() === 'D') setIsShiftDPressed(false);
-      if (e.key === 'Escape') setIsEscPressed(false);
+      if (e.key === 'Shift' || e.key.toUpperCase() === 'S') setIsShiftSPressed(false);
     };
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
@@ -108,7 +106,10 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
           ref={inputRef}
           value={code}
           onChange={handleCodeInput}
-          onKeyDown={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+            if (e.key === 'Escape') e.currentTarget.blur();
+          }}
           placeholder='Code'
           maxLength={3}
           className={`w-15 px-2 py-1.5 text-xs rounded-md font-display uppercase placeholder:normal-case
@@ -140,16 +141,15 @@ function BoundingBoxControls({ code, setCode, codesDict, boxes, setBoxes, currSe
           onMouseLeave={(e) => !isShiftDPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
           className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Delete Box
-          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift</div>
-          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>D</div>
+          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift+D</div>
         </button>
         <button onClick={handleDeselectBox}
-          style={{ backgroundColor: isEscPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
-          onMouseEnter={(e) => !isEscPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
-          onMouseLeave={(e) => !isEscPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
+          style={{ backgroundColor: isShiftSPressed ? theme.buttonsPressed : theme.buttons, color: theme.buttonsText }}
+          onMouseEnter={(e) => !isShiftSPressed && (e.currentTarget.style.backgroundColor = theme.buttonsHover)}
+          onMouseLeave={(e) => !isShiftSPressed && (e.currentTarget.style.backgroundColor = theme.buttons)}
           className='px-2 py-1.5 text-xs rounded-md font-display whitespace-nowrap cursor-pointer flex items-center gap-1'>
           Deselect Box
-          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Esc</div>
+          <div style={{ backgroundColor: theme.keyButtons, color: theme.keyText }} className='text-xs font-display px-2 rounded-md'>Shift+S</div>
         </button>
       </div>
     </div>
