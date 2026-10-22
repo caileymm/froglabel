@@ -100,6 +100,7 @@ Additionally, we also have the [adapters](https://github.com/caileymm/froglabel-
 
 
 ## RUNNING THE PROJECT 
+  Ensure you have git and Node.js downloaded beforehand.
   ### Run locally (for developers):
   1. Open Terminal window 1, run:
       ```bash
