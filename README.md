@@ -118,6 +118,7 @@ Additionally, we also have the [adapters](https://github.com/caileymm/froglabel-
   5. Navigate to your Personal Access Token on Label-Studio.
   6. Copy the Access Token.
   7. Paste the Access Token and task number into the login page on the local web page.
+  8. The access token and project ID are kept in memory only. They are not saved in browser storage and must be entered again after a page reload.
 
   ### Demo Mode Access (for developers):
   1. Open Terminal window 1, run:
@@ -149,7 +150,6 @@ Additionally, we also have the [adapters](https://github.com/caileymm/froglabel-
   - [FINAL PRESENTATION](https://docs.google.com/presentation/d/1TOCNL7Rg-TOa_IB5ZToZK-hIDA3hgP1P7RpdjB0QWuo/edit?usp=sharing)
   - [FINAL VIDEO](https://drive.google.com/file/d/1pu6PP8UIsiFl7K6Xt0NvXc5laxh9SYaq/view?usp=drive_link)
   - [INSTRUCTIONS TO USE THE FRONT END](here)
-
 
 
 

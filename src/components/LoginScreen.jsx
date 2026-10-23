@@ -41,7 +41,7 @@ function LoginScreen({ defaultFormValues, onLogin }) {
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} autoComplete="off" className="space-y-5">
                     <label
                         className="flex items-center justify-between gap-3 cursor-pointer"
                         style={{ color: theme.text }}
@@ -81,7 +81,7 @@ function LoginScreen({ defaultFormValues, onLogin }) {
                                     value={token}
                                     onChange={(e) => setToken(e.target.value)}
                                     placeholder="Label Studio API token"
-                                    autoComplete="off"
+                                    autoComplete="new-password"
                                     onKeyDown={(e) => e.stopPropagation()}
                                     className='w-full px-2 py-1.5 text-sm rounded-md font-display'
                                     style={{ backgroundColor: theme.textInput, color: theme.textInputText }}
@@ -100,6 +100,7 @@ function LoginScreen({ defaultFormValues, onLogin }) {
                                     id="projectId"
                                     type="text"
                                     inputMode="numeric"
+                                    autoComplete="off"
                                     value={projectId}
                                     onChange={(e) => setProjectId(e.target.value)}
                                     placeholder="ID via Label Studio project URL"

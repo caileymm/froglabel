@@ -1,7 +1,9 @@
-const STORAGE_KEY = 'froglabel-session';
+const LEGACY_STORAGE_KEY = 'froglabel-session';
 export const DEFAULT_LS_URL = import.meta.env.VITE_LS_URL || 'http://localhost:8080';
 
 let activeConfig = null;
+
+clearLegacyStoredConfig();
 
 export function getDefaultFormValues() {
     return {
@@ -28,9 +30,13 @@ export function setSessionConfig(config) {
 
 export function clearSessionConfig() {
     activeConfig = null;
-    clearStoredConfig(); // cleans up anything previously saved
+    clearLegacyStoredConfig();
 }
 
-function clearStoredConfig() {
-    localStorage.removeItem(STORAGE_KEY);
+function clearLegacyStoredConfig() {
+    try {
+        localStorage.removeItem(LEGACY_STORAGE_KEY);
+    } catch (error) {
+        console.error('Unable to clear legacy saved session settings from browser storage.', error);
+    }
 }
